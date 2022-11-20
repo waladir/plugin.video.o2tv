@@ -1,0 +1,43 @@
+﻿<addon id="plugin.video.o2tv" name="O2TV" provider-name="waladir" version="1.0.0">
+  <requires>
+    <import addon="xbmc.python" version="3.0.0"/>
+    <import addon="inputstream.adaptive" version="19.0.0"/>
+  </requires>
+  <extension library="main.py" point="xbmc.python.pluginsource">
+    <provides>video</provides>
+  </extension>
+  <extension library="service.py" point="xbmc.service"/>
+  <extension point="kodi.context.item">
+    <menu id="kodi.core.main">
+      <item library="iptvsc_rec.py">
+          <label>Nahrát v O2TV</label>
+          <visible>
+            Window.IsActive(10702)
+          </visible>
+      </item> 
+    </menu>         
+  </extension>  
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en_GB">Doplněk pouze pro O2TV 2.0</summary>
+    <summary lang="cs_CZ">Doplněk pouze pro O2TV 2.0</summary>
+    <description lang="en_GB">
+Živé vysílání, archiv, nahrávky, vytváření playlistu a EPG pro IPTV Simple Clienta
+
+Další informace a podporu najdete na fóru www.xbmc-kodi.cz (https://www.xbmc-kodi.cz/prispevek-o2tv)
+    </description>
+    <description lang="cs_CZ">
+Živé vysílání, archiv, nahrávky, vytváření playlistu a EPG pro IPTV Simple Clienta
+
+Další informace a podporu najdete na fóru www.xbmc-kodi.cz (https://www.xbmc-kodi.cz/prispevek-o2tv)
+    </description>
+    <platform>all</platform>
+    <source>https://github.com/waladir/plugin.video.o2tv</source>
+    <news>
+v1.0.0 (20.11.2022)
+- první verze doplňku
+    </news>
+    <assets>
+        <icon>icon.png</icon>
+    </assets>
+  </extension>
+</addon>
