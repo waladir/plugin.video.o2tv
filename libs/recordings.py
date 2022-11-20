@@ -35,6 +35,7 @@ def list_recordings(label):
     if 'err' in data or not 'result' in data or not 'objectType' in data['result'] or data['result']['objectType'] != 'KalturaAssetListResponse':
         xbmcgui.Dialog().notification('O2TV','Problém při stažení EPG', xbmcgui.NOTIFICATION_ERROR, 5000)
         sys.exit() 
+    print(data['result'])
     if 'objects' in data['result']:
         for item in data['result']['objects']:
             recording_ids.update({item['id'] : item['recordingId']})

@@ -21,7 +21,7 @@ def list_live(label):
     for num in sorted(channels_list.keys()):
         if channels_list[num]['id'] in epg:
             epg_item = epg[channels_list[num]['id']]
-            list_item = xbmcgui.ListItem(label = encode(channels_list[num]['name']) + ' | [COLOR dimgray]' + encode(epg_item['title'] + ' | ' + datetime.fromtimestamp(epg_item['startts']).strftime('%H:%M') + ' - ' + datetime.fromtimestamp(epg_item['endts']).strftime('%H:%M') + '[/COLOR]'))
+            list_item = xbmcgui.ListItem(label = encode(channels_list[num]['name']) + ' | ' + encode(epg_item['title'] + ' | ' + datetime.fromtimestamp(epg_item['startts']).strftime('%H:%M') + ' - ' + datetime.fromtimestamp(epg_item['endts']).strftime('%H:%M')))
             list_item = epg_listitem(list_item = list_item, epg = epg_item, logo = channels_list[num]['logo'])
         else:
             list_item = xbmcgui.ListItem(label = encode(channels_list[num]['name']))

@@ -28,7 +28,6 @@ def epg_api(post, key):
     if 'objects' in data['result']:
         for item in data['result']['objects']:
             if item['objectType'] == 'KalturaProgramAsset' or item['objectType'] == 'KalturaRecordingAsset':
-                print({item['name'] : item['images']})
                 id = item['id']
                 channel_id = item['linearAssetId']
                 title = item['name']

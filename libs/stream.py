@@ -42,7 +42,7 @@ def play_archive(id):
 
 def play_recording(id):
     session = Session()
-    post = {"1":{"service":"asset","action":"get","id":id,"assetReferenceType":"npvr","ks":session.ks},"2":{"service":"asset","action":"getPlaybackContext","assetId":id,"assetType":"recording","contextDataParams":{"objectType":"KalturaPlaybackContextOptions","context":"PLAYBACK","streamerType":"mpegdash","urlType":"DIRECT"},"ks":session.ks},"apiVersion":"7.8.1","ks":"djJ8MzIwMXwfL4dq7dGdAjIGcffiB5xF3EJa-owKpoaAkSaoEXZEKA0zeK1OIUYS9wKW1bAfiYiAA3NR4iK0djikEiPi1vHAIOBMG6qK0nvo_3bTjnl4lGRx-6TI-HHPybgwbp3rZ9LY-UF_qg8nHFHu9jbIHPLKZ_64-bj9JYYAUrECTCBfHac8ZN4VvBSvb9_qZdl7VsuCeUrTufWFLGbTLsZzzAXeKeB--iuVbQiTVvYCmIjFsL2irzZC1GcSJm2QXlYYKmpf5X6nhS0ofG9yQ5Q_62QZSNCjuUEpoul8Cj7E2YQPX8lBon6b18N11SzPGfrjulVDVZLb59StJN9vFuD3mgPq3mZKpHYjRyNnv1Q8OpPd8XrliQHNT3jTv09t3ExQ5XwUimcwJvk7IpD5zpKlIHrO","partnerId":3201}
+    post = {"1":{"service":"asset","action":"get","id":id,"assetReferenceType":"npvr","ks":session.ks},"2":{"service":"asset","action":"getPlaybackContext","assetId":id,"assetType":"recording","contextDataParams":{"objectType":"KalturaPlaybackContextOptions","context":"PLAYBACK","streamerType":"mpegdash","urlType":"DIRECT"},"ks":session.ks},"apiVersion":"7.8.1","ks":session.ks,"partnerId":3201}
     play_stream(post)
 
 def play_stream(post):
@@ -52,15 +52,21 @@ def play_stream(post):
         xbmcgui.Dialog().notification('O2TV','Problém při přihrání', xbmcgui.NOTIFICATION_ERROR, 5000)
     else:
         if len(data['result'][1]['sources']) > 0:
-            url = data['result'][1]['sources'][1]['url']
-            list_item = xbmcgui.ListItem(path = url)
-            list_item.setProperty('inputstreamaddon', 'inputstream.adaptive')
-            list_item.setProperty('inputstream', 'inputstream.adaptive')
-            list_item.setProperty('inputstream.adaptive.manifest_type', 'mpd')
-            list_item.setMimeType('application/dash+xml')
-            list_item.setContentLookup(False)       
-            xbmcplugin.setResolvedUrl(_handle, True, list_item)
+            urls = {}
+            for stream in data['result'][1]['sources']:
+                urls.update({stream['type'] : stream['url']})
+            if 'DASH' in urls:
+                url = urls['DASH']
+                list_item = xbmcgui.ListItem(path = url)
+                list_item.setProperty('inputstreamaddon', 'inputstream.adaptive')
+                list_item.setProperty('inputstream', 'inputstream.adaptive')
+                list_item.setProperty('inputstream.adaptive.manifest_type', 'mpd')
+                list_item.setMimeType('application/dash+xml')
+                list_item.setContentLookup(False)       
+                xbmcplugin.setResolvedUrl(_handle, True, list_item)
+            else:
+                xbmcgui.Dialog().notification('O2TV','Problém při přehrání', xbmcgui.NOTIFICATION_ERROR, 5000)
         elif 'messages' in data['result'][1] and len(data['result'][1]['messages']) > 0 and data['result'][1]['messages'][0]['code'] == 'ConcurrencyLimitation' :
             xbmcgui.Dialog().notification('O2TV','Překročený limit přehrávání', xbmcgui.NOTIFICATION_ERROR, 5000)
         else:
-            xbmcgui.Dialog().notification('O2TV','Problém při přihrání', xbmcgui.NOTIFICATION_ERROR, 5000)
+            xbmcgui.Dialog().notification('O2TV','Problém při přehrání', xbmcgui.NOTIFICATION_ERROR, 5000)

@@ -1,3 +1,7 @@
+v1.0.1 (20.11.2022)
+- oprava a úprava získání URL streamu
+- úprava barvy u živého vysílání
+
 v1.0.0 (20.11.2022)
 - první verze doplňku
 
