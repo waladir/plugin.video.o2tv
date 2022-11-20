@@ -20,7 +20,6 @@
 	</category>    
     <category label="Logování">
                 <setting label="Logování požadavků - URL" type="bool" id="log_request_url" default="false"/>
-                <setting label="Logování požadavků - data (logují se i citlivá data!)" type="bool" id="log_request_data" default="false"/>
                 <setting label="Logování odpovědí" type="bool" id="log_response" default="false"/>
 	</category>
 </settings>
