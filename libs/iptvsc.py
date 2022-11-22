@@ -91,7 +91,6 @@ def generate_epg(output_file = ''):
             return
         output_dir = addon.getSetting('output_dir') 
         try:
-
             if len(output_file) > 0:
                 file = xbmcvfs.File(output_file, 'w')
             else:
@@ -120,7 +119,9 @@ def generate_epg(output_file = ''):
                     id = channels_list[number]['id']
                     cnt = 0
                     content = ''
-                    epg = get_channel_epg(id, today_start_ts, today_end_ts + 60*60*24*7)
+                    epg1 = get_channel_epg(id, today_start_ts - 60*60*24*7, today_end_ts - 60*60*24)
+                    epg2 = get_channel_epg(id, today_start_ts, today_end_ts + 60*60*24*7)
+                    epg = {**epg1,**epg2}
                     for ts in sorted(epg.keys()):
                         epg_item = epg[ts]
                         starttime = datetime.fromtimestamp(epg_item['startts']).strftime('%Y%m%d%H%M%S')

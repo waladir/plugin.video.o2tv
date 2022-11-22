@@ -1,3 +1,6 @@
+v1.0.2 (22.11.2022)
+- úprava generovaní EPG pro IPTV Simple Clienta
+
 v1.0.1 (20.11.2022)
 - oprava a úprava získání URL streamu
 - úprava barvy u živého vysílání

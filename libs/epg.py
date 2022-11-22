@@ -15,7 +15,7 @@ def get_live_epg():
 
 def get_channel_epg(id, from_ts, to_ts):
     session = Session()
-    post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaSearchAssetFilter","orderBy":"START_DATE_ASC","kSql":"(and linear_media_id:'" + str(id) + "' start_date >= '" + str(from_ts) + "' end_date  <= '" + str(to_ts) + "' asset_type='epg' auto_fill= true)"},"pager":{"objectType":"KalturaFilterPager","pageSize":2000,"pageIndex":1},"clientTag":"1.16.1-PC","apiVersion":"5.4.0"}
+    post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaSearchAssetFilter","orderBy":"START_DATE_ASC","kSql":"(and linear_media_id:'" + str(id) + "' start_date >= '" + str(from_ts) + "' end_date  <= '" + str(to_ts) + "' asset_type='epg' auto_fill= true)"},"pager":{"objectType":"KalturaFilterPager","pageSize":500,"pageIndex":1},"clientTag":"1.16.1-PC","apiVersion":"5.4.0"}
     return epg_api(post = post, key = 'startts')
 
 def epg_api(post, key):
