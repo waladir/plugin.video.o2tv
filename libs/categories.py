@@ -101,7 +101,7 @@ def list_category(id, series, label):
                         list_item.setArt({'thumb': epg[key]['cover'], 'icon': epg[key]['cover']})
                 else:
                     list_item.setArt({'thumb': channels_list[epg[key]['channel_id']]['logo'], 'icon': channels_list[epg[key]['channel_id']]['logo']})    
-                xbmcplugin.addDirectoryIte(_handle, url, list_item, True)
+                xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
             else:
                 list_item = epg_listitem(list_item = list_item, epg = epg[key], logo = '')
                 list_item.setProperty('IsPlayable', 'true')
