@@ -9,8 +9,9 @@ from datetime import datetime
 import time
 
 from libs.channels import Channels
+from libs.channels import Session
 from libs.utils import plugin_id, decode
-from libs.epg import get_channel_epg
+from libs.epg import get_channel_epg, epg_api
 from libs.recordings import add_recording
 tz_offset = int((time.mktime(datetime.now().timetuple())-time.mktime(datetime.utcnow().timetuple()))/3600)
 
@@ -85,6 +86,8 @@ def generate_epg(output_file = ''):
     addon = xbmcaddon.Addon()
     channels = Channels()
     channels_list = channels.get_channels_list('channel_number', visible_filter = False)
+    channels_list_by_id = channels.get_channels_list('id', visible_filter = False)
+
     if len(channels_list) > 0:
         if save_file_test() == 0:
             xbmcgui.Dialog().notification('O2TV', 'Chyba při uložení EPG', xbmcgui.NOTIFICATION_ERROR, 5000)
@@ -111,22 +114,24 @@ def generate_epg(output_file = ''):
                     content = content + '            <icon src="' + logo + '" />\n'
                     content = content + '    </channel>\n'
                 file.write(bytearray((content).encode('utf-8')))
-
                 today_date = datetime.today() 
                 today_start_ts = int(time.mktime(datetime(today_date.year, today_date.month, today_date.day) .timetuple()))
                 today_end_ts = today_start_ts + 60*60*24 - 1
+                session = Session()
+                channels_ids = []
                 for number in sorted(channels_list.keys()):
-                    id = channels_list[number]['id']
+                    channels_ids.append("linear_media_id:'" + str(channels_list[number]['id']) + "'")
+                for i in range(0, len(channels_ids), 10):
+                    channels_query = ' '.join(channels_ids[i:i+10])
                     cnt = 0
                     content = ''
-                    epg1 = get_channel_epg(id, today_start_ts - 60*60*24*7, today_end_ts - 60*60*24)
-                    epg2 = get_channel_epg(id, today_start_ts, today_end_ts + 60*60*24*7)
-                    epg = {**epg1,**epg2}
+                    post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaSearchAssetFilter","orderBy":"START_DATE_ASC","kSql":"(and (or " + channels_query + ") start_date >= '" + str(today_start_ts - 60*60*24*7) + "' end_date  <= '" + str(today_end_ts + 60*60*24*7) + "' asset_type='epg' auto_fill= true)"},"pager":{"objectType":"KalturaFilterPager","pageSize":500,"pageIndex":1},"clientTag":"1.16.1-PC","apiVersion":"5.4.0"}
+                    epg =  epg_api(post = post, key = 'startts_channel_number')
                     for ts in sorted(epg.keys()):
                         epg_item = epg[ts]
                         starttime = datetime.fromtimestamp(epg_item['startts']).strftime('%Y%m%d%H%M%S')
                         endtime = datetime.fromtimestamp(epg_item['endts']).strftime('%Y%m%d%H%M%S')
-                        content = content + '    <programme start="' + starttime + ' +0' + str(tz_offset) + '00" stop="' + endtime + ' +0' + str(tz_offset) + '00" channel="' + channels_list[number]['name'] + '">\n'
+                        content = content + '    <programme start="' + starttime + ' +0' + str(tz_offset) + '00" stop="' + endtime + ' +0' + str(tz_offset) + '00" channel="' + channels_list_by_id[epg_item['channel_id']]['name'] + '">\n'
                         content = content + '       <title lang="cs">' + epg_item['title'].replace('&','&amp;').replace('<','&lt;').replace('>','&gt;') + '</title>\n'
                         if epg_item['original'] != None and len(epg_item['original']) > 0:
                             content = content + '       <title>' + epg_item['original'].replace('&','&amp;').replace('<','&lt;').replace('<','&gt;') + '</title>\n'
@@ -164,7 +169,7 @@ def generate_epg(output_file = ''):
                 xbmcgui.Dialog().notification('O2TV', 'EPG bylo uložené', xbmcgui.NOTIFICATION_INFO, 5000)    
         except Exception:
             file.close()
-            xbmcgui.Dialog().notification('O2TV', 'Nemohu zapsat do ' + output_dir + 'o2_epg.xml' + '!', xbmcgui.NOTIFICATION_ERROR, 5000)
+            xbmcgui.Dialog().notification('O2TV', 'Chyba při generování EPG!', xbmcgui.NOTIFICATION_ERROR, 5000)
             sys.exit()
     else:
         xbmcgui.Dialog().notification('O2TV', 'Nevrácena žádná data!', xbmcgui.NOTIFICATION_ERROR, 5000)

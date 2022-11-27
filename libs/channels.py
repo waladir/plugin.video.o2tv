@@ -22,7 +22,7 @@ import time
 from datetime import datetime
 
 from libs.settings import Settings
-from libs.o2tv import O2API
+from libs.o2tv import o2tv_list_api
 from libs.session import Session
 from libs.utils import get_url, encode, decode, plugin_id
 
@@ -299,11 +299,10 @@ class Channels:
 
     def get_channels(self):
         channels = {}
-        o2api = O2API()
         session = Session()
         post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaChannelFilter","kSql":"(and asset_type=607)","idEqual":355960},"pager":{"objectType":"KalturaFilterPager","pageSize":300,"pageIndex":1},"clientTag":"1.16.1-PC","apiVersion":"5.4.0"}
-        data = o2api.call_o2_api(url = 'https://3201.frp1.ott.kaltura.com/api_v3/service/asset/action/list?format=1&clientTag=1.16.1-PC', data = post, headers = o2api.headers)
-        for channel in data['result']['objects']:
+        result = o2tv_list_api(post = post)
+        for channel in result:
             if 'ChannelNumber' in channel['metas']:
                 if len(channel['images']) > 1:
                     image = channel['images'][0]['url'] + '/height/320/width/480'
@@ -325,7 +324,7 @@ class Channels:
             else:
                 self.channels = {}
                 self.valid_to = -1
-            if not self.valid_to or self.valid_to -1 or self.valid_to < int(time.time()):
+            if not self.valid_to or self.valid_to == -1 or self.valid_to < int(time.time()):
                 self.valid_to = -1
                 self.merge_channels()
                 self.save_channels()

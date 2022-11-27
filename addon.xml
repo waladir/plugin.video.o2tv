@@ -1,4 +1,4 @@
-﻿<addon id="plugin.video.o2tv" name="O2TV" provider-name="waladir" version="1.0.2">
+﻿<addon id="plugin.video.o2tv" name="O2TV" provider-name="waladir" version="1.1.0">
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
     <import addon="inputstream.adaptive" version="19.0.0"/>
@@ -18,14 +18,16 @@
     </menu>         
   </extension>  
   <extension point="xbmc.addon.metadata">
-    <summary lang="en_GB">Doplněk pouze pro O2TV 2.0</summary>
-    <summary lang="cs_CZ">Doplněk pouze pro O2TV 2.0</summary>
+    <summary lang="en_GB">O2TV</summary>
+    <summary lang="cs_CZ">O2TV</summary>
     <description lang="en_GB">
+[B]Doplněk pouze pro O2TV 2.0[/B]
 Živé vysílání, archiv, nahrávky, vytváření playlistu a EPG pro IPTV Simple Clienta
 
 Další informace a podporu najdete na fóru www.xbmc-kodi.cz (https://www.xbmc-kodi.cz/prispevek-o2tv)
     </description>
     <description lang="cs_CZ">
+[B]Doplněk pouze pro O2TV 2.0[/B]
 Živé vysílání, archiv, nahrávky, vytváření playlistu a EPG pro IPTV Simple Clienta
 
 Další informace a podporu najdete na fóru www.xbmc-kodi.cz (https://www.xbmc-kodi.cz/prispevek-o2tv)
@@ -33,6 +35,14 @@ Další informace a podporu najdete na fóru www.xbmc-kodi.cz (https://www.xbmc-
     <platform>all</platform>
     <source>https://github.com/waladir/plugin.video.o2tv</source>
     <news>
+v1.0.3 (27.11.2022)
+- oprava přehrávání nahrávek
+- přidané zpracování stránkování u API
+- u archivu se pořad přehrává jako nahrávka s posunutým časem konce
+- optimalizace stahování EPG pro IPTV Simple Clienta
+- přidání kategorií
+- drobné bugfixy a optimalizace
+
 v1.0.2 (22.11.2022)
 - úprava generovaní EPG pro IPTV Simple Clienta
 

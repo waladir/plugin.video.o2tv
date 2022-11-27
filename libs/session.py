@@ -61,7 +61,6 @@ class Session:
         data = o2api.call_o2_api(url = 'https://login-a-moje.o2.cz/cas-external/v1/login', data = post, headers = o2api.headers)
         if 'err' in data or not 'jwt' in data or not 'refresh_token' in data:
             xbmcgui.Dialog().ok('O2TV', 'Doplněk je určený pouze pro O2TV 2.0.\n\nPro původní O2TV použijte doplněk Sledování O2TV ze stejného repozitáře.')
-            # xbmcgui.Dialog().notification('O2TV','Problém při přihlášení', xbmcgui.NOTIFICATION_ERROR, 5000)
             sys.exit() 
         jwt_token = data['jwt']
         

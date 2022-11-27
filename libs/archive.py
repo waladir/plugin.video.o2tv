@@ -64,6 +64,6 @@ def list_program(id, day_min, label):
             list_item.addContextMenuItems(menus)       
             list_item.setProperty('IsPlayable', 'true')
             list_item.setContentLookup(False)          
-            url = get_url(action='play_archive', id = epg[key]['id'], start = epg[key]['startts'], end = epg[key]['endts'])
+            url = get_url(action='play_archive', id = epg[key]['id'], channel_id = epg[key]['channel_id'], startts = epg[key]['startts']-1, endts = epg[key]['endts'])
             xbmcplugin.addDirectoryItem(_handle, url, list_item, False)
     xbmcplugin.endOfDirectory(_handle, cacheToDisc = False)

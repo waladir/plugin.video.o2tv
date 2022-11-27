@@ -19,7 +19,7 @@ from datetime import datetime
 
 from libs.utils import PY3, get_url, plugin_id, day_translation_short, decode
 from libs.session import Session
-from libs.o2tv import O2API
+from libs.o2tv import o2tv_list_api
 from libs.channels import Channels
 from libs.epg import epg_listitem, epg_api
 
@@ -55,24 +55,19 @@ def program_search(query, label):
         else:
             save_search_history(query)
     session = Session()
-    o2api = O2API()
     channels = Channels()
     channels_list = channels.get_channels_list(visible_filter = True)
     post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaChannelFilter","orderBy":"NAME_ASC","kSql":"(and name^'" + query +  "')","idEqual":355960},"pager":{"objectType":"KalturaFilterPager","pageSize":500,"pageIndex":1},"clientTag":"1.16.1-PC","apiVersion":"5.4.0"}
-    data = o2api.call_o2_api(url = 'https://3201.frp1.ott.kaltura.com/api_v3/service/asset/action/list?format=1&clientTag=1.16.1-PC', data = post, headers = o2api.headers)
-    if 'err' in data or not 'result' in data or not 'objectType' in data['result'] or data['result']['objectType'] != 'KalturaAssetListResponse':
-        xbmcgui.Dialog().notification('O2TV','Problém při stažení EPG', xbmcgui.NOTIFICATION_ERROR, 5000)
-        sys.exit() 
-    if 'objects' in data['result'] and len(data['result']['objects']) > 0:
-        epg = epg_api(post = post, key = 'id')
-        for item in data['result']['objects']:
-            if item['objectType'] == 'KalturaProgramAsset' and item['linearAssetId'] in channels_list:                
-                list_item = xbmcgui.ListItem(label = item['name'] + ' (' + channels_list[item['linearAssetId']]['name'] + ' | ' + decode(day_translation_short[datetime.fromtimestamp(item['startDate']).strftime('%w')]) + ' ' + datetime.fromtimestamp(item['startDate']).strftime('%d.%m %H:%M') + ' - ' + datetime.fromtimestamp(item['endDate']).strftime('%H:%M') + ')')
-                list_item = epg_listitem(list_item = list_item, epg = epg[item['id']], logo = channels_list[item['linearAssetId']]['logo'])
+    epg = epg_api(post = post, key = 'startts_channel_number')
+    if len(epg) > 0:
+        for key in sorted(epg.keys(), reverse = True):
+            if epg[key]['channel_id'] in channels_list:                
+                list_item = xbmcgui.ListItem(label = epg[key]['title'] + ' (' + channels_list[epg[key]['channel_id']]['name'] + ' | ' + decode(day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')]) + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ')')
+                list_item = epg_listitem(list_item = list_item, epg = epg[key], logo = channels_list[epg[key]['channel_id']]['logo'])
                 list_item.setProperty('IsPlayable', 'true')
                 list_item.setContentLookup(False)          
-                url = get_url(action='play_archive', id = item['id'], start = item['startDate'], end = item['endDate'])
-                menus = [('Přidat nahrávku', 'RunPlugin(plugin://' + plugin_id + '?action=add_recording&id=' + str(item['id']) + ')')]
+                url = get_url(action='play_archive', id = epg[key]['id'], channel_id = epg[key]['channel_id'], startts = epg[key]['startts'], endts = epg[key]['endts'])
+                menus = [('Přidat nahrávku', 'RunPlugin(plugin://' + plugin_id + '?action=add_recording&id=' + str(epg[key]['id']) + ')')]
                 list_item.addContextMenuItems(menus)       
                 xbmcplugin.addDirectoryItem(_handle, url, list_item, False)
         xbmcplugin.endOfDirectory(_handle)

@@ -1,3 +1,11 @@
+v1.0.3 (27.11.2022)
+- oprava přehrávání nahrávek
+- přidané zpracování stránkování u API
+- u archivu se pořad přehrává jako nahrávka s posunutým časem konce
+- optimalizace stahování EPG pro IPTV Simple Clienta
+- přidání kategorií
+- drobné bugfixy a optimalizace
+
 v1.0.2 (22.11.2022)
 - úprava generovaní EPG pro IPTV Simple Clienta
 

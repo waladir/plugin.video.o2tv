@@ -11,7 +11,7 @@ import time
 from libs.session import Session
 from libs.channels import Channels
 from libs.epg import epg_api, epg_listitem, get_channel_epg
-from libs.o2tv import O2API
+from libs.o2tv import O2API, o2tv_list_api
 from libs.utils import get_url, plugin_id, encode, decode, day_translation, day_translation_short
 
 if len(sys.argv) > 1:
@@ -30,14 +30,9 @@ def list_recordings(label):
     recording_ids = {}
     session = Session()
     post = {"language":"ces","ks":session.ks,"responseProfile":{"objectType":"KalturaOnDemandResponseProfile","relatedProfiles":[{"objectType":"KalturaDetachedResponseProfile","name":"group_result","filter":{"objectType":"KalturaAggregationCountFilter"}}]},"filter":{"objectType":"KalturaSearchAssetFilter","orderBy":"START_DATE_DESC","kSql":"(and asset_type='recording' start_date <'0' end_date < '-900')","groupBy":[{"objectType":"KalturaAssetMetaOrTagGroupBy","value":"SeriesID"}],"groupingOptionEqual":"Include"},"pager":{"objectType":"KalturaFilterPager","pageSize":500,"pageIndex":1},"clientTag":"1.16.1-PC","apiVersion":"5.4.0"}
-    o2api = O2API()
-    data = o2api.call_o2_api(url = 'https://3201.frp1.ott.kaltura.com/api_v3/service/asset/action/list?format=1&clientTag=1.16.1-PC', data = post, headers = o2api.headers)
-    if 'err' in data or not 'result' in data or not 'objectType' in data['result'] or data['result']['objectType'] != 'KalturaAssetListResponse':
-        xbmcgui.Dialog().notification('O2TV','Problém při stažení EPG', xbmcgui.NOTIFICATION_ERROR, 5000)
-        sys.exit() 
-    if 'objects' in data['result']:
-        for item in data['result']['objects']:
-            recording_ids.update({item['id'] : item['recordingId']})
+    result = o2tv_list_api(post = post)
+    for item in result:
+        recording_ids.update({item['id'] : item['recordingId']})
     channels = Channels()
     channels_list = channels.get_channels_list('id', visible_filter = False)            
     epg = epg_api(post = post, key = 'startts')
@@ -49,7 +44,7 @@ def list_recordings(label):
         list_item.setContentLookup(False)          
         menus = [('Smazat nahrávku', 'RunPlugin(plugin://' + plugin_id + '?action=delete_recording&id=' + str(recording_ids[epg[key]['id']]) + ')')]
         list_item.addContextMenuItems(menus)         
-        url = get_url(action='play_recording', id = epg[key]['id'], start = epg[key]['startts'], end = epg[key]['endts'])
+        url = get_url(action='play_recording', id = recording_ids[epg[key]['id']], start = epg[key]['startts'], end = epg[key]['endts'])
         xbmcplugin.addDirectoryItem(_handle, url, list_item, False)
     xbmcplugin.endOfDirectory(_handle, cacheToDisc = False)
 
@@ -81,15 +76,10 @@ def list_future_recordings(label):
     xbmcplugin.setPluginCategory(_handle, label)
     recording_ids = {}
     session = Session()
-    o2api = O2API()
     post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaScheduledRecordingProgramFilter","orderBy":"START_DATE_ASC","recordingTypeEqual":"single"},"pager":{"objectType":"KalturaFilterPager","pageSize":500,"pageIndex":1},"clientTag":"1.16.1-PC","apiVersion":"5.4.0"}
-    data = o2api.call_o2_api(url = 'https://3201.frp1.ott.kaltura.com/api_v3/service/asset/action/list?format=1&clientTag=1.16.1-PC', data = post, headers = o2api.headers)
-    if 'err' in data or not 'result' in data or not 'objectType' in data['result'] or data['result']['objectType'] != 'KalturaAssetListResponse':
-        xbmcgui.Dialog().notification('O2TV','Problém při stažení EPG', xbmcgui.NOTIFICATION_ERROR, 5000)
-        sys.exit() 
-    if 'objects' in data['result']:
-        for item in data['result']['objects']:
-            recording_ids.update({item['id'] : item['recordingId']})
+    result = o2tv_list_api(post = post)
+    for item in result:
+        recording_ids.update({item['id'] : item['recordingId']})
     epg = epg_api(post = post, key = 'startts')
     for key in sorted(epg.keys(), reverse = False):
         list_item = xbmcgui.ListItem(label = epg[key]['title'])

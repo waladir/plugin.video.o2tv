@@ -4,7 +4,8 @@ import xbmcgui
 
 import time
 from libs.session import Session
-from libs.o2tv import O2API
+from libs.channels import Channels
+from libs.o2tv import o2tv_list_api
 from libs.utils import encode
 
 def get_live_epg():
@@ -20,84 +21,91 @@ def get_channel_epg(id, from_ts, to_ts):
 
 def epg_api(post, key):
     epg = {}
-    o2api = O2API()
-    data = o2api.call_o2_api(url = 'https://3201.frp1.ott.kaltura.com/api_v3/service/asset/action/list?format=1&clientTag=1.16.1-PC', data = post, headers = o2api.headers)
-    if 'err' in data or not 'result' in data or not 'objectType' in data['result'] or data['result']['objectType'] != 'KalturaAssetListResponse':
-        xbmcgui.Dialog().notification('O2TV','Problém při stažení EPG', xbmcgui.NOTIFICATION_ERROR, 5000)
-        sys.exit() 
-    if 'objects' in data['result']:
-        for item in data['result']['objects']:
-            if item['objectType'] == 'KalturaProgramAsset' or item['objectType'] == 'KalturaRecordingAsset':
-                id = item['id']
-                channel_id = item['linearAssetId']
-                title = item['name']
-                description = item['description']
-                startts = item['startDate']
-                endts = item['endDate']
+    result = o2tv_list_api(post = post, nolog = True)
+    channels = Channels()
+    channels_list = channels.get_channels_list('id', visible_filter = False)            
+    for item in result:
+        if item['objectType'] == 'KalturaProgramAsset' or item['objectType'] == 'KalturaRecordingAsset':
+            id = item['id']
+            channel_id = item['linearAssetId']
+            title = item['name']
+            description = item['description']
+            startts = item['startDate']
+            endts = item['endDate']
 
-                cover = ''
-                poster = ''
-                imdb = ''
-                year = ''
-                contentType = ''
-                original = ''
-                genres = []
-                cast = []
-                directors = []
-                country = ''
+            cover = ''
+            poster = ''
+            imdb = ''
+            year = ''
+            contentType = ''
+            original = ''
+            genres = []
+            cast = []
+            directors = []
+            country = ''
 
-                ratios = {'2x3' : '/height/720/width/480', '3x2' : '/height/480/width/720', '16x9' : '/height/480/width/853'}
-                if len(item['images']) > 0:
-                    poster = item['images'][0]['url'] + ratios[item['images'][0]['ratio']]
-                if len(item['images']) > 1:
-                    cover = item['images'][1]['url'] + ratios[item['images'][1]['ratio']]
-                if 'original_name' in item['metas']:
-                    original = item['metas']['original_name']['value']
-                if 'imdb_id' in item['metas']:
-                    imdb = str(item['metas']['imdb_id']['value'])
-                if 'Year' in item['metas']:
-                    year = str(item['metas']['Year']['value'])
-                if 'ContentType' in item['metas']:
-                    contentType = item['metas']['ContentType']['value']
-                if 'Genre' in item['tags']:
-                    for genre in item['tags']['Genre']['objects']:
-                        genres.append(genre['value'])
-                if 'Actors' in item['tags']:
-                    for person in item['tags']['Actors']['objects']:
-                        cast.append(person['value'])
-                if 'Director' in item['tags']:
-                    for director in item['tags']['Director']['objects']:
-                        directors.append(director['value'])
-                if 'Country' in item['tags'] and 'value' in item['tags']['Country']:
-                    country = item['tags']['Country']['value']
+            ratios = {'2x3' : '/height/720/width/480', '3x2' : '/height/480/width/720', '16x9' : '/height/480/width/853'}
+            if len(item['images']) > 0:
+                poster = item['images'][0]['url'] + ratios[item['images'][0]['ratio']]
+            if len(item['images']) > 1:
+                cover = item['images'][1]['url'] + ratios[item['images'][1]['ratio']]
+            if 'original_name' in item['metas']:
+                original = item['metas']['original_name']['value']
+            if 'imdb_id' in item['metas']:
+                imdb = str(item['metas']['imdb_id']['value'])
+            if 'Year' in item['metas']:
+                year = str(item['metas']['Year']['value'])
+            if 'ContentType' in item['metas']:
+                contentType = item['metas']['ContentType']['value']
+            if 'Genre' in item['tags']:
+                for genre in item['tags']['Genre']['objects']:
+                    genres.append(genre['value'])
+            if 'Actors' in item['tags']:
+                for person in item['tags']['Actors']['objects']:
+                    cast.append(person['value'])
+            if 'Director' in item['tags']:
+                for director in item['tags']['Director']['objects']:
+                    directors.append(director['value'])
+            if 'Country' in item['tags'] and 'value' in item['tags']['Country']:
+                country = item['tags']['Country']['value']
 
-                episodeNumber = -1
-                seasonNumber = -1
-                episodesInSeason = -1
-                episodeName = ''
-                seasonName = ''
-                seriesName = ''    
+            episodeNumber = -1
+            seasonNumber = -1
+            episodesInSeason = -1
+            episodeName = ''
+            seasonName = ''
+            seriesName = ''    
 
-                if 'EpisodeNumber' in item['metas']:
-                    episodeNumber = int(item['metas']['EpisodeNumber']['value'])
-                if 'SeasonNumber' in item['metas']:
-                    seasonNumber = int(item['metas']['SeasonNumber']['value'])
-                if 'EpisodeInSeason' in item['metas']:
-                    episodesInSeason = int(item['metas']['EpisodeInSeason']['value'])
-                if 'EpisodeName' in item['metas']:
-                    episodeName = str(item['metas']['EpisodeName']['value'])
-                if 'SeasonName' in item['metas']:
-                    seasonName = str(item['metas']['SeasonName']['value'])
-                if 'SeriesName' in item['metas']:
-                    seriesName = str(item['metas']['SeriesName']['value'])
+            if 'EpisodeNumber' in item['metas']:
+                episodeNumber = int(item['metas']['EpisodeNumber']['value'])
+            if 'SeasonNumber' in item['metas']:
+                seasonNumber = int(item['metas']['SeasonNumber']['value'])
+            if 'EpisodeInSeason' in item['metas']:
+                episodesInSeason = int(item['metas']['EpisodeInSeason']['value'])
+            if 'EpisodeName' in item['metas']:
+                episodeName = str(item['metas']['EpisodeName']['value'])
+            if 'SeasonName' in item['metas']:
+                seasonName = str(item['metas']['SeasonName']['value'])
+            if 'SeriesName' in item['metas']:
+                seriesName = str(item['metas']['SeriesName']['value'])
 
-                epg_item = {'id' : id, 'title' : title, 'channel_id' : channel_id, 'description' : description, 'startts' : startts, 'endts' : endts, 'cover' : cover, 'poster' : poster, 'original' : original, 'imdb' : imdb, 'year' : year, 'contentType' : contentType, 'genres' : genres, 'cast' : cast, 'directors' : directors, 'country' : country, 'episodeNumber' : episodeNumber, 'seasonNumber' : seasonNumber, 'episodesInSeason' : episodesInSeason, 'episodeName' : episodeName, 'seasonName' : seasonName, 'seriesName' : seriesName}
-                if key == 'startts':
-                    epg.update({startts : epg_item})
-                elif key == 'channel_id':
-                    epg.update({channel_id : epg_item})
-                elif key == 'id':
-                    epg.update({id : epg_item})
+            if 'IsSeries' in item['metas'] and int(item['metas']['IsSeries']['value']) == 1:
+                isSeries = True
+                seriesId = item['metas']['SeriesID']['value']
+            else:
+                isSeries = False
+                seriesId = ''
+
+            epg_item = {'id' : id, 'title' : title, 'channel_id' : channel_id, 'description' : description, 'startts' : startts, 'endts' : endts, 'cover' : cover, 'poster' : poster, 'original' : original, 'imdb' : imdb, 'year' : year, 'contentType' : contentType, 'genres' : genres, 'cast' : cast, 'directors' : directors, 'country' : country, 'episodeNumber' : episodeNumber, 'seasonNumber' : seasonNumber, 'episodesInSeason' : episodesInSeason, 'episodeName' : episodeName, 'seasonName' : seasonName, 'seriesName' : seriesName, 'isSeries' : isSeries, 'seriesId' : seriesId}
+            if key == 'startts':
+                epg.update({startts : epg_item})
+            elif key == 'channel_id':
+                epg.update({channel_id : epg_item})
+            elif key == 'id':
+                epg.update({id : epg_item})
+            elif key == 'startts_channel_number':
+                if channel_id in channels_list:
+                    epg.update({int(str(startts)+str(channels_list[channel_id]['channel_number']).zfill(5))  : epg_item})
     return epg
 
 def epg_listitem(list_item, epg, logo):
