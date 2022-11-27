@@ -1,4 +1,4 @@
-v1.0.3 (27.11.2022)
+v1.1.0 (27.11.2022)
 - oprava přehrávání nahrávek
 - přidané zpracování stránkování u API
 - u archivu se pořad přehrává jako nahrávka s posunutým časem konce
