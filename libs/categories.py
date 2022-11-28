@@ -4,6 +4,7 @@ import xbmcplugin
 import xbmcgui
 
 from datetime import datetime
+import time
 
 from libs.session import Session
 from libs.o2tv import O2API, o2tv_list_api
@@ -13,12 +14,25 @@ from libs.utils import get_url, encode, decode, day_translation_short
 
 _handle = int(sys.argv[1])
 
+def getid(name):
+    session = Session()
+    o2api = O2API()
+    post = {"language":"ces","ks":session.ks,"deviceFamilyId":5,"clientTag":"1.16.1-PC","apiVersion":"5.4.0"}
+    data = o2api.call_o2_api(url = 'https://3201.frp1.ott.kaltura.com/api_v3/service/categorytree/action/getByVersion?format=1&clientTag=1.16.1-PC', data = post, headers = o2api.headers)
+    if 'err' in data or not 'result' in data or len(data['result']) == 0 or 'children' not in data['result'] or len(data['result']['children']) == 0:
+        xbmcgui.Dialog().notification('O2TV','Problém při načtení kategorií', xbmcgui.NOTIFICATION_ERROR, 5000)
+        sys.exit() 
+    for item in data['result']['children']:
+        if item['name'] == name:
+            return item['id']
+    return -1
+
 def list_categories(label):
     xbmcplugin.setPluginCategory(_handle, label)
     categories = [
         {'id' : 359022, 'title' : 'Nejlepší filmy', 'subcategories' : False, 'image' : 'https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/3201/entry_id/5af997402e454447942c4fae6a8d316f/version/0/height/320/width/570'},
-        {'id' : 629494, 'title' : 'Seriály', 'subcategories' : True, 'image' : 'https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/3201/entry_id/136803eb36e148f69494e07e9cea3da7/version/1/height/320/width/570'},
-        {'id' : 629738, 'title' : 'Dokumenty', 'subcategories' : True, 'image' : 'https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/3201/entry_id/45abcd0514ed4e19a091631f07f9458b/version/0/height/320/width/570'},
+        {'id' : getid(name = 'HP / Category Series'), 'title' : 'Seriály', 'subcategories' : True, 'image' : 'https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/3201/entry_id/136803eb36e148f69494e07e9cea3da7/version/1/height/320/width/570'},
+        {'id' : getid(name = 'Dokumenty'), 'title' : 'Dokumenty', 'subcategories' : True, 'image' : 'https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/3201/entry_id/45abcd0514ed4e19a091631f07f9458b/version/0/height/320/width/570'},
         {'id' : 354992, 'title' : 'Akční a dobrodružné', 'subcategories' : False, 'image' : 'https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/3201/entry_id/b41491e591514f1eb849a673e2b43831/version/0/height/320/width/570'},
         {'id' : 354993, 'title' : 'Dětské a rodinné', 'subcategories' : False, 'image' : 'https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/3201/entry_id/db018cead90c449f93748de8dec0c476/version/0/height/320/width/570'},
         {'id' : 354994, 'title' : 'Komedie', 'subcategories' : False, 'image' : 'https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/3201/entry_id/6025ed6b8bfa4b708b2573a0b2b4e6f6/version/0/height/320/width/570'},
@@ -102,7 +116,7 @@ def list_category(id, series, label):
                 else:
                     list_item.setArt({'thumb': channels_list[epg[key]['channel_id']]['logo'], 'icon': channels_list[epg[key]['channel_id']]['logo']})    
                 xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
-            else:
+            elif epg[key]['endts'] < int(time.time()):
                 list_item = epg_listitem(list_item = list_item, epg = epg[key], logo = '')
                 list_item.setProperty('IsPlayable', 'true')
                 list_item.setContentLookup(False)          
@@ -117,9 +131,17 @@ def list_series(id, label):
     channels_list = channels.get_channels_list('id', visible_filter = True)            
     post = {"language":"ces","ks":session.ks,"responseProfile":{"objectType":"KalturaOnDemandResponseProfile","relatedProfiles":[{"objectType":"KalturaDetachedResponseProfile","name":"group_result","filter":{"objectType":"KalturaAggregationCountFilter"}}],"retrievedProperties":"assetId, assetType, duration, finishedWatching, position, watchedDate, mediaFiles,description,objectType,name,id,images,tags,metas,epgChannelId,enableCatchUp,enableCdvr,enableStartOver,enableTrickPlay,linearAssetId,type,updateDate,externalId,epgId,endDate,createDate,crid,startDate"},"filter":{"objectType":"KalturaSearchAssetFilter","dynamicOrderBy":{"objectType":"KalturaDynamicOrderBy","name":"EpisodeNumber","orderBy":"META_ASC"},"kSql":"(and SeriesId='" + str(id) + "')","typeIn":"0"},"pager":{"objectType":"KalturaFilterPager","pageSize":500,"pageIndex":1},"clientTag":"1.16.1-PC","apiVersion":"5.4.0"}
     epg = epg_api(post = post, key = 'startts_channel_number')
-    for key in epg:
-        if epg[key]['channel_id'] in channels_list:
-            list_item = xbmcgui.ListItem(label = epg[key]['episodeName'] + ' (' + channels_list[epg[key]['channel_id']]['name'] + ' | ' + decode(day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')]) + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ')')        
+    for key in sorted(epg.keys()):
+        if epg[key]['channel_id'] in channels_list and epg[key]['endts'] < int(time.time()):
+            title = epg[key]['episodeName']
+            if len(title) == 0:
+                title = epg[key]['title']
+                if epg[key]['episodeNumber'] > 0:
+                    if epg[key]['seasonNumber']  > 0:
+                        title = title + ' S' + str(epg[key]['seasonNumber']) + 'E' + str(epg[key]['seasonNumber'])
+                    else:
+                        title = title + ' E' + str(epg[key]['episodeNumber'])
+            list_item = xbmcgui.ListItem(label = title + ' (' + channels_list[epg[key]['channel_id']]['name'] + ' | ' + decode(day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')]) + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ')')        
             list_item = epg_listitem(list_item = list_item, epg = epg[key], logo = '')
             list_item.setProperty('IsPlayable', 'true')
             list_item.setContentLookup(False)          
