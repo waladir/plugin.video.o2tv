@@ -18,7 +18,7 @@ from libs.stream import play_live, play_archive, play_recording, play_catchup
 from libs.channels import Channels, manage_channels, list_channels_list_backups, list_channels_edit, edit_channel, delete_channel, change_channels_numbers
 from libs.channels import list_channels_groups, add_channel_group, edit_channel_group, edit_channel_group_list_channels, edit_channel_group_add_channel, edit_channel_group_add_all_channels, edit_channel_group_delete_channel, select_channel_group, delete_channel_group
 from libs.recordings import list_recordings, delete_recording, delete_future_recording, list_future_recordings, list_planning_recordings, list_rec_days, future_program, add_recording
-from libs.categories import list_categories, list_category, list_subcategories, list_series, list_sport_categories
+from libs.categories import list_categories, list_category, list_subcategories, list_series, list_sport_categories, list_children_categories
 from libs.search import list_search, delete_search, program_search
 from libs.settings import list_settings
 from libs.session import Session
@@ -90,7 +90,9 @@ def router(paramstring):
         elif params['action'] == 'list_series':
             list_series(params['id'], params['label'])
         elif params['action'] == 'list_sport_categories':
-            list_sport_categories(params['label'])
+            list_sport_categories(params['id'], params['label'])
+        elif params['action'] == 'list_children_categories':
+            list_children_categories(params['id'], params['label'])
             
         elif params['action'] == 'list_recordings':
             list_recordings(params['label'])

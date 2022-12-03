@@ -1,4 +1,4 @@
-﻿<addon id="plugin.video.o2tv" name="O2TV" provider-name="waladir" version="1.1.2">
+﻿<addon id="plugin.video.o2tv" name="O2TV" provider-name="waladir" version="1.1.3">
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
     <import addon="inputstream.adaptive" version="19.0.0"/>
@@ -35,6 +35,10 @@ Další informace a podporu najdete na fóru www.xbmc-kodi.cz (https://www.xbmc-
     <platform>all</platform>
     <source>https://github.com/waladir/plugin.video.o2tv</source>
     <news>
+
+v1.1.3 (03.12.2022)
+- přidané kategorie Sport a Dětské
+
 v1.1.2 (28.11.2022)
 - odstranění pořadů v kategoriích, které ještě nejsou v archivu
 - doplnění titulku, pokud chybí data v EPG
@@ -53,10 +57,6 @@ v1.1.0 (27.11.2022)
 
 v1.0.2 (22.11.2022)
 - úprava generovaní EPG pro IPTV Simple Clienta
-
-v1.0.1 (20.11.2022)
-- oprava a úprava získání URL streamu
-- úprava barvy u živého vysílání
 
     </news>
     <assets>

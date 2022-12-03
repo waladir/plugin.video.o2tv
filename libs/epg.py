@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
-import sys
-import xbmcgui
-
 import time
 from libs.session import Session
 from libs.channels import Channels

@@ -30,6 +30,7 @@ def getid(name):
 def list_categories(label):
     xbmcplugin.setPluginCategory(_handle, label)
     categories = [
+        {'id' : getid(name = 'Kids'), 'title' : 'Dětské', 'subcategories' : True, 'image' : ''},       
         {'id' : 359022, 'title' : 'Nejlepší filmy', 'subcategories' : False, 'image' : 'https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/3201/entry_id/5af997402e454447942c4fae6a8d316f/version/0/height/320/width/570'},
         {'id' : getid(name = 'HP / Category Series'), 'title' : 'Seriály', 'subcategories' : True, 'image' : 'https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/3201/entry_id/136803eb36e148f69494e07e9cea3da7/version/1/height/320/width/570'},
         {'id' : getid(name = 'Dokumenty'), 'title' : 'Dokumenty', 'subcategories' : True, 'image' : 'https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/3201/entry_id/45abcd0514ed4e19a091631f07f9458b/version/0/height/320/width/570'},
@@ -42,16 +43,18 @@ def list_categories(label):
         {'id' : 357179, 'title' : 'Krimi', 'subcategories' : False, 'image' : 'https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/3201/entry_id/d9b43ca784ac44898fabe13c5e1c5393/version/0/height/320/width/570'},
         {'id' : 355131, 'title' : 'Drama', 'subcategories' : False, 'image' : 'https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/3201/entry_id/b57b594f4f894b37bb2ef4bd86017521/version/0/height/320/width/570'},
     ]
-    # list_item = xbmcgui.ListItem(label='Sporty')
-    # list_item.setArt({'thumb' : '', 'icon' : ''})
-    # url = get_url(action='list_sport_categories', label = label + ' / Sporty')  
-    # xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
-
+    list_item = xbmcgui.ListItem(label='Sport')
+    list_item.setArt({'thumb' : '', 'icon' : ''})
+    url = get_url(action='list_sport_categories', id = 355153, label = label + ' / Sport')  
+    xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
     for category in categories:
         list_item = xbmcgui.ListItem(label=encode(category['title']))
         list_item.setArt({'thumb' : category['image'], 'icon' : category['image']})
         if category['subcategories'] == True:
-            url = get_url(action='list_subcategories', id = category['id'], label = label + ' / ' + encode(category['title']))  
+            if category['title'] == 'Dětské':
+                url = get_url(action='list_children_categories', id = category['id'], label = label + ' / ' + encode(category['title']))  
+            else:
+                url = get_url(action='list_subcategories', id = category['id'], label = label + ' / ' + encode(category['title']))  
         else:
             url = get_url(action='list_category', id = category['id'], label = label + ' / ' + encode(category['title']))  
         xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
@@ -81,17 +84,71 @@ def list_subcategories(id, label):
         list_item = xbmcgui.ListItem(label=encode(category['name']))
         url = get_url(action='list_category', id = category['category_id'], series = category['series'], label = label + ' / ' + encode(category['name']))  
         xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
-    xbmcplugin.endOfDirectory(_handle)              
-
-def list_sport_categories(label):
+    xbmcplugin.endOfDirectory(_handle, cacheToDisc = True)              
+    
+def list_sport_categories(id, label):
+    id = int(id)
     session = Session()
-    post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaChannelFilter","kSql":"","idEqual":355153},"pager":{"objectType":"KalturaFilterPager","pageSize":20,"pageIndex":1},"clientTag":"1.16.1-PC","apiVersion":"5.4.0"}    
+    o2api = O2API()
+    post = {"language":"ces","ks":session.ks,"deviceFamilyId":5,"clientTag":"1.16.1-PC","apiVersion":"5.4.0"}
+    data = o2api.call_o2_api(url = 'https://3201.frp1.ott.kaltura.com/api_v3/service/categorytree/action/getByVersion?format=1&clientTag=1.16.1-PC', data = post, headers = o2api.headers)
+    if 'err' in data or not 'result' in data or len(data['result']) == 0 or 'children' not in data['result'] or len(data['result']['children']) == 0:
+        xbmcgui.Dialog().notification('O2TV','Problém při načtení kategorií', xbmcgui.NOTIFICATION_ERROR, 5000)
+        sys.exit() 
+    category_tree = data
+    post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaChannelFilter","kSql":"","idEqual":id},"pager":{"objectType":"KalturaFilterPager","pageSize":20,"pageIndex":1},"clientTag":"1.16.1-PC","apiVersion":"5.4.0"}    
     result = o2tv_list_api(post = post)
     for item in result:
-        list_item = xbmcgui.ListItem(label=encode(item['name']))
-        url = get_url(action='list_category', id = item['id'], series = 0, label = label + ' / ' + encode(item['name']))  
+        list_item = xbmcgui.ListItem(label=encode(item['name'].capitalize()))
+        for item2 in category_tree['result']['children']:
+            print(item2)
+            if item2['referenceId'] == item['metas']['in_app_link']['value']:
+                for category in item2['children']:
+                    if category['name'] == 'Ze záznamu':
+                        list_item = xbmcgui.ListItem(label=encode(item['name'].capitalize()))
+                        if 'images' in item and len(item['images']) > 0 and 'url' in item['images'][0]:
+                            if id == 355178:
+                                list_item.setArt({'thumb' : item['images'][0]['url'] + '/height/560/width/374', 'icon' : item['images'][0]['url'] + '/height/560/width/374'})
+                            else:
+                                list_item.setArt({'thumb' : item['images'][0]['url'] + '/height/320/width/570', 'icon' : item['images'][0]['url'] + '/height/320/width/570'})
+                        url = get_url(action='list_category', id = category['unifiedChannels'][0]['id'], series = 0, label = label + ' / ' + encode(item['name'].capitalize()))  
+                        xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
+    if id != 355178:
+        list_item = xbmcgui.ListItem(label='Soutěže')
+        list_item.setArt({'thumb' : '', 'icon' : ''})
+        url = get_url(action='list_sport_categories', id = 355178, label = label + ' / Soutěže')  
         xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
-    xbmcplugin.endOfDirectory(_handle)              
+    xbmcplugin.endOfDirectory(_handle, cacheToDisc = True)              
+
+def list_children_categories(id, label):
+    id = int(id)
+    xbmcplugin.setPluginCategory(_handle, label)
+    categories = []
+    session = Session()
+    o2api = O2API()
+    post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaChannelFilter","kSql":"","idEqual":354900},"pager":{"objectType":"KalturaFilterPager","pageSize":300,"pageIndex":1},"clientTag":"1.16.1-PC","apiVersion":"5.4.0"}
+    data = o2api.call_o2_api(url = 'https://3201.frp1.ott.kaltura.com/api_v3/service/asset/action/list?format=1&clientTag=1.16.1-PC', data = post, headers = o2api.headers, nolog = False)
+    print(data)
+
+    post = {"language":"ces","ks":session.ks,"deviceFamilyId":5,"clientTag":"1.16.1-PC","apiVersion":"5.4.0"}
+    data = o2api.call_o2_api(url = 'https://3201.frp1.ott.kaltura.com/api_v3/service/categorytree/action/getByVersion?format=1&clientTag=1.16.1-PC', data = post, headers = o2api.headers)
+    if 'err' in data or not 'result' in data or len(data['result']) == 0 or 'children' not in data['result'] or len(data['result']['children']) == 0:
+        xbmcgui.Dialog().notification('O2TV','Problém při načtení kategorií', xbmcgui.NOTIFICATION_ERROR, 5000)
+        sys.exit() 
+    for item in data['result']['children']:
+        if item['id'] == id:
+            for category in item['children']:
+                if 'unifiedChannels' in category and len(category['unifiedChannels']) > 0 and category['name'] in ['Dětské filmy', 'Dětské seriály']:
+                    if 'seriál' in category['unifiedChannels'][0]['name']:
+                        series = 1
+                    else:
+                        series = 0
+                    categories.append({'id' : category['id'], 'category_id' : category['unifiedChannels'][0]['id'], 'name' : category['name'], 'series' : series})
+    for category in categories:
+        list_item = xbmcgui.ListItem(label=encode(category['name']))
+        url = get_url(action='list_category', id = category['category_id'], series = category['series'], label = label + ' / ' + encode(category['name']))  
+        xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
+    xbmcplugin.endOfDirectory(_handle, cacheToDisc = True)              
 
 def list_category(id, series, label):
     xbmcplugin.setPluginCategory(_handle, label)
