@@ -304,8 +304,13 @@ class Channels:
         result = o2tv_list_api(post = post)
         for channel in result:
             if 'ChannelNumber' in channel['metas']:
+                image = None
                 if len(channel['images']) > 1:
-                    image = channel['images'][0]['url'] + '/height/320/width/480'
+                    for img in channel['images']:
+                        if img['ratio'] == '16x9':
+                            image = img['url']
+                    if image is None:  
+                        image = channel['images'][0]['url'] + '/height/320/width/480'
                 else:
                     image = None
                 channels.update({int(channel['id']) : {'channel_number' : int(channel['metas']['ChannelNumber']['value']), 'o2_number' : int(channel['metas']['ChannelNumber']['value']), 'name' : channel['name'], 'id' : channel['id'], 'logo' : image, 'visible' : True}})

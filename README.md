@@ -6,6 +6,10 @@
 <a href="https://www.xbmc-kodi.cz/prispevek-o2tv">Vlákno na fóru XBMC-Kodi.cz</a><br><br>
 <h3>Doplněk je určený pro O2TV 2.0. Pro původní O2TV používejte doplněk Sledování O2TV!</h3><br><br>
 
+v1.1.4 (22.01.2023)<br>
+- upravený výběr loga kanálu<br>
+- ošetření chyby při přehrávání přes catchup<br><br>
+
 v1.1.3 (03.12.2022)<br>
 - přidané kategorie Sport a Dětské<br><br>
 
@@ -24,8 +28,5 @@ v1.1.0 (27.11.2022)<br>
 - optimalizace stahování EPG pro IPTV Simple Clienta<br>
 - přidání kategorií<br>
 - drobné bugfixy a optimalizace<br><br>
-
-v1.0.2 (22.11.2022)<br>
-- úprava generovaní EPG pro IPTV Simple Clienta<br><br>
 
 </p>

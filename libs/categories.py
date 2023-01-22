@@ -101,7 +101,6 @@ def list_sport_categories(id, label):
     for item in result:
         list_item = xbmcgui.ListItem(label=encode(item['name'].capitalize()))
         for item2 in category_tree['result']['children']:
-            print(item2)
             if item2['referenceId'] == item['metas']['in_app_link']['value']:
                 for category in item2['children']:
                     if category['name'] == 'Ze záznamu':
@@ -128,7 +127,6 @@ def list_children_categories(id, label):
     o2api = O2API()
     post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaChannelFilter","kSql":"","idEqual":354900},"pager":{"objectType":"KalturaFilterPager","pageSize":300,"pageIndex":1},"clientTag":"1.16.1-PC","apiVersion":"5.4.0"}
     data = o2api.call_o2_api(url = 'https://3201.frp1.ott.kaltura.com/api_v3/service/asset/action/list?format=1&clientTag=1.16.1-PC', data = post, headers = o2api.headers, nolog = False)
-    print(data)
 
     post = {"language":"ces","ks":session.ks,"deviceFamilyId":5,"clientTag":"1.16.1-PC","apiVersion":"5.4.0"}
     data = o2api.call_o2_api(url = 'https://3201.frp1.ott.kaltura.com/api_v3/service/categorytree/action/getByVersion?format=1&clientTag=1.16.1-PC', data = post, headers = o2api.headers)

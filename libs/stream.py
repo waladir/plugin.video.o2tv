@@ -8,7 +8,7 @@ import time
 
 from libs.session import Session
 from libs.o2tv import O2API, o2tv_list_api
-from libs.epg import get_channel_epg, epg_listitem
+from libs.epg import get_channel_epg
 
 if len(sys.argv) > 1:
     _handle = int(sys.argv[1])
@@ -40,7 +40,7 @@ def play_archive(id, channel_id, startts, endts):
     o2api = O2API()
     no_remove = False
     post = {"language":"ces","ks":session.ks,"responseProfile":{"objectType":"KalturaOnDemandResponseProfile","relatedProfiles":[{"objectType":"KalturaDetachedResponseProfile","name":"group_result","filter":{"objectType":"KalturaAggregationCountFilter"}}]},"filter":{"objectType":"KalturaSearchAssetFilter","orderBy":"START_DATE_DESC","kSql":"(and asset_type='recording' start_date <'0' end_date < '-900')","groupBy":[{"objectType":"KalturaAssetMetaOrTagGroupBy","value":"SeriesID"}],"groupingOptionEqual":"Include"},"pager":{"objectType":"KalturaFilterPager","pageSize":500,"pageIndex":1},"clientTag":"1.16.1-PC","apiVersion":"5.4.0"}
-    result = o2tv_list_api(post = post)
+    result = o2tv_list_api(post = post, silent = True)
     for item in result:
         if int(item['id']) == int(id):
             no_remove = True

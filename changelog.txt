@@ -1,3 +1,7 @@
+v1.1.4 (22.01.2023)
+- upravený výběr loga kanálu
+- ošetření chyby při přehrávání přes catchup
+
 v1.1.3 (03.12.2022)
 - přidané kategorie Sport a Dětské
 
@@ -16,6 +20,3 @@ v1.1.0 (27.11.2022)
 - optimalizace stahování EPG pro IPTV Simple Clienta
 - přidání kategorií
 - drobné bugfixy a optimalizace
-
-v1.0.2 (22.11.2022)
-- úprava generovaní EPG pro IPTV Simple Clienta

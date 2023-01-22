@@ -44,14 +44,15 @@ class O2API:
             xbmc.log('O2TV > ' 'Chyba při volání '+ str(url) + ': ' + e.reason)
             return { 'err' : e.reason }  
         
-def o2tv_list_api(post, nolog = False):
+def o2tv_list_api(post, nolog = False, silent = False):
     result = []
     o2api = O2API()
     fetch = True
     while fetch == True:
         data = o2api.call_o2_api(url = 'https://3201.frp1.ott.kaltura.com/api_v3/service/asset/action/list?format=1&clientTag=1.16.1-PC', data = post, headers = o2api.headers, nolog = nolog)
         if 'err' in data or not 'result' in data or not 'totalCount' in data['result']:
-            xbmcgui.Dialog().notification('O2TV','Problém při stažení dat z O2TV', xbmcgui.NOTIFICATION_ERROR, 5000)
+            if silent == False:
+                xbmcgui.Dialog().notification('O2TV','Problém při stažení dat z O2TV', xbmcgui.NOTIFICATION_ERROR, 5000)
             fetch = False
         else:
             total_count = data['result']['totalCount']
