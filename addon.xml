@@ -1,4 +1,4 @@
-﻿<addon id="plugin.video.o2tv" name="O2TV" provider-name="waladir" version="1.1.5">
+﻿<addon id="plugin.video.o2tv" name="O2TV" provider-name="waladir" version="1.1.6">
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
     <import addon="inputstream.adaptive" version="19.0.0"/>
@@ -35,6 +35,9 @@ Další informace a podporu najdete na fóru www.xbmc-kodi.cz (https://www.xbmc-
     <platform>all</platform>
     <source>https://github.com/waladir/plugin.video.o2tv</source>
     <news>
+v1.1.6 (01.02.2023)
+- oštření speciálních znaků v EPG
+
 v1.1.5 (01.02.2023)
 - podpora pro IPTV Merge
 
@@ -49,9 +52,6 @@ v1.1.2 (28.11.2022)
 - odstranění pořadů v kategoriích, které ještě nejsou v archivu
 - doplnění titulku, pokud chybí data v EPG
 - dynamické dotahování id pro kategorie Dokumenty a Seriály
-
-v1.1.1 (27.11.2022)
-- oprava chyby u kategorie Seriály
     </news>
     <assets>
         <icon>icon.png</icon>

@@ -1,3 +1,6 @@
+v1.1.6 (01.02.2023)
+- oštření speciálních znaků v EPG
+
 v1.1.5 (01.02.2023)
 - podpora pro IPTV Merge
 
@@ -12,6 +15,3 @@ v1.1.2 (28.11.2022)
 - odstranění pořadů v kategoriích, které ještě nejsou v archivu
 - doplnění titulku, pokud chybí data v EPG
 - dynamické dotahování id pro kategorie Dokumenty a Seriály
-
-v1.1.1 (27.11.2022)
-- oprava chyby u kategorie Seriály

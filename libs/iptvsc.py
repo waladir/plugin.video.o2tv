@@ -131,7 +131,7 @@ def generate_epg(output_file = ''):
                         epg_item = epg[ts]
                         starttime = datetime.fromtimestamp(epg_item['startts']).strftime('%Y%m%d%H%M%S')
                         endtime = datetime.fromtimestamp(epg_item['endts']).strftime('%Y%m%d%H%M%S')
-                        content = content + '    <programme start="' + starttime + ' +0' + str(tz_offset) + '00" stop="' + endtime + ' +0' + str(tz_offset) + '00" channel="' + channels_list_by_id[epg_item['channel_id']]['name'] + '">\n'
+                        content = content + '    <programme start="' + starttime + ' +0' + str(tz_offset) + '00" stop="' + endtime + ' +0' + str(tz_offset) + '00" channel="' + channels_list_by_id[epg_item['channel_id']]['name'].replace('&','&amp;').replace('<','&lt;').replace('<','&gt;') + '">\n'
                         content = content + '       <title lang="cs">' + epg_item['title'].replace('&','&amp;').replace('<','&lt;').replace('>','&gt;') + '</title>\n'
                         if epg_item['original'] != None and len(epg_item['original']) > 0:
                             content = content + '       <title>' + epg_item['original'].replace('&','&amp;').replace('<','&lt;').replace('<','&gt;') + '</title>\n'
