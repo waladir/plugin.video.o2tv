@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
+import os
 import sys
-
 import xbmc
 import xbmcgui
 import xbmcplugin
+import xbmcaddon
 
 from datetime import date, datetime, timedelta
 import time
@@ -12,7 +13,7 @@ from libs.session import Session
 from libs.channels import Channels
 from libs.epg import epg_api, epg_listitem, get_channel_epg
 from libs.o2tv import O2API, o2tv_list_api
-from libs.utils import get_url, plugin_id, encode, decode, day_translation, day_translation_short
+from libs.utils import get_url, plugin_id, encode, decode, day_translation, day_translation_short, clientTag, apiVersion, partnerId
 
 if len(sys.argv) > 1:
     _handle = int(sys.argv[1])
@@ -29,7 +30,7 @@ def list_recordings(label):
 
     recording_ids = {}
     session = Session()
-    post = {"language":"ces","ks":session.ks,"responseProfile":{"objectType":"KalturaOnDemandResponseProfile","relatedProfiles":[{"objectType":"KalturaDetachedResponseProfile","name":"group_result","filter":{"objectType":"KalturaAggregationCountFilter"}}]},"filter":{"objectType":"KalturaSearchAssetFilter","orderBy":"START_DATE_DESC","kSql":"(and asset_type='recording' start_date <'0' end_date < '-900')","groupBy":[{"objectType":"KalturaAssetMetaOrTagGroupBy","value":"SeriesID"}],"groupingOptionEqual":"Include"},"pager":{"objectType":"KalturaFilterPager","pageSize":500,"pageIndex":1},"clientTag":"1.16.1-PC","apiVersion":"5.4.0"}
+    post = {"language":"ces","ks":session.ks,"responseProfile":{"objectType":"KalturaOnDemandResponseProfile","relatedProfiles":[{"objectType":"KalturaDetachedResponseProfile","name":"group_result","filter":{"objectType":"KalturaAggregationCountFilter"}}]},"filter":{"objectType":"KalturaSearchAssetFilter","orderBy":"START_DATE_DESC","kSql":"(and asset_type='recording' start_date <'0' end_date < '-900')","groupBy":[{"objectType":"KalturaAssetMetaOrTagGroupBy","value":"SeriesID"}],"groupingOptionEqual":"Include"},"pager":{"objectType":"KalturaFilterPager","pageSize":500,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
     result = o2tv_list_api(post = post)
     for item in result:
         recording_ids.update({item['id'] : item['recordingId']})
@@ -38,7 +39,6 @@ def list_recordings(label):
     epg = epg_api(post = post, key = 'startts')
     for key in sorted(epg.keys(), reverse = False):
         list_item = xbmcgui.ListItem(label = epg[key]['title'] + ' (' + channels_list[epg[key]['channel_id']]['name'] + ' | ' + decode(day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')]) + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ')')
-
         list_item = epg_listitem(list_item = list_item, epg = epg[key], logo = '')
         list_item.setProperty('IsPlayable', 'true')
         list_item.setContentLookup(False)          
@@ -51,9 +51,9 @@ def list_recordings(label):
 def delete_recording(id):
     id = int(id)
     session = Session()
-    post = {"language":"ces","ks":session.ks,"id":id,"clientTag":"1.16.1-PC","apiVersion":"5.4.0"}
+    post = {"language":"ces","ks":session.ks,"id":id,"clientTag":clientTag,"apiVersion":apiVersion}
     o2api = O2API()
-    data = o2api.call_o2_api(url = 'https://3201.frp1.ott.kaltura.com/api_v3/service/recording/action/delete?format=1&clientTag=1.16.1-PC', data = post, headers = o2api.headers)
+    data = o2api.call_o2_api(url = 'https://' + partnerId + '.frp1.ott.kaltura.com/api_v3/service/recording/action/delete?format=1&clientTag=' + clientTag, data = post, headers = o2api.headers)
     if 'err' in data or not 'result' in data or not 'status' in data['result'] or data['result']['status'] != 'DELETED':
         xbmcgui.Dialog().notification('O2TV', 'Problém se smazáním nahrávky', xbmcgui.NOTIFICATION_ERROR, 5000)
     else:
@@ -63,9 +63,9 @@ def delete_recording(id):
 def delete_future_recording(id):
     id = int(id)
     session = Session()
-    post = {"language":"ces","ks":session.ks,"id":id,"clientTag":"1.16.1-PC","apiVersion":"5.4.0"}
+    post = {"language":"ces","ks":session.ks,"id":id,"clientTag":clientTag,"apiVersion":apiVersion}
     o2api = O2API()
-    data = o2api.call_o2_api(url = 'https://3201.frp1.ott.kaltura.com/api_v3/service/recording/action/cancel?format=1&clientTag=1.16.1-PC', data = post, headers = o2api.headers)
+    data = o2api.call_o2_api(url = 'https://' + partnerId + '.frp1.ott.kaltura.com/api_v3/service/recording/action/cancel?format=1&clientTag=' + clientTag, data = post, headers = o2api.headers)
     if 'err' in data or not 'result' in data or not 'status' in data['result'] or data['result']['status'] != 'CANCELED':
         xbmcgui.Dialog().notification('O2TV', 'Problém se smazáním nahrávky', xbmcgui.NOTIFICATION_ERROR, 5000)
     else:
@@ -76,7 +76,7 @@ def list_future_recordings(label):
     xbmcplugin.setPluginCategory(_handle, label)
     recording_ids = {}
     session = Session()
-    post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaScheduledRecordingProgramFilter","orderBy":"START_DATE_ASC","recordingTypeEqual":"single"},"pager":{"objectType":"KalturaFilterPager","pageSize":500,"pageIndex":1},"clientTag":"1.16.1-PC","apiVersion":"5.4.0"}
+    post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaScheduledRecordingProgramFilter","orderBy":"START_DATE_ASC","recordingTypeEqual":"single"},"pager":{"objectType":"KalturaFilterPager","pageSize":500,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
     result = o2tv_list_api(post = post)
     for item in result:
         recording_ids.update({item['id'] : item['recordingId']})
@@ -122,6 +122,9 @@ def list_rec_days(id, label):
     xbmcplugin.endOfDirectory(_handle)
 
 def future_program(id, day, label):
+    addon = xbmcaddon.Addon()
+    icons_dir = os.path.join(addon.getAddonInfo('path'), 'resources','images')
+
     label = label.replace('Nahrávky / Plánování /', '')
     xbmcplugin.setPluginCategory(_handle, label)
     id = int(id)
@@ -135,6 +138,15 @@ def future_program(id, day, label):
         from_ts = today_start_ts + int(day)*60*60*24
         to_ts = today_end_ts + int(day)*60*60*24 
     epg = get_channel_epg(id, from_ts, to_ts)
+
+    if int(day) >  0:
+        list_item = xbmcgui.ListItem(label='Předchozí den')
+        day_dt = date.today() - timedelta(days = int(day) - 1)
+        den_label = day_translation_short[day_dt.strftime('%w')] + ' ' + day_dt.strftime('%d.%m')
+        url = get_url(action='future_program', id = id, day = int(day) - 1, label = label + ' / ' + den_label)  
+        list_item.setArt({ 'thumb' : os.path.join(icons_dir , 'previous_arrow.png'), 'icon' : os.path.join(icons_dir , 'previous_arrow.png') })
+        xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
+
     for key in sorted(epg.keys()):
         start = epg[key]['startts']
         end = epg[key]['endts']
@@ -144,14 +156,24 @@ def future_program(id, day, label):
         list_item.addContextMenuItems([('Přidat nahrávku', 'RunPlugin(plugin://' + plugin_id + '?action=add_recording&id=' + str(epg[key]['id']) + ')',)])       
         url = get_url(action='add_recording', id = epg[key]['id'])
         xbmcplugin.addDirectoryItem(_handle, url, list_item, False)
+
+    if int(day) <  7:
+        list_item = xbmcgui.ListItem(label='Následující den')
+        day_dt = date.today() - timedelta(days = int(day) + 1)
+        den_label = day_translation_short[day_dt.strftime('%w')] + ' ' + day_dt.strftime('%d.%m')
+        url = get_url(action='future_program', id = id, day = int(day) + 1, label = label + ' / ' + den_label)  
+        list_item.setArt({ 'thumb' : os.path.join(icons_dir , 'next_arrow.png'), 'icon' : os.path.join(icons_dir , 'next_arrow.png') })
+        xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
+
+
     xbmcplugin.endOfDirectory(_handle)
 
 def add_recording(id):
     id = int(id)
     session = Session()
     o2api = O2API()
-    post = {"language":"ces","ks":session.ks,"recording":{"objectType":"KalturaRecording","assetId":id},"clientTag":"1.16.1-PC","apiVersion":"5.4.0"}
-    data = o2api.call_o2_api(url = 'https://3201.frp1.ott.kaltura.com/api_v3/service/recording/action/add?format=1&clientTag=1.16.1-PC', data = post, headers = o2api.headers)
+    post = {"language":"ces","ks":session.ks,"recording":{"objectType":"KalturaRecording","assetId":id},"clientTag":clientTag,"apiVersion":apiVersion}
+    data = o2api.call_o2_api(url = 'https://' + partnerId + '.frp1.ott.kaltura.com/api_v3/service/recording/action/add?format=1&clientTag=' + clientTag, data = post, headers = o2api.headers)
     if 'err' in data or not 'result' in data or not 'status' in data['result'] or (data['result']['status'] != 'SCHEDULED' and data['result']['status'] != 'RECORDED'):
         xbmcgui.Dialog().notification('O2TV', 'Problém s přidáním nahrávky', xbmcgui.NOTIFICATION_ERROR, 5000)
     else:

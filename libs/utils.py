@@ -4,10 +4,8 @@ import xbmc
 import xbmcaddon
 import xbmcgui
 import string, random
-try:
-    from urllib import urlencode
-except ImportError:
-    from urllib.parse import urlencode
+
+from urllib.parse import urlencode
 
 PY2 = sys.version_info[0] == 2
 PY3 = sys.version_info[0] == 3
@@ -15,6 +13,9 @@ PY3 = sys.version_info[0] == 3
 plugin_id = 'plugin.video.o2tv'
 day_translation = {'1' : 'Pondělí', '2' : 'Úterý', '3' : 'Středa', '4' : 'Čtvrtek', '5' : 'Pátek', '6' : 'Sobota', '0' : 'Neděle'}  
 day_translation_short = {'1' : 'Po', '2' : 'Út', '3' : 'St', '4' : 'Čt', '5' : 'Pá', '6' : 'So', '0' : 'Ne'}  
+clientTag = '1.22.0-PC'
+apiVersion = '5.4.0'
+partnerId = '3201'
 
 
 _url = sys.argv[0]
@@ -75,5 +76,4 @@ def parsetime(txt):
         elif txt.endswith(PM) and h < 12:
             h += 12
     return '%02d:%02d' % (h, m)
-
 

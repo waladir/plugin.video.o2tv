@@ -5,16 +5,9 @@ import xbmc
 import xbmcgui
 import xbmcaddon
 import xbmcplugin
+from xbmcvfs import translatePath
 
-try:
-    from xbmcvfs import translatePath
-except ImportError:
-    from xbmc import translatePath
-
-try:
-    from urllib import quote
-except ImportError:
-    from urllib.parse import quote
+from urllib.parse import quote
 
 import json
 import codecs
@@ -24,7 +17,7 @@ from datetime import datetime
 from libs.settings import Settings
 from libs.o2tv import o2tv_list_api
 from libs.session import Session
-from libs.utils import get_url, encode, decode, plugin_id
+from libs.utils import get_url, encode, decode, plugin_id, clientTag, apiVersion
 
 if len(sys.argv) > 1:
     _handle = int(sys.argv[1])
@@ -300,7 +293,7 @@ class Channels:
     def get_channels(self):
         channels = {}
         session = Session()
-        post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaChannelFilter","kSql":"(and asset_type=607)","idEqual":355960},"pager":{"objectType":"KalturaFilterPager","pageSize":300,"pageIndex":1},"clientTag":"1.16.1-PC","apiVersion":"5.4.0"}
+        post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaChannelFilter","kSql":"(and asset_type=607)","idEqual":355960},"pager":{"objectType":"KalturaFilterPager","pageSize":300,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
         result = o2tv_list_api(post = post)
         for channel in result:
             if 'ChannelNumber' in channel['metas']:

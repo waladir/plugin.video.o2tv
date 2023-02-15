@@ -8,6 +8,7 @@ import time
 
 from libs.settings import Settings
 from libs.o2tv import O2API
+from libs.utils import clientTag, apiVersion, partnerId
 
 class Session:
     def __init__(self):
@@ -49,23 +50,39 @@ class Session:
     def get_token(self):
         addon = xbmcaddon.Addon()
         o2api = O2API()
-        ks_code = self.get_ks_code()
-        post = {'language' : '*', 'partnerId' : 3201, 'clientTag' : '1.16.1-PC', 'apiVersion' : '5.4.0'}
-        data = o2api.call_o2_api(url = 'https://3201.frp1.ott.kaltura.com/api_v3/service/ottuser/action/anonymousLogin?format=1&clientTag=1.16.1-PC', data = post, headers = o2api.headers)
+        # ks_code = self.get_ks_code()
+        ks_code = None
+        post = {'language' : '*', 'partnerId' : int(partnerId), 'clientTag' : clientTag, 'apiVersion' : apiVersion}
+        data = o2api.call_o2_api(url = 'https://' + partnerId + '.frp1.ott.kaltura.com/api_v3/service/ottuser/action/anonymousLogin?format=1&clientTag=' + clientTag, data = post, headers = o2api.headers)
         if 'err' in data or not 'result' in data or not 'objectType' in data['result'] or data['result']['objectType'] != 'KalturaLoginSession':
             xbmcgui.Dialog().notification('O2TV','Problém při přihlášení', xbmcgui.NOTIFICATION_ERROR, 5000)
             sys.exit() 
         ks = data['result']['ks']
-            
+
         post = {'username' : addon.getSetting('username'), 'password' : addon.getSetting('password'), 'udid' : addon.getSetting('deviceid'), 'service' : 'https://www.new-o2tv.cz/'} 
         data = o2api.call_o2_api(url = 'https://login-a-moje.o2.cz/cas-external/v1/login', data = post, headers = o2api.headers)
         if 'err' in data or not 'jwt' in data or not 'refresh_token' in data:
             xbmcgui.Dialog().ok('O2TV', 'Doplněk je určený pouze pro O2TV 2.0.\n\nPro původní O2TV použijte doplněk Sledování O2TV ze stejného repozitáře.')
             sys.exit() 
         jwt_token = data['jwt']
+
+        post = {"intent":"Service List","adapterData":[{"_allowedEmptyArray":[],"_allowedEmptyObject":[],"_dependentProperties":{},"key":"access_token","value":jwt_token,"relatedObjects":{}},{"_allowedEmptyArray":[],"_allowedEmptyObject":[],"_dependentProperties":{},"key":"pageIndex","value":"0","relatedObjects":{}},{"_allowedEmptyArray":[],"_allowedEmptyObject":[],"_dependentProperties":{},"key":"pageSize","value":"100","relatedObjects":{}}],"ks":ks}
+        data = o2api.call_o2_api(url = 'https://' + partnerId + '.frp1.ott.kaltura.com/api/p/' + partnerId + '/service/CZ/action/Invoke', data = post, headers = o2api.headers)
+        if 'err' in data or not 'result' in data or not 'adapterData' in data['result'] or not 'service_list' in data['result']['adapterData']:
+            xbmcgui.Dialog().notification('O2TV','Problém při přihlášení', xbmcgui.NOTIFICATION_ERROR, 5000)
+            sys.exit() 
+        services = json.loads(data['result']['adapterData']['service_list']['value'])
+        services = services['ServicesList']
+        for service in services:
+            for id in service:
+                ks_code = service[id]
         
-        post = {'language' : 'ces', 'ks' : ks, 'partnerId' : 3201, 'username' : 'NONE', 'password' : 'NONE', 'extraParams' : {'token' : {'objectType' : 'KalturaStringValue', 'value' : jwt_token}, 'loginType' : {'objectType' : 'KalturaStringValue', 'value' : 'accessToken'}, 'brandId' : {'objectType' : 'KalturaStringValue', 'value' : '22'}, 'externalId' : {'objectType' : 'KalturaStringValue', 'value' : ks_code}}, 'udid' : addon.getSetting('deviceid'), 'clientTag' : '1.16.1-PC', 'apiVersion' : '5.4.0'}
-        data = o2api.call_o2_api(url = 'https://3201.frp1.ott.kaltura.com/api_v3/service/ottuser/action/login?format=1&clientTag=1.16.1-PC', data = post, headers = o2api.headers)
+        if ks_code is None:
+            xbmcgui.Dialog().notification('O2TV','Problém při přihlášení', xbmcgui.NOTIFICATION_ERROR, 5000)
+            sys.exit() 
+
+        post = {'language' : 'ces', 'ks' : ks, 'partnerId' : int(partnerId), 'username' : 'NONE', 'password' : 'NONE', 'extraParams' : {'token' : {'objectType' : 'KalturaStringValue', 'value' : jwt_token}, 'loginType' : {'objectType' : 'KalturaStringValue', 'value' : 'accessToken'}, 'brandId' : {'objectType' : 'KalturaStringValue', 'value' : '22'}, 'externalId' : {'objectType' : 'KalturaStringValue', 'value' : ks_code}}, 'udid' : addon.getSetting('deviceid'), 'clientTag' : clientTag, 'apiVersion' : apiVersion}
+        data = o2api.call_o2_api(url = 'https://' + partnerId + '.frp1.ott.kaltura.com/api_v3/service/ottuser/action/login?format=1&clientTag=' + clientTag, data = post, headers = o2api.headers)
         if 'err' in data or not 'result' in data or not 'objectType' in data['result'] or data['result']['objectType'] != 'KalturaLoginResponse' or not 'loginSession' in data['result']:
             xbmcgui.Dialog().notification('O2TV','Problém při přihlášení', xbmcgui.NOTIFICATION_ERROR, 5000)
             sys.exit() 
@@ -73,8 +90,8 @@ class Session:
         self.ks_refresh_token = data['result']['loginSession']['refreshToken']
         self.ks = data['result']['loginSession']['ks']
 
-        # post = {'language' : 'ces', 'ks' : ks, 'clientTag' : '1.16.1-PC', 'apiVersion' : '5.4.0'}
-        # data = o2api.call_o2_api(url = 'https://3201.frp1.ott.kaltura.com/api_v3/service/ottuser/action/get?format=1&clientTag=1.16.1-PC', data = post, headers = o2api.headers)
+        # post = {'language' : 'ces', 'ks' : ks, 'clientTag' : clientTag, 'apiVersion' : apiVersion}
+        # data = o2api.call_o2_api(url = 'https://' + partnerId + '.frp1.ott.kaltura.com/api_v3/service/ottuser/action/get?format=1&clientTag=' + clientTag, data = post, headers = o2api.headers)
         # print(data)
 
     def load_session(self):

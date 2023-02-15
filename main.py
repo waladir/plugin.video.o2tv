@@ -5,10 +5,7 @@ import xbmcgui
 import xbmcplugin
 import xbmcaddon
 
-try:
-    from urlparse import parse_qsl
-except ImportError:
-    from urllib.parse import parse_qsl
+from urllib.parse import parse_qsl
 
 from libs.utils import get_url, check_settings
 from libs.live import list_live

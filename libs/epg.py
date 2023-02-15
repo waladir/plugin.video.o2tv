@@ -3,17 +3,17 @@ import time
 from libs.session import Session
 from libs.channels import Channels
 from libs.o2tv import o2tv_list_api
-from libs.utils import encode
+from libs.utils import encode, clientTag, apiVersion
 
 def get_live_epg():
     session = Session()
     current_timestamp = int(time.time())
-    post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaSearchAssetFilter","orderBy":"START_DATE_ASC","kSql":"(and start_date <= '" + str(current_timestamp) + "' end_date  >= '" + str(current_timestamp) + "' asset_type='epg' auto_fill= true)"},"pager":{"objectType":"KalturaFilterPager","pageSize":500,"pageIndex":1},"clientTag":"1.16.1-PC","apiVersion":"5.4.0"}
+    post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaSearchAssetFilter","orderBy":"START_DATE_ASC","kSql":"(and start_date <= '" + str(current_timestamp) + "' end_date  >= '" + str(current_timestamp) + "' asset_type='epg' auto_fill= true)"},"pager":{"objectType":"KalturaFilterPager","pageSize":500,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
     return epg_api(post = post , key = 'channel_id')
 
 def get_channel_epg(id, from_ts, to_ts):
     session = Session()
-    post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaSearchAssetFilter","orderBy":"START_DATE_ASC","kSql":"(and linear_media_id:'" + str(id) + "' start_date >= '" + str(from_ts) + "' end_date  <= '" + str(to_ts) + "' asset_type='epg' auto_fill= true)"},"pager":{"objectType":"KalturaFilterPager","pageSize":500,"pageIndex":1},"clientTag":"1.16.1-PC","apiVersion":"5.4.0"}
+    post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaSearchAssetFilter","orderBy":"START_DATE_ASC","kSql":"(and linear_media_id:'" + str(id) + "' start_date >= '" + str(from_ts) + "' end_date  <= '" + str(to_ts) + "' asset_type='epg' auto_fill= true)"},"pager":{"objectType":"KalturaFilterPager","pageSize":500,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
     return epg_api(post = post, key = 'startts')
 
 def epg_api(post, key):

@@ -4,22 +4,14 @@ import xbmc
 import xbmcgui
 import xbmcplugin
 import xbmcaddon
+from xbmcvfs import translatePath
 
-try:
-    from xbmcvfs import translatePath
-except ImportError:
-    from xbmc import translatePath
-
-try:
-    from urllib import quote
-except ImportError:
-    from urllib.parse import quote    
+from urllib.parse import quote    
 
 from datetime import datetime
 
-from libs.utils import PY3, get_url, plugin_id, day_translation_short, decode
+from libs.utils import PY3, get_url, plugin_id, day_translation_short, decode, clientTag, apiVersion
 from libs.session import Session
-from libs.o2tv import o2tv_list_api
 from libs.channels import Channels
 from libs.epg import epg_listitem, epg_api
 
@@ -57,7 +49,7 @@ def program_search(query, label):
     session = Session()
     channels = Channels()
     channels_list = channels.get_channels_list(visible_filter = True)
-    post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaChannelFilter","orderBy":"NAME_ASC","kSql":"(and name^'" + query +  "')","idEqual":355960},"pager":{"objectType":"KalturaFilterPager","pageSize":500,"pageIndex":1},"clientTag":"1.16.1-PC","apiVersion":"5.4.0"}
+    post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaChannelFilter","orderBy":"NAME_ASC","kSql":"(and name^'" + query +  "')","idEqual":355960},"pager":{"objectType":"KalturaFilterPager","pageSize":500,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
     epg = epg_api(post = post, key = 'startts_channel_number')
     if len(epg) > 0:
         for key in sorted(epg.keys(), reverse = True):

@@ -10,7 +10,7 @@ import time
 
 from libs.channels import Channels
 from libs.channels import Session
-from libs.utils import plugin_id, decode
+from libs.utils import plugin_id, decode, clientTag, apiVersion
 from libs.epg import get_channel_epg, epg_api
 from libs.recordings import add_recording
 tz_offset = int((time.mktime(datetime.now().timetuple())-time.mktime(datetime.utcnow().timetuple()))/3600)
@@ -125,7 +125,7 @@ def generate_epg(output_file = ''):
                     channels_query = ' '.join(channels_ids[i:i+10])
                     cnt = 0
                     content = ''
-                    post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaSearchAssetFilter","orderBy":"START_DATE_ASC","kSql":"(and (or " + channels_query + ") start_date >= '" + str(today_start_ts - 60*60*24*7) + "' end_date  <= '" + str(today_end_ts + 60*60*24*7) + "' asset_type='epg' auto_fill= true)"},"pager":{"objectType":"KalturaFilterPager","pageSize":500,"pageIndex":1},"clientTag":"1.16.1-PC","apiVersion":"5.4.0"}
+                    post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaSearchAssetFilter","orderBy":"START_DATE_ASC","kSql":"(and (or " + channels_query + ") start_date >= '" + str(today_start_ts - 60*60*24*7) + "' end_date  <= '" + str(today_end_ts + 60*60*24*7) + "' asset_type='epg' auto_fill= true)"},"pager":{"objectType":"KalturaFilterPager","pageSize":500,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
                     epg =  epg_api(post = post, key = 'startts_channel_number')
                     for ts in sorted(epg.keys()):
                         epg_item = epg[ts]

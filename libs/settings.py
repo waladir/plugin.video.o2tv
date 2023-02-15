@@ -4,11 +4,7 @@ import sys
 import xbmcaddon
 import xbmcgui
 import xbmcplugin
-
-try:
-    from xbmcvfs import translatePath
-except ImportError:
-    from xbmc import translatePath
+from xbmcvfs import translatePath
 
 from libs.utils import get_url
 
