@@ -40,6 +40,10 @@ def play_archive(id, channel_id, startts, endts):
     session = Session()
     o2api = O2API()
     no_remove = False
+
+    # post = {"1":{"service":"asset","action":"get","id":id,"assetReferenceType":"epg_internal","ks":session.ks},"2":{"service":"asset","action":"getPlaybackContext","assetId":id,"assetType":"epg","contextDataParams":{"objectType":"KalturaPlaybackContextOptions","context":"START_OVER","streamerType":"mpegdash","urlType":"DIRECT"},"ks":session.ks},"apiVersion":"7.8.1","ks":session.ks,"partnerId":partnerId}    
+    # play_stream(post)
+
     post = {"language":"ces","ks":session.ks,"responseProfile":{"objectType":"KalturaOnDemandResponseProfile","relatedProfiles":[{"objectType":"KalturaDetachedResponseProfile","name":"group_result","filter":{"objectType":"KalturaAggregationCountFilter"}}]},"filter":{"objectType":"KalturaSearchAssetFilter","orderBy":"START_DATE_DESC","kSql":"(and asset_type='recording' start_date <'0' end_date < '-900')","groupBy":[{"objectType":"KalturaAssetMetaOrTagGroupBy","value":"SeriesID"}],"groupingOptionEqual":"Include"},"pager":{"objectType":"KalturaFilterPager","pageSize":500,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
     result = o2tv_list_api(post = post, silent = True)
     for item in result:
@@ -66,7 +70,6 @@ def play_stream(post):
     o2api = O2API()
     data = o2api.call_o2_api(url = 'https://' + partnerId + '.frp1.ott.kaltura.com/api_v3/service/multirequest', data = post, headers = o2api.headers)
     if 'err' in data or not 'result' in data or len(data['result']) == 0 or not 'sources' in data['result'][1]:
-        print(data)
         xbmcgui.Dialog().notification('O2TV','Problém při přehrání', xbmcgui.NOTIFICATION_ERROR, 5000)
     else:
         if len(data['result'][1]['sources']) > 0:
@@ -76,7 +79,7 @@ def play_stream(post):
             if 'DASH' in urls:
                 url = urls['DASH']
                 list_item = xbmcgui.ListItem(path = url)
-                list_item.setProperty('inputstreamaddon', 'inputstream.adaptive')
+                # list_item.setProperty('inputstream.adaptive.play_timeshift_buffer', 'true')
                 list_item.setProperty('inputstream', 'inputstream.adaptive')
                 list_item.setProperty('inputstream.adaptive.manifest_type', 'mpd')
                 list_item.setMimeType('application/dash+xml')

@@ -1,4 +1,4 @@
-﻿<addon id="plugin.video.o2tv" name="O2TV" provider-name="waladir" version="1.2.0">
+﻿<addon id="plugin.video.o2tv" name="O2TV" provider-name="waladir" version="1.2.1">
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
     <import addon="inputstream.adaptive" version="19.0.0"/>
@@ -35,6 +35,9 @@ Další informace a podporu najdete na fóru www.xbmc-kodi.cz (https://www.xbmc-
     <platform>all</platform>
     <source>https://github.com/waladir/plugin.video.o2tv</source>
     <news>
+v1.2.1 (16.02.2022)
+- ošetření chyby u nahrávek, pokud žádná neexistuje
+
 v1.2.0 (15.02.2022)
 - odstranění kódu pro kompatibilitu s Kodi 18
 - úprava přihlašovaní (odstranění volání staré platformy)
@@ -50,9 +53,6 @@ v1.1.5 (01.02.2023)
 v1.1.4 (22.01.2023)
 - upravený výběr loga kanálu
 - ošetření chyby při přehrávání přes catchup
-
-v1.1.3 (03.12.2022)
-- přidané kategorie Sport a Dětské
     </news>
     <assets>
         <icon>icon.png</icon>

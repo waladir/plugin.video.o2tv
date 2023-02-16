@@ -31,21 +31,22 @@ def list_recordings(label):
     recording_ids = {}
     session = Session()
     post = {"language":"ces","ks":session.ks,"responseProfile":{"objectType":"KalturaOnDemandResponseProfile","relatedProfiles":[{"objectType":"KalturaDetachedResponseProfile","name":"group_result","filter":{"objectType":"KalturaAggregationCountFilter"}}]},"filter":{"objectType":"KalturaSearchAssetFilter","orderBy":"START_DATE_DESC","kSql":"(and asset_type='recording' start_date <'0' end_date < '-900')","groupBy":[{"objectType":"KalturaAssetMetaOrTagGroupBy","value":"SeriesID"}],"groupingOptionEqual":"Include"},"pager":{"objectType":"KalturaFilterPager","pageSize":500,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
-    result = o2tv_list_api(post = post)
+    result = o2tv_list_api(post = post, silent = True)
     for item in result:
         recording_ids.update({item['id'] : item['recordingId']})
     channels = Channels()
-    channels_list = channels.get_channels_list('id', visible_filter = False)            
-    epg = epg_api(post = post, key = 'startts')
-    for key in sorted(epg.keys(), reverse = False):
-        list_item = xbmcgui.ListItem(label = epg[key]['title'] + ' (' + channels_list[epg[key]['channel_id']]['name'] + ' | ' + decode(day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')]) + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ')')
-        list_item = epg_listitem(list_item = list_item, epg = epg[key], logo = '')
-        list_item.setProperty('IsPlayable', 'true')
-        list_item.setContentLookup(False)          
-        menus = [('Smazat nahrávku', 'RunPlugin(plugin://' + plugin_id + '?action=delete_recording&id=' + str(recording_ids[epg[key]['id']]) + ')')]
-        list_item.addContextMenuItems(menus)         
-        url = get_url(action='play_recording', id = recording_ids[epg[key]['id']], start = epg[key]['startts'], end = epg[key]['endts'])
-        xbmcplugin.addDirectoryItem(_handle, url, list_item, False)
+    channels_list = channels.get_channels_list('id', visible_filter = False)  
+    if len(recording_ids) > 0:
+        epg = epg_api(post = post, key = 'startts')
+        for key in sorted(epg.keys(), reverse = False):
+            list_item = xbmcgui.ListItem(label = epg[key]['title'] + ' (' + channels_list[epg[key]['channel_id']]['name'] + ' | ' + decode(day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')]) + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ')')
+            list_item = epg_listitem(list_item = list_item, epg = epg[key], logo = '')
+            list_item.setProperty('IsPlayable', 'true')
+            list_item.setContentLookup(False)          
+            menus = [('Smazat nahrávku', 'RunPlugin(plugin://' + plugin_id + '?action=delete_recording&id=' + str(recording_ids[epg[key]['id']]) + ')')]
+            list_item.addContextMenuItems(menus)         
+            url = get_url(action='play_recording', id = recording_ids[epg[key]['id']], start = epg[key]['startts'], end = epg[key]['endts'])
+            xbmcplugin.addDirectoryItem(_handle, url, list_item, False)
     xbmcplugin.endOfDirectory(_handle, cacheToDisc = False)
 
 def delete_recording(id):
@@ -164,8 +165,6 @@ def future_program(id, day, label):
         url = get_url(action='future_program', id = id, day = int(day) + 1, label = label + ' / ' + den_label)  
         list_item.setArt({ 'thumb' : os.path.join(icons_dir , 'next_arrow.png'), 'icon' : os.path.join(icons_dir , 'next_arrow.png') })
         xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
-
-
     xbmcplugin.endOfDirectory(_handle)
 
 def add_recording(id):

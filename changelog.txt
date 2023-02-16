@@ -1,3 +1,6 @@
+v1.2.1 (16.02.2022)
+- ošetření chyby u nahrávek, pokud žádná neexistuje
+
 v1.2.0 (15.02.2022)
 - odstranění kódu pro kompatibilitu s Kodi 18
 - úprava přihlašovaní (odstranění volání staré platformy)
@@ -13,6 +16,3 @@ v1.1.5 (01.02.2023)
 v1.1.4 (22.01.2023)
 - upravený výběr loga kanálu
 - ošetření chyby při přehrávání přes catchup
-
-v1.1.3 (03.12.2022)
-- přidané kategorie Sport a Dětské
