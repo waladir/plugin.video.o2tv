@@ -1,3 +1,7 @@
+v1.2.3 (26.02.2023)
+- oprava generování EPG pro IPTV simple clienta
+- doplnění rolí
+
 v1.2.2 (26.02.2023)
 - podpora DRM
 - odstranění nepoužívaného kódu
@@ -15,6 +19,3 @@ v1.2.0 (15.02.2023)
 
 v1.1.6 (01.02.2023)
 - oštření speciálních znaků v EPG
-
-v1.1.5 (01.02.2023)
-- podpora pro IPTV Merge

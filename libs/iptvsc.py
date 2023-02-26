@@ -109,8 +109,8 @@ def generate_epg(output_file = ''):
                     if logo is None:
                         logo = ''
                     channel = channels_list[number]['name']
-                    content = content + '    <channel id="' + channel.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;') + '">\n'
-                    content = content + '            <display-name lang="cs">' + channel.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;') + '</display-name>\n'
+                    content = content + '    <channel id="' + channel.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;').replace("'","&apos;").replace('"',"&quot") + '">\n'
+                    content = content + '            <display-name lang="cs">' + channel.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;').replace("'","&apos;").replace('"',"&quot") + '</display-name>\n'
                     content = content + '            <icon src="' + logo + '" />\n'
                     content = content + '    </channel>\n'
                 file.write(bytearray((content).encode('utf-8')))
@@ -132,13 +132,13 @@ def generate_epg(output_file = ''):
                         starttime = datetime.fromtimestamp(epg_item['startts']).strftime('%Y%m%d%H%M%S')
                         endtime = datetime.fromtimestamp(epg_item['endts']).strftime('%Y%m%d%H%M%S')
                         content = content + '    <programme start="' + starttime + ' +0' + str(tz_offset) + '00" stop="' + endtime + ' +0' + str(tz_offset) + '00" channel="' + channels_list_by_id[epg_item['channel_id']]['name'].replace('&','&amp;').replace('<','&lt;').replace('<','&gt;') + '">\n'
-                        content = content + '       <title lang="cs">' + epg_item['title'].replace('&','&amp;').replace('<','&lt;').replace('>','&gt;') + '</title>\n'
+                        content = content + '       <title lang="cs">' + epg_item['title'].replace('&','&amp;').replace('<','&lt;').replace('>','&gt;').replace("'","&apos;").replace('"',"&quot") + '</title>\n'
                         if epg_item['original'] != None and len(epg_item['original']) > 0:
-                            content = content + '       <title>' + epg_item['original'].replace('&','&amp;').replace('<','&lt;').replace('<','&gt;') + '</title>\n'
+                            content = content + '       <title>' + epg_item['original'].replace('&','&amp;').replace('<','&lt;').replace('<','&gt;').replace("'","&apos;").replace('"',"&quot") + '</title>\n'
                         if epg_item['description'] != None and len(epg_item['description']) > 0:
-                            content = content + '       <desc lang="cs">' + epg_item['description'].replace('&','&amp;').replace('<','&lt;').replace('<','&gt;') + '</desc>\n'
+                            content = content + '       <desc lang="cs">' + epg_item['description'].replace('&','&amp;').replace('<','&lt;').replace('<','&gt;').replace("'","&apos;").replace('"',"&quot") + '</desc>\n'
                         if epg_item['episodeName'] != None and len(epg_item['episodeName']) > 0:
-                            content = content + '       <sub-title lang="cs">' + epg_item['episodeName'].replace('&','&amp;').replace('<','&lt;').replace('<','&gt;') + '</sub-title>\n'
+                            content = content + '       <sub-title lang="cs">' + epg_item['episodeName'].replace('&','&amp;').replace('<','&lt;').replace('<','&gt;').replace("'","&apos;").replace('"',"&quot") + '</sub-title>\n'
                         if epg_item['episodeNumber'] != None and epg_item['seasonNumber'] != None and epg_item['episodeNumber'] > 0 and epg_item['seasonNumber'] > 0:
                             if epg_item['episodesInSeason'] != None and epg_item['episodesInSeason'] > 0:
                                 content = content + '       <episode-num system="xmltv_ns">' + str(epg_item['seasonNumber']-1) + '.' + str(epg_item['episodeNumber']-1) + '/' + str(epg_item['episodesInSeason']) + '.0/0"</episode-num>\n'
@@ -146,17 +146,17 @@ def generate_epg(output_file = ''):
                                 content = content + '       <episode-num system="xmltv_ns">' + str(epg_item['seasonNumber']-1) + '.' + str(epg_item['episodeNumber']-1) + '.0/0"</episode-num>\n'
                         content = content + '       <icon src="' + epg_item['poster'] + '"/>\n'
                         content = content + '       <credits>\n'
-                        for cast in epg_item['cast']: 
-                            content = content + '         <actor>' + cast.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;') + '</actor>\n'
+                        for person in epg_item['cast']: 
+                            content = content + '         <actor role="' + person[1].replace('&','&amp;').replace('<','&lt;').replace('>','&gt;').replace("'","&apos;").replace('"',"&quot") + '">' + person[0].replace('&','&amp;').replace('<','&lt;').replace('>','&gt;') + '</actor>\n'
                         for director in epg_item['directors']: 
-                            content = content + '         <director>' + director.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;') + '</director>\n'
+                            content = content + '         <director>' + director.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;').replace("'","&apos;").replace('"',"&quot") + '</director>\n'
                         content = content + '       </credits>\n'
                         for category in epg_item['genres']:
-                            content = content + '       <category>' + category.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;') + '</category>\n'
+                            content = content + '       <category>' + category.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;').replace("'","&apos;").replace('"',"&quot") + '</category>\n'
                         if len(str(epg_item['year'])) > 0 and int(epg_item['year']) > 0:
                             content = content + '       <date>' + str(epg_item['year']) + '</date>\n'
                         if len(epg_item['country']) > 0:
-                            content = content + '       <country>' + epg_item['country'].replace('&','&amp;').replace('<','&lt;').replace('>','&gt;') + '</country>\n'
+                            content = content + '       <country>' + epg_item['country'].replace('&','&amp;').replace('<','&lt;').replace('>','&gt;').replace("'","&apos;").replace('"',"&quot") + '</country>\n'
                         content = content + '    </programme>\n'
                         cnt = cnt + 1
                         if cnt > 20:
