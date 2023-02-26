@@ -10,7 +10,7 @@ import time
 
 from libs.channels import Channels
 from libs.channels import Session
-from libs.utils import plugin_id, decode, clientTag, apiVersion
+from libs.utils import plugin_id, clientTag, apiVersion
 from libs.epg import get_channel_epg, epg_api
 from libs.recordings import add_recording
 tz_offset = int((time.mktime(datetime.now().timetuple())-time.mktime(datetime.utcnow().timetuple()))/3600)
@@ -178,7 +178,6 @@ def generate_epg(output_file = ''):
 def iptv_sc_rec(channelName, startdatetime):
     channels = Channels()
     channels_list = channels.get_channels_list('name', visible_filter = False)
-    channelName = decode(channelName)
     from_ts = int(time.mktime(time.strptime(startdatetime, '%d.%m.%Y %H:%M')))
     epg = get_channel_epg(id = channels_list[channelName]['id'], from_ts = from_ts, to_ts = from_ts + 60*60*12)
     if len(epg) > 0 and from_ts in epg:

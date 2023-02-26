@@ -10,15 +10,12 @@ from urllib.parse import quote
 
 from datetime import datetime
 
-from libs.utils import PY3, get_url, plugin_id, day_translation_short, decode, clientTag, apiVersion
+from libs.utils import get_url, plugin_id, day_translation_short, clientTag, apiVersion
 from libs.session import Session
 from libs.channels import Channels
 from libs.epg import epg_listitem, epg_api
 
 _handle = int(sys.argv[1])
-
-def openfile(fname, mode):
-    return open(fname, mode, encoding = 'utf-8') if PY3 else open(fname, mode)
 
 def list_search(label):
     xbmcplugin.setPluginCategory(_handle, label)
@@ -54,7 +51,7 @@ def program_search(query, label):
     if len(epg) > 0:
         for key in sorted(epg.keys(), reverse = True):
             if epg[key]['channel_id'] in channels_list:                
-                list_item = xbmcgui.ListItem(label = epg[key]['title'] + ' (' + channels_list[epg[key]['channel_id']]['name'] + ' | ' + decode(day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')]) + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ')')
+                list_item = xbmcgui.ListItem(label = epg[key]['title'] + ' (' + channels_list[epg[key]['channel_id']]['name'] + ' | ' + day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')] + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ')')
                 list_item = epg_listitem(list_item = list_item, epg = epg[key], logo = channels_list[epg[key]['channel_id']]['logo'])
                 list_item.setProperty('IsPlayable', 'true')
                 list_item.setContentLookup(False)          
@@ -74,14 +71,14 @@ def save_search_history(query):
     history = []
     filename = addon_userdata_dir + 'search_history.txt'
     try:
-        with openfile(filename, 'r') as file:
+        with open(filename, 'r') as file:
             for line in file:
                 item = line[:-1]
                 history.append(item)
     except IOError:
         history = []
     history.insert(0,query)
-    with openfile(filename, 'w') as file:
+    with open(filename, 'w') as file:
         for item  in history:
             cnt = cnt + 1
             if cnt <= max_history:
@@ -93,7 +90,7 @@ def load_search_history():
     addon_userdata_dir = translatePath(addon.getAddonInfo('profile')) 
     filename = addon_userdata_dir + 'search_history.txt'
     try:
-        with openfile(filename, 'r') as file:
+        with open(filename, 'r') as file:
             for line in file:
                 item = line[:-1]
                 history.append(item)
@@ -110,7 +107,7 @@ def delete_search(query):
         if item == query:
             history.remove(item)
     try:
-        with openfile(filename, 'w') as file:
+        with open(filename, 'w') as file:
             for item in history:
                 file.write('%s\n' % item)
     except IOError:

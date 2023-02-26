@@ -75,9 +75,27 @@ def play_stream(post):
         if len(data['result'][1]['sources']) > 0:
             urls = {}
             for stream in data['result'][1]['sources']:
-                urls.update({stream['type'] : stream['url']})
+                license = None
+                for drm in stream['drm']:
+                    if drm['scheme'] == 'WIDEVINE_CENC':
+                        license = drm['licenseURL']
+                urls.update({stream['type'] : { 'url' : stream['url'], 'license' : license}})
+
+            if 'DASH_WV' in urls and 1 == 0:
+                url = urls['DASH_WV']['url']
+                list_item = xbmcgui.ListItem(path = url)
+                # list_item.setProperty('inputstream.adaptive.play_timeshift_buffer', 'true')
+                list_item.setProperty('inputstream', 'inputstream.adaptive')
+                list_item.setProperty('inputstream.adaptive.manifest_type', 'mpd')
+                list_item.setProperty('inputstream.adaptive.license_type', 'com.widevine.alpha')
+                from urllib.parse import urlencode
+                list_item.setProperty('inputstream.adaptive.license_key', urls['DASH_WV']['license'] + '|' + urlencode(o2api.headers) + '|R{SSM}|')                
+                list_item.setMimeType('application/dash+xml')
+                list_item.setContentLookup(False)       
+                xbmcplugin.setResolvedUrl(_handle, True, list_item)
+
             if 'DASH' in urls:
-                url = urls['DASH']
+                url = urls['DASH']['url']
                 list_item = xbmcgui.ListItem(path = url)
                 # list_item.setProperty('inputstream.adaptive.play_timeshift_buffer', 'true')
                 list_item.setProperty('inputstream', 'inputstream.adaptive')

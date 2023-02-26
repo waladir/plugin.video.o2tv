@@ -17,7 +17,7 @@ from datetime import datetime
 from libs.settings import Settings
 from libs.o2tv import o2tv_list_api
 from libs.session import Session
-from libs.utils import get_url, encode, decode, plugin_id, clientTag, apiVersion
+from libs.utils import get_url, plugin_id, clientTag, apiVersion
 
 if len(sys.argv) > 1:
     _handle = int(sys.argv[1])
@@ -50,9 +50,9 @@ def list_channels_edit(label):
                 list_item = xbmcgui.ListItem(label='[COLOR=gray]' + str(number) + ' ' + channels_list[number]['name'] + '[/COLOR]')
             list_item.setArt({'thumb': channels_list[number]['logo'], 'icon': channels_list[number]['logo']})
             url = get_url(action='edit_channel', id = channels_list[number]['id'])
-            list_item.addContextMenuItems([('Zvýšit čísla kanálů', encode('RunPlugin(plugin://' + plugin_id + '?action=change_channels_numbers&from_number=' + str(number) + '&direction=increase)')),       
-                                            ('Snížit čísla kanálů', encode('RunPlugin(plugin://' + plugin_id + '?action=change_channels_numbers&from_number=' + str(number) + '&direction=decrease)')),
-                                            ('Odstranit kanál', encode('RunPlugin(plugin://' + plugin_id + '?action=delete_channel&id='  + str(channels_list[number]['id']) + ')'))])       
+            list_item.addContextMenuItems([('Zvýšit čísla kanálů', 'RunPlugin(plugin://' + plugin_id + '?action=change_channels_numbers&from_number=' + str(number) + '&direction=increase)'),       
+                                            ('Snížit čísla kanálů', 'RunPlugin(plugin://' + plugin_id + '?action=change_channels_numbers&from_number=' + str(number) + '&direction=decrease)'),
+                                            ('Odstranit kanál', 'RunPlugin(plugin://' + plugin_id + '?action=delete_channel&id='  + str(channels_list[number]['id']) + ')')])       
             xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
         xbmcplugin.endOfDirectory(_handle, cacheToDisc = False)
 
@@ -64,7 +64,7 @@ def edit_channel(id):
     if len(new_num) > 0 and int(new_num) > 0:
         channels_nums = channels.get_channels_list('channel_number', visible_filter = False)
         if int(new_num) in channels_nums:
-            xbmcgui.Dialog().notification('O2TV', 'Číslo kanálu ' + new_num +  ' je použité u kanálu ' + encode(channels_nums[int(new_num)]['name']), xbmcgui.NOTIFICATION_ERROR, 5000)
+            xbmcgui.Dialog().notification('O2TV', 'Číslo kanálu ' + new_num +  ' je použité u kanálu ' + channels_nums[int(new_num)]['name'], xbmcgui.NOTIFICATION_ERROR, 5000)
         else:  
             channels.set_number(id = id, number = new_num)
 
@@ -127,9 +127,9 @@ def list_channels_groups(label):
             list_item = xbmcgui.ListItem(label='[B]' + channels_group + '[/B]')                
         else:
             list_item = xbmcgui.ListItem(label=channels_group)
-        url = get_url(action='edit_channel_group', group = encode(channels_group), label = 'Skupiny kanálů / ' + encode(channels_group)) 
-        list_item.addContextMenuItems([('Vybrat skupinu', 'RunPlugin(plugin://' + plugin_id + '?action=select_channel_group&group=' + quote(encode(channels_group)) + ')'), 
-                                      ('Smazat skupinu', 'RunPlugin(plugin://' + plugin_id + '?action=delete_channel_group&group=' + quote(encode(channels_group)) + ')')])       
+        url = get_url(action='edit_channel_group', group = channels_group, label = 'Skupiny kanálů / ' + channels_group)
+        list_item.addContextMenuItems([('Vybrat skupinu', 'RunPlugin(plugin://' + plugin_id + '?action=select_channel_group&group=' + quote(channels_group) + ')'), 
+                                      ('Smazat skupinu', 'RunPlugin(plugin://' + plugin_id + '?action=delete_channel_group&group=' + quote(channels_group) + ')')])       
         xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
     xbmcplugin.endOfDirectory(_handle,cacheToDisc = False)
 
@@ -142,7 +142,6 @@ def add_channel_group(label):
     if len(group) == 0:
         xbmcgui.Dialog().notification('O2TV', 'Je nutné zadat název skupiny', xbmcgui.NOTIFICATION_ERROR, 5000)
         sys.exit()          
-    group = decode(group)
     channels_groups = Channels_groups()
     if group in channels_groups.groups:
         xbmcgui.Dialog().notification('O2TV', 'Název skupiny je už použitý', xbmcgui.NOTIFICATION_ERROR, 5000)
@@ -151,60 +150,56 @@ def add_channel_group(label):
     xbmc.executebuiltin('Container.Refresh')
 
 def edit_channel_group(group, label):
-    group = decode(group)
     xbmcplugin.setPluginCategory(_handle, label)    
     channels_groups = Channels_groups()
     channels = Channels()
     channels_list = channels.get_channels_list('name', visible_filter = False)
     list_item = xbmcgui.ListItem(label='Přidat kanál')
-    url = get_url(action='edit_channel_group_list_channels', group = encode(group), label = encode(group) + ' / Přidat kanál')  
+    url = get_url(action='edit_channel_group_list_channels', group = group, label = group + ' / Přidat kanál')  
     xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
     list_item = xbmcgui.ListItem(label='Přidat všechny kanály')
-    url = get_url(action='edit_channel_group_add_all_channels', group = encode(group), label = encode(group) + ' / Přidat kanál')  
+    url = get_url(action='edit_channel_group_add_all_channels', group = group, label = group + ' / Přidat kanál')  
     xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
     if group in channels_groups.channels:
         for channel in channels_groups.channels[group]:
             if channel in channels_list:
                 list_item = xbmcgui.ListItem(label = channels_list[channel]['name'])
                 list_item.setArt({'thumb': channels_list[channel]['logo'], 'icon': channels_list[channel]['logo']})
-                url = get_url(action='edit_channel_group', group = encode(group), label = label)  
-                list_item.addContextMenuItems([('Smazat kanál', 'RunPlugin(plugin://' + plugin_id + '?action=edit_channel_group_delete_channel&group=' + quote(encode(group)) + '&channel='  + quote(encode(channel)) + ')',)])       
+                url = get_url(action='edit_channel_group', group = group, label = label)  
+                list_item.addContextMenuItems([('Smazat kanál', 'RunPlugin(plugin://' + plugin_id + '?action=edit_channel_group_delete_channel&group=' + quote(group) + '&channel='  + quote(channel) + ')',)])       
                 xbmcplugin.addDirectoryItem(_handle, url, list_item, False)
     xbmcplugin.endOfDirectory(_handle,cacheToDisc = False)
 
 def delete_channel_group(group):
     response = xbmcgui.Dialog().yesno('Smazání skupiny kanálů', 'Opravdu smazat skupinu kanálů ' + group + '?', nolabel = 'Ne', yeslabel = 'Ano')
     if response:
-        group = decode(group)
         channels_groups = Channels_groups()
         channels_groups.delete_channels_group(group)
         xbmc.executebuiltin('Container.Refresh')
 
 def edit_channel_group(group, label):
-    group = decode(group)
     xbmcplugin.setPluginCategory(_handle, label)    
     channels_groups = Channels_groups()
     channels = Channels()
     channels_list = channels.get_channels_list('name', visible_filter = False)
    
     list_item = xbmcgui.ListItem(label='Přidat kanál')
-    url = get_url(action='edit_channel_group_list_channels', group = encode(group), label = encode(group) + ' / Přidat kanál')  
+    url = get_url(action='edit_channel_group_list_channels', group = group, label = group + ' / Přidat kanál')  
     xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
     list_item = xbmcgui.ListItem(label='Přidat všechny kanály')
-    url = get_url(action='edit_channel_group_add_all_channels', group = encode(group), label = encode(group) + ' / Přidat kanál')  
+    url = get_url(action='edit_channel_group_add_all_channels', group = group, label = group + ' / Přidat kanál')  
     xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
     if group in channels_groups.channels:
         for channel in channels_groups.channels[group]:
             if channel in channels_list:
                 list_item = xbmcgui.ListItem(label = channels_list[channel]['name'])
                 list_item.setArt({'thumb': channels_list[channel]['logo'], 'icon': channels_list[channel]['logo']})
-                url = get_url(action='edit_channel_group', group = encode(group), label = label)  
-                list_item.addContextMenuItems([('Smazat kanál', 'RunPlugin(plugin://' + plugin_id + '?action=edit_channel_group_delete_channel&group=' + quote(encode(group)) + '&channel='  + quote(encode(channel)) + ')',)])       
+                url = get_url(action='edit_channel_group', group = group, label = label)  
+                list_item.addContextMenuItems([('Smazat kanál', 'RunPlugin(plugin://' + plugin_id + '?action=edit_channel_group_delete_channel&group=' + quote(group) + '&channel='  + quote(channel) + ')',)])       
                 xbmcplugin.addDirectoryItem(_handle, url, list_item, False)
     xbmcplugin.endOfDirectory(_handle,cacheToDisc = False)
 
 def select_channel_group(group):
-    group = decode(group)
     channels_groups = Channels_groups()
     channels_groups.select_group(group)
     xbmc.executebuiltin('Container.Refresh')
@@ -213,7 +208,6 @@ def select_channel_group(group):
 
 
 def edit_channel_group_list_channels(group, label):
-    group = decode(group)
     xbmcplugin.setPluginCategory(_handle, label)  
     channels_groups = Channels_groups()
     channels = Channels()
@@ -222,26 +216,21 @@ def edit_channel_group_list_channels(group, label):
         if not group in channels_groups.groups or not group in channels_groups.channels or not channels_list[number]['name'] in channels_groups.channels[group]:
             list_item = xbmcgui.ListItem(label=str(number) + ' ' + channels_list[number]['name'])
             list_item.setArt({'thumb': channels_list[number]['logo'], 'icon': channels_list[number]['logo']})
-            url = get_url(action='edit_channel_group_add_channel', group = encode(group), channel = encode(channels_list[number]['name']))  
+            url = get_url(action='edit_channel_group_add_channel', group = group, channel = channels_list[number]['name'])  
             xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
     xbmcplugin.endOfDirectory(_handle,cacheToDisc = False)
 
 def edit_channel_group_add_channel(group, channel):
-    group = decode(group)
-    channel = decode(channel)
     channels_groups = Channels_groups()
     channels_groups.add_channel_to_group(channel, group)
     xbmc.executebuiltin('Container.Refresh')
 
 def edit_channel_group_add_all_channels(group):
-    group = decode(group)
     channels_groups = Channels_groups()
     channels_groups.add_all_channels_to_group(group)
     xbmc.executebuiltin('Container.Refresh')
 
 def edit_channel_group_delete_channel(group, channel):
-    group = decode(group)
-    channel = decode(channel)
     channels_groups = Channels_groups()
     channels_groups.delete_channel_from_group(channel, group)
     xbmc.executebuiltin('Container.Refresh')

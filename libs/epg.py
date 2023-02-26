@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
+import xbmc
+
 import time
+
 from libs.session import Session
 from libs.channels import Channels
 from libs.o2tv import o2tv_list_api
-from libs.utils import encode, clientTag, apiVersion
+from libs.utils import clientTag, apiVersion, get_kodi_version
 
 def get_live_epg():
     session = Session()
@@ -39,6 +42,7 @@ def epg_api(post, key):
             genres = []
             cast = []
             directors = []
+            writers = []
             country = ''
 
             ratios = {'2x3' : '/height/720/width/480', '3x2' : '/height/480/width/720', '16x9' : '/height/480/width/853'}
@@ -57,12 +61,18 @@ def epg_api(post, key):
             if 'Genre' in item['tags']:
                 for genre in item['tags']['Genre']['objects']:
                     genres.append(genre['value'])
-            if 'Actors' in item['tags']:
-                for person in item['tags']['Actors']['objects']:
-                    cast.append(person['value'])
+            if 'PersonReference' in item['tags']:
+                for person in item['tags']['PersonReference']['objects']:
+                    person_data = person['value'].split('|')
+                    if len(person_data) < 3:
+                        person_data.append('')
+                    cast.append((person_data[1], person_data[2]))
             if 'Director' in item['tags']:
                 for director in item['tags']['Director']['objects']:
                     directors.append(director['value'])
+            if 'Writers' in item['tags']:
+                for writer in item['tags']['Writers']['objects']:
+                    writers.append(writer['value'])
             if 'Country' in item['tags'] and 'value' in item['tags']['Country']:
                 country = item['tags']['Country']['value']
 
@@ -93,7 +103,7 @@ def epg_api(post, key):
                 isSeries = False
                 seriesId = ''
 
-            epg_item = {'id' : id, 'title' : title, 'channel_id' : channel_id, 'description' : description, 'startts' : startts, 'endts' : endts, 'cover' : cover, 'poster' : poster, 'original' : original, 'imdb' : imdb, 'year' : year, 'contentType' : contentType, 'genres' : genres, 'cast' : cast, 'directors' : directors, 'country' : country, 'episodeNumber' : episodeNumber, 'seasonNumber' : seasonNumber, 'episodesInSeason' : episodesInSeason, 'episodeName' : episodeName, 'seasonName' : seasonName, 'seriesName' : seriesName, 'isSeries' : isSeries, 'seriesId' : seriesId}
+            epg_item = {'id' : id, 'title' : title, 'channel_id' : channel_id, 'description' : description, 'startts' : startts, 'endts' : endts, 'cover' : cover, 'poster' : poster, 'original' : original, 'imdb' : imdb, 'year' : year, 'contentType' : contentType, 'genres' : genres, 'cast' : cast, 'directors' : directors, 'writers' : writers, 'country' : country, 'episodeNumber' : episodeNumber, 'seasonNumber' : seasonNumber, 'episodesInSeason' : episodesInSeason, 'episodeName' : episodeName, 'seasonName' : seasonName, 'seriesName' : seriesName, 'isSeries' : isSeries, 'seriesId' : seriesId}
             if key == 'startts':
                 epg.update({startts : epg_item})
             elif key == 'channel_id':
@@ -108,13 +118,15 @@ def epg_api(post, key):
 def epg_listitem(list_item, epg, logo):
     cast = []
     directors = []
+    writers = []
     genres = []
 
-    # if 'contentType' in epg and len(epg['contentType']) > 0:
-    #     list_item.setInfo('video', {'mediatype' : epg['contentType']})
-    # else:
-    list_item.setInfo('video', {'mediatype' : 'movie'})
-
+    kodi_version = get_kodi_version()
+    if kodi_version >= 20:
+        infotag = list_item.getVideoInfoTag()
+        infotag.setMediaType('movie')
+    else:
+        list_item.setInfo('video', {'mediatype' : 'movie'})
     if 'cover' in epg and len(epg['cover']) > 0:
         if 'poster' in epg and len(epg['poster']) > 0:
             list_item.setArt({'poster': epg['poster'], 'icon': epg['cover']})
@@ -123,39 +135,80 @@ def epg_listitem(list_item, epg, logo):
     else:
         list_item.setArt({'thumb': logo, 'icon': logo})    
     if 'description' in epg and len(epg['description']) > 0:
-        list_item.setInfo('video', {'plot': epg['description']})
+        if kodi_version >= 20:
+            infotag.setPlot(epg['description'])
+        else:
+            list_item.setInfo('video', {'plot': epg['description']})
     if 'imdb' in epg and len(epg['imdb']) > 0:
-        list_item.setInfo('video', {'imdbnumber': epg['imdb']})
+        if kodi_version >= 20:
+            infotag.setIMDBNumber(epg['imdb'])
+        else:
+            list_item.setInfo('video', {'imdbnumber': epg['imdb']})
     if 'year' in epg and len(str(epg['year'])) > 0:
-        list_item.setInfo('video', {'year': int(epg['year'])})
+        if kodi_version >= 20:
+            infotag.setYear(int(epg['year']))
+        else:
+            list_item.setInfo('video', {'year': int(epg['year'])})
     if 'original' in epg and len(epg['original']) > 0:
-        list_item.setInfo('video', {'originaltitle': epg['original']})
+        if kodi_version >= 20:
+            infotag.setOriginalTitle(epg['original'])
+        else:
+            list_item.setInfo('video', {'originaltitle': epg['original']})
     if 'country' in epg and len(epg['country']) > 0:
-        list_item.setInfo('video', {'country': epg['country']})
-
+        if kodi_version >= 20:
+            infotag.setCountries([epg['country']])
+        else:
+            list_item.setInfo('video', {'country': epg['country']})
     if 'genres' in epg and len(epg['genres']) > 0:
         for genre in epg['genres']:      
-          genres.append(encode(genre))
-        list_item.setInfo('video', {'genre' : genres})    
+          genres.append(genre)
+        if kodi_version >= 20:
+            infotag.setGenres(genres)
+        else:
+            list_item.setInfo('video', {'genre' : genres})    
     if 'cast' in epg and len(epg['cast']) > 0:
-        for person in epg['cast']:      
-            cast.append(encode(person))
-        list_item.setInfo('video', {'cast' : cast})  
+        for person in epg['cast']: 
+            if kodi_version >= 20:
+                cast.append(xbmc.Actor(person[0], person[1]))
+            else:
+                cast.append(person)
+        if kodi_version >= 20:
+            infotag.setCast(cast)
+        else:
+            list_item.setInfo('video', {'castandrole' : cast})  
     if 'directors' in epg and len(epg['directors']) > 0:
         for person in epg['directors']:      
-            directors.append(encode(person))
-        list_item.setInfo('video', {'director' : directors})  
-
+            directors.append(person)
+        if kodi_version >= 20:
+            infotag.setDirectors(directors)
+        else:
+            list_item.setInfo('video', {'director' : directors})  
+    if 'writers' in epg and len(epg['writers']) > 0:
+        for person in epg['writers']:      
+            writers.append(person)
+        if kodi_version >= 20:
+            infotag.setWriters(writers)
+        else:
+            list_item.setInfo('video', {'writer' : writers})  
     if 'episodeNumber' in epg and epg['episodeNumber'] != None and int(epg['episodeNumber']) > 0:
-        list_item.setInfo('video', {'mediatype': 'episode', 'episode' : int(epg['episodeNumber'])}) 
-        # list_item.setInfo('video', {'mediatype': 'episode'}) 
+        if kodi_version >= 20:
+            infotag.setEpisode(int(epg['episodeNumber']))
+        else:
+            list_item.setInfo('video', {'mediatype': 'episode', 'episode' : int(epg['episodeNumber'])}) 
     if 'episodeName' in epg and epg['episodeName'] != None and len(epg['episodeName']) > 0:
-        list_item.setInfo('video', {'title' : epg['episodeName']})  
+        if kodi_version >= 20:
+            infotag.setEpisodeGuide(epg['episodeName'])
+        else:
+            list_item.setInfo('video', {'title' : epg['episodeName']})  
     if 'seriesName' in epg and epg['seriesName'] != None and len(epg['seriesName']) > 0:
-        list_item.setInfo('video', {'tvshowtitle' : epg['seriesName']})  
-
+        if kodi_version >= 20:
+            infotag.addSeason(int(epg['seasonNumber']), epg['seriesName'])
+        else:
+            list_item.setInfo('video', {'tvshowtitle' : epg['seriesName']})  
     if 'seasonNumber' in epg and epg['seasonNumber'] != None and int(epg['seasonNumber']) > 0:
-        list_item.setInfo('video', {'season' : int(epg['seasonNumber'])})  
-    
+        if kodi_version >= 20:
+            infotag.setSeason(int(epg['seasonNumber']))
+        else:
+            list_item.setInfo('video', {'season' : int(epg['seasonNumber'])})  
     return list_item
 

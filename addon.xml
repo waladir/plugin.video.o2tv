@@ -1,4 +1,4 @@
-﻿<addon id="plugin.video.o2tv" name="O2TV" provider-name="waladir" version="1.2.1">
+﻿<addon id="plugin.video.o2tv" name="O2TV" provider-name="waladir" version="1.2.2">
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
     <import addon="inputstream.adaptive" version="19.0.0"/>
@@ -35,10 +35,16 @@ Další informace a podporu najdete na fóru www.xbmc-kodi.cz (https://www.xbmc-
     <platform>all</platform>
     <source>https://github.com/waladir/plugin.video.o2tv</source>
     <news>
-v1.2.1 (16.02.2022)
+v1.2.2 (26.02.2023)
+- podpora DRM
+- odstranění nepoužívaného kódu
+- úprava zobrazení metadat pro Kodi Nexus
+- doplnění metadat k pořadům
+
+v1.2.1 (16.02.2023)
 - ošetření chyby u nahrávek, pokud žádná neexistuje
 
-v1.2.0 (15.02.2022)
+v1.2.0 (15.02.2023)
 - odstranění kódu pro kompatibilitu s Kodi 18
 - úprava přihlašovaní (odstranění volání staré platformy)
 - parametrizace clientTag a apiVersion
@@ -49,10 +55,6 @@ v1.1.6 (01.02.2023)
 
 v1.1.5 (01.02.2023)
 - podpora pro IPTV Merge
-
-v1.1.4 (22.01.2023)
-- upravený výběr loga kanálu
-- ošetření chyby při přehrávání přes catchup
     </news>
     <assets>
         <icon>icon.png</icon>

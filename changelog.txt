@@ -1,7 +1,13 @@
-v1.2.1 (16.02.2022)
+v1.2.2 (26.02.2023)
+- podpora DRM
+- odstranění nepoužívaného kódu
+- úprava zobrazení metadat pro Kodi Nexus
+- doplnění metadat k pořadům
+
+v1.2.1 (16.02.2023)
 - ošetření chyby u nahrávek, pokud žádná neexistuje
 
-v1.2.0 (15.02.2022)
+v1.2.0 (15.02.2023)
 - odstranění kódu pro kompatibilitu s Kodi 18
 - úprava přihlašovaní (odstranění volání staré platformy)
 - parametrizace clientTag a apiVersion
@@ -12,7 +18,3 @@ v1.1.6 (01.02.2023)
 
 v1.1.5 (01.02.2023)
 - podpora pro IPTV Merge
-
-v1.1.4 (22.01.2023)
-- upravený výběr loga kanálu
-- ošetření chyby při přehrávání přes catchup

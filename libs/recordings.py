@@ -13,7 +13,7 @@ from libs.session import Session
 from libs.channels import Channels
 from libs.epg import epg_api, epg_listitem, get_channel_epg
 from libs.o2tv import O2API, o2tv_list_api
-from libs.utils import get_url, plugin_id, encode, decode, day_translation, day_translation_short, clientTag, apiVersion, partnerId
+from libs.utils import get_url, plugin_id, day_translation, day_translation_short, clientTag, apiVersion, partnerId
 
 if len(sys.argv) > 1:
     _handle = int(sys.argv[1])
@@ -39,7 +39,7 @@ def list_recordings(label):
     if len(recording_ids) > 0:
         epg = epg_api(post = post, key = 'startts')
         for key in sorted(epg.keys(), reverse = False):
-            list_item = xbmcgui.ListItem(label = epg[key]['title'] + ' (' + channels_list[epg[key]['channel_id']]['name'] + ' | ' + decode(day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')]) + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ')')
+            list_item = xbmcgui.ListItem(label = epg[key]['title'] + ' (' + channels_list[epg[key]['channel_id']]['name'] + ' | ' + day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')] + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ')')
             list_item = epg_listitem(list_item = list_item, epg = epg[key], logo = '')
             list_item.setProperty('IsPlayable', 'true')
             list_item.setContentLookup(False)          
@@ -100,7 +100,7 @@ def list_planning_recordings(label):
     for number in sorted(channels_list.keys()):  
         list_item = xbmcgui.ListItem(label = channels_list[number]['name'])
         list_item.setArt({'thumb': channels_list[number]['logo'], 'icon': channels_list[number]['logo']})
-        url = get_url(action='list_rec_days', id = channels_list[number]['id'], label = label + ' / ' + encode(channels_list[number]['name']))  
+        url = get_url(action='list_rec_days', id = channels_list[number]['id'], label = label + ' / ' + channels_list[number]['name'])
         xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
     xbmcplugin.endOfDirectory(_handle)
     
@@ -116,7 +116,7 @@ def list_rec_days(id, label):
             den = 'Zítra'
         else:
             den_label = day_translation_short[day.strftime('%w')] + ' ' + day.strftime('%d.%m')
-            den = decode(day_translation[day.strftime('%w')]) + ' ' + day.strftime('%d.%m.%Y')
+            den = day_translation[day.strftime('%w')] + ' ' + day.strftime('%d.%m.%Y')
         list_item = xbmcgui.ListItem(label=den)
         url = get_url(action='future_program', id = id, day = i, label = label + ' / ' + den_label)  
         xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
@@ -151,7 +151,7 @@ def future_program(id, day, label):
     for key in sorted(epg.keys()):
         start = epg[key]['startts']
         end = epg[key]['endts']
-        list_item = xbmcgui.ListItem(label= decode(day_translation_short[datetime.fromtimestamp(start).strftime('%w')]) + ' ' + datetime.fromtimestamp(start).strftime('%d.%m %H:%M') + ' - ' + datetime.fromtimestamp(end).strftime('%H:%M') + ' | ' + epg[key]['title'])
+        list_item = xbmcgui.ListItem(label = day_translation_short[datetime.fromtimestamp(start).strftime('%w')] + ' ' + datetime.fromtimestamp(start).strftime('%d.%m %H:%M') + ' - ' + datetime.fromtimestamp(end).strftime('%H:%M') + ' | ' + epg[key]['title'])
         list_item = epg_listitem(list_item, epg[key], '')
         list_item.setProperty('IsPlayable', 'false')
         list_item.addContextMenuItems([('Přidat nahrávku', 'RunPlugin(plugin://' + plugin_id + '?action=add_recording&id=' + str(epg[key]['id']) + ')',)])       

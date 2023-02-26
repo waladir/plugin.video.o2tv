@@ -10,7 +10,7 @@ from libs.session import Session
 from libs.o2tv import O2API, o2tv_list_api
 from libs.channels import Channels
 from libs.epg import epg_api, epg_listitem
-from libs.utils import get_url, encode, decode, day_translation_short, clientTag, apiVersion, partnerId
+from libs.utils import get_url, day_translation_short, clientTag, apiVersion, partnerId
 
 _handle = int(sys.argv[1])
 
@@ -43,20 +43,20 @@ def list_categories(label):
         {'id' : 357179, 'title' : 'Krimi', 'subcategories' : False, 'image' : 'https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/' + partnerId + '/entry_id/d9b43ca784ac44898fabe13c5e1c5393/version/0/height/320/width/570'},
         {'id' : 355131, 'title' : 'Drama', 'subcategories' : False, 'image' : 'https://images.frp1.ott.kaltura.com/Service.svc/GetImage/p/' + partnerId + '/entry_id/b57b594f4f894b37bb2ef4bd86017521/version/0/height/320/width/570'},
     ]
-    list_item = xbmcgui.ListItem(label='Sport')
+    list_item = xbmcgui.ListItem(label = 'Sport')
     list_item.setArt({'thumb' : '', 'icon' : ''})
     url = get_url(action='list_sport_categories', id = 355153, label = label + ' / Sport')  
     xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
     for category in categories:
-        list_item = xbmcgui.ListItem(label=encode(category['title']))
+        list_item = xbmcgui.ListItem(label = category['title'])
         list_item.setArt({'thumb' : category['image'], 'icon' : category['image']})
         if category['subcategories'] == True:
             if category['title'] == 'Dětské':
-                url = get_url(action='list_children_categories', id = category['id'], label = label + ' / ' + encode(category['title']))  
+                url = get_url(action='list_children_categories', id = category['id'], label = label + ' / ' + category['title'])  
             else:
-                url = get_url(action='list_subcategories', id = category['id'], label = label + ' / ' + encode(category['title']))  
+                url = get_url(action='list_subcategories', id = category['id'], label = label + ' / ' + category['title'])  
         else:
-            url = get_url(action='list_category', id = category['id'], label = label + ' / ' + encode(category['title']))  
+            url = get_url(action='list_category', id = category['id'], label = label + ' / ' + category['title'])  
         xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
     xbmcplugin.endOfDirectory(_handle)              
 
@@ -81,8 +81,8 @@ def list_subcategories(id, label):
                         series = 0
                     categories.append({'id' : category['id'], 'category_id' : category['unifiedChannels'][0]['id'], 'name' : category['name'], 'series' : series})
     for category in categories:
-        list_item = xbmcgui.ListItem(label=encode(category['name']))
-        url = get_url(action='list_category', id = category['category_id'], series = category['series'], label = label + ' / ' + encode(category['name']))  
+        list_item = xbmcgui.ListItem(label = category['name'])
+        url = get_url(action='list_category', id = category['category_id'], series = category['series'], label = label + ' / ' + category['name'])
         xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
     xbmcplugin.endOfDirectory(_handle, cacheToDisc = True)              
     
@@ -99,18 +99,18 @@ def list_sport_categories(id, label):
     post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaChannelFilter","kSql":"","idEqual":id},"pager":{"objectType":"KalturaFilterPager","pageSize":20,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}    
     result = o2tv_list_api(post = post)
     for item in result:
-        list_item = xbmcgui.ListItem(label=encode(item['name'].capitalize()))
+        list_item = xbmcgui.ListItem(label = item['name'].capitalize())
         for item2 in category_tree['result']['children']:
             if item2['referenceId'] == item['metas']['in_app_link']['value']:
                 for category in item2['children']:
                     if category['name'] == 'Ze záznamu':
-                        list_item = xbmcgui.ListItem(label=encode(item['name'].capitalize()))
+                        list_item = xbmcgui.ListItem(label = item['name'].capitalize())
                         if 'images' in item and len(item['images']) > 0 and 'url' in item['images'][0]:
                             if id == 355178:
                                 list_item.setArt({'thumb' : item['images'][0]['url'] + '/height/560/width/374', 'icon' : item['images'][0]['url'] + '/height/560/width/374'})
                             else:
                                 list_item.setArt({'thumb' : item['images'][0]['url'] + '/height/320/width/570', 'icon' : item['images'][0]['url'] + '/height/320/width/570'})
-                        url = get_url(action='list_category', id = category['unifiedChannels'][0]['id'], series = 0, label = label + ' / ' + encode(item['name'].capitalize()))  
+                        url = get_url(action='list_category', id = category['unifiedChannels'][0]['id'], series = 0, label = label + ' / ' + item['name'].capitalize())  
                         xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
     if id != 355178:
         list_item = xbmcgui.ListItem(label='Soutěže')
@@ -143,8 +143,8 @@ def list_children_categories(id, label):
                         series = 0
                     categories.append({'id' : category['id'], 'category_id' : category['unifiedChannels'][0]['id'], 'name' : category['name'], 'series' : series})
     for category in categories:
-        list_item = xbmcgui.ListItem(label=encode(category['name']))
-        url = get_url(action='list_category', id = category['category_id'], series = category['series'], label = label + ' / ' + encode(category['name']))  
+        list_item = xbmcgui.ListItem(label = category['name'])
+        url = get_url(action='list_category', id = category['category_id'], series = category['series'], label = label + ' / ' + category['name'])
         xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
     xbmcplugin.endOfDirectory(_handle, cacheToDisc = True)              
 
@@ -160,9 +160,9 @@ def list_category(id, series, label):
     epg = epg_api(post = post, key = 'startts_channel_number')
     for key in epg:
         if epg[key]['channel_id'] in channels_list:
-            list_item = xbmcgui.ListItem(label = epg[key]['title'] + ' (' + channels_list[epg[key]['channel_id']]['name'] + ' | ' + decode(day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')]) + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ')')        
+            list_item = xbmcgui.ListItem(label = epg[key]['title'] + ' (' + channels_list[epg[key]['channel_id']]['name'] + ' | ' + day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')] + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ')')        
             if epg[key]['isSeries'] == True:
-                url = get_url(action='list_series', id = epg[key]['seriesId'], label = label + ' / ' + encode(epg[key]['title']))  
+                url = get_url(action='list_series', id = epg[key]['seriesId'], label = label + ' / ' + epg[key]['title'])
                 if 'cover' in epg[key] and len(epg[key]['cover']) > 0:
                     if 'poster' in epg[key] and len(epg[key]['poster']) > 0:
                         list_item.setArt({'poster': epg[key]['poster'], 'icon': epg[key]['cover']})
@@ -196,7 +196,7 @@ def list_series(id, label):
                         title = title + ' S' + str(epg[key]['seasonNumber']) + 'E' + str(epg[key]['seasonNumber'])
                     else:
                         title = title + ' E' + str(epg[key]['episodeNumber'])
-            list_item = xbmcgui.ListItem(label = title + ' (' + channels_list[epg[key]['channel_id']]['name'] + ' | ' + decode(day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')]) + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ')')        
+            list_item = xbmcgui.ListItem(label = title + ' (' + channels_list[epg[key]['channel_id']]['name'] + ' | ' + day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')] + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ')')        
             list_item = epg_listitem(list_item = list_item, epg = epg[key], logo = '')
             list_item.setProperty('IsPlayable', 'true')
             list_item.setContentLookup(False)          
