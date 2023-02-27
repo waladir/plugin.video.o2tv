@@ -64,3 +64,5 @@ def parsetime(txt):
             h += 12
     return '%02d:%02d' % (h, m)
 
+def replace_by_html_entity(string):
+    return string.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;').replace("'","&apos;").replace('"',"&quot;")

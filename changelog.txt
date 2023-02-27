@@ -1,3 +1,7 @@
+v1.2.4 (27.02.2023)
+- upravené procházení programu v archivu a při plánovaní nahrávek (díky Radek_Kovacik a cache)
+- optimalizace náhrady problémových znaků v EPG pro IPTV SC
+
 v1.2.3 (26.02.2023)
 - oprava generování EPG pro IPTV simple clienta
 - doplnění rolí
@@ -16,6 +20,3 @@ v1.2.0 (15.02.2023)
 - úprava přihlašovaní (odstranění volání staré platformy)
 - parametrizace clientTag a apiVersion
 - do archivu a plánování nahrávek přidaná možnost přechodu na předcházající a nadcházející den
-
-v1.1.6 (01.02.2023)
-- oštření speciálních znaků v EPG

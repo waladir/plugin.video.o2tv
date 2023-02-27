@@ -89,4 +89,4 @@ def list_program(id, day_min, label):
         list_item.setArt({ 'thumb' : os.path.join(icons_dir , 'next_arrow.png'), 'icon' : os.path.join(icons_dir , 'next_arrow.png') })
         xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
 
-    xbmcplugin.endOfDirectory(_handle, cacheToDisc = False)
+    xbmcplugin.endOfDirectory(_handle, updateListing = True, cacheToDisc = False)

@@ -165,7 +165,7 @@ def future_program(id, day, label):
         url = get_url(action='future_program', id = id, day = int(day) + 1, label = label + ' / ' + den_label)  
         list_item.setArt({ 'thumb' : os.path.join(icons_dir , 'next_arrow.png'), 'icon' : os.path.join(icons_dir , 'next_arrow.png') })
         xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
-    xbmcplugin.endOfDirectory(_handle)
+    xbmcplugin.endOfDirectory(_handle, updateListing = True)
 
 def add_recording(id):
     id = int(id)
