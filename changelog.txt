@@ -1,3 +1,6 @@
+v1.2.5 (27.02.2023)
+- úprava labelu v archivu a nahrávkách
+
 v1.2.4 (27.02.2023)
 - upravené procházení programu v archivu a při plánovaní nahrávek (díky Radek_Kovacik a cache)
 - optimalizace náhrady problémových znaků v EPG pro IPTV SC
@@ -14,9 +17,3 @@ v1.2.2 (26.02.2023)
 
 v1.2.1 (16.02.2023)
 - ošetření chyby u nahrávek, pokud žádná neexistuje
-
-v1.2.0 (15.02.2023)
-- odstranění kódu pro kompatibilitu s Kodi 18
-- úprava přihlašovaní (odstranění volání staré platformy)
-- parametrizace clientTag a apiVersion
-- do archivu a plánování nahrávek přidaná možnost přechodu na předcházající a nadcházející den

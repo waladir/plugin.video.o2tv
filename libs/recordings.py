@@ -130,7 +130,7 @@ def future_program(id, day, label):
     xbmcplugin.setPluginCategory(_handle, label)
     id = int(id)
     today_date = datetime.today() 
-    today_start_ts = int(time.mktime(datetime(today_date.year, today_date.month, today_date.day) .timetuple()))
+    today_start_ts = int(time.mktime(datetime(today_date.year, today_date.month, today_date.day).timetuple()))
     today_end_ts = today_start_ts + 60*60*24 -1
     if int(day) == 0:
         from_ts = int(time.mktime(datetime.now().timetuple()))
@@ -142,9 +142,9 @@ def future_program(id, day, label):
 
     if int(day) >  0:
         list_item = xbmcgui.ListItem(label='Předchozí den')
-        day_dt = date.today() - timedelta(days = int(day) - 1)
+        day_dt = date.today() + timedelta(days = int(day) - 1)
         den_label = day_translation_short[day_dt.strftime('%w')] + ' ' + day_dt.strftime('%d.%m')
-        url = get_url(action='future_program', id = id, day = int(day) - 1, label = label + ' / ' + den_label)  
+        url = get_url(action='future_program', id = id, day = int(day) - 1, label = label.rsplit(' / ')[0] + ' / ' + den_label)  
         list_item.setArt({ 'thumb' : os.path.join(icons_dir , 'previous_arrow.png'), 'icon' : os.path.join(icons_dir , 'previous_arrow.png') })
         xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
 
@@ -160,9 +160,9 @@ def future_program(id, day, label):
 
     if int(day) <  7:
         list_item = xbmcgui.ListItem(label='Následující den')
-        day_dt = date.today() - timedelta(days = int(day) + 1)
+        day_dt = date.today() + timedelta(days = int(day) + 1)
         den_label = day_translation_short[day_dt.strftime('%w')] + ' ' + day_dt.strftime('%d.%m')
-        url = get_url(action='future_program', id = id, day = int(day) + 1, label = label + ' / ' + den_label)  
+        url = get_url(action='future_program', id = id, day = int(day) + 1, label = label.rsplit(' / ')[0] + ' / ' + den_label)  
         list_item.setArt({ 'thumb' : os.path.join(icons_dir , 'next_arrow.png'), 'icon' : os.path.join(icons_dir , 'next_arrow.png') })
         xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
     xbmcplugin.endOfDirectory(_handle, updateListing = True)

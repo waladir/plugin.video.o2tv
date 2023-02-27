@@ -66,7 +66,7 @@ def list_program(id, day_min, label):
         list_item = xbmcgui.ListItem(label='Předchozí den')
         day = date.today() - timedelta(days = int(day_min) + 1)
         den_label = day_translation_short[day.strftime('%w')] + ' ' + day.strftime('%d.%m')
-        url = get_url(action='list_program', id = id, day_min = int(day_min) + 1, label = label + ' / ' + den_label)  
+        url = get_url(action='list_program', id = id, day_min = int(day_min) + 1, label = label.rsplit(' / ')[0] + ' / ' + den_label)
         list_item.setArt({ 'thumb' : os.path.join(icons_dir , 'previous_arrow.png'), 'icon' : os.path.join(icons_dir , 'previous_arrow.png') })
         xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
 
@@ -85,7 +85,7 @@ def list_program(id, day_min, label):
         list_item = xbmcgui.ListItem(label='Následující den')
         day = date.today() - timedelta(days = int(day_min) - 1)
         den_label = day_translation_short[day.strftime('%w')] + ' ' + day.strftime('%d.%m')
-        url = get_url(action='list_program', id = id, day_min = int(day_min) - 1, label = label + ' / ' + den_label)  
+        url = get_url(action='list_program', id = id, day_min = int(day_min) - 1, label = label.rsplit(' / ')[0] + ' / ' + den_label)  
         list_item.setArt({ 'thumb' : os.path.join(icons_dir , 'next_arrow.png'), 'icon' : os.path.join(icons_dir , 'next_arrow.png') })
         xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
 
