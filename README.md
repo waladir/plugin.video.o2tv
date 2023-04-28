@@ -6,6 +6,9 @@
 <a href="https://www.xbmc-kodi.cz/prispevek-o2tv">Vlákno na fóru XBMC-Kodi.cz</a><br><br>
 <h3>Doplněk je určený pro O2TV 2.0. Pro původní O2TV používejte doplněk Sledování O2TV!</h3><br><br>
 
+v1.2.6 (28.04.2023)<br>
+- stahování a generování EPG pro IPTV Simple Clienta je omezené jen na viditelné kanály (ve vybrané skupině)<br><br>
+
 v1.2.5 (27.02.2023)<br>
 - úprava labelu v archivu a nahrávkách<br><br>
 
@@ -23,6 +26,4 @@ v1.2.2 (26.02.2023)<br>
 - úprava zobrazení metadat pro Kodi Nexus<br>
 - doplnění metadat k pořadům<br><br>
 
-v1.2.1 (16.02.2023)<br>
-- ošetření chyby u nahrávek, pokud žádná neexistuje<br><br>
 </p>

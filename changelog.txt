@@ -1,3 +1,6 @@
+v1.2.6 (28.04.2023)
+- stahování a generování EPG pro IPTV Simple Clienta je omezené jen na viditelné kanály (ve vybrané skupině)
+
 v1.2.5 (27.02.2023)
 - úprava labelu v archivu a nahrávkách
 
@@ -14,6 +17,3 @@ v1.2.2 (26.02.2023)
 - odstranění nepoužívaného kódu
 - úprava zobrazení metadat pro Kodi Nexus
 - doplnění metadat k pořadům
-
-v1.2.1 (16.02.2023)
-- ošetření chyby u nahrávek, pokud žádná neexistuje

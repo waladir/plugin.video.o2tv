@@ -85,8 +85,8 @@ def generate_playlist(output_file = ''):
 def generate_epg(output_file = ''):
     addon = xbmcaddon.Addon()
     channels = Channels()
-    channels_list = channels.get_channels_list('channel_number', visible_filter = False)
-    channels_list_by_id = channels.get_channels_list('id', visible_filter = False)
+    channels_list = channels.get_channels_list('channel_number')
+    channels_list_by_id = channels.get_channels_list('id')
 
     if len(channels_list) > 0:
         if save_file_test() == 0:
