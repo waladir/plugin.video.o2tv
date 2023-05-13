@@ -6,7 +6,6 @@ import xbmcgui
 import json
 import time 
 
-from libs.settings import Settings
 from libs.o2tv import O2API
 from libs.utils import clientTag, apiVersion, partnerId
 
@@ -19,39 +18,18 @@ class Session:
         self.get_token()
         self.save_session()
 
-    def get_ks_code(self):
-        ks_code = None
-        addon = xbmcaddon.Addon()    
-        o2api = O2API()
-        post = {'username' : addon.getSetting('username'), 'password' : addon.getSetting('password')} 
-        data = o2api.call_o2_api(url = 'https://api.o2tv.cz/unity/api/v1/services/', data = post, headers = o2api.headers)
-        if 'err' in data:
-            xbmcgui.Dialog().notification('O2TV','Problém při přihlášení', xbmcgui.NOTIFICATION_ERROR, 5000)
-            sys.exit()    
-        if 'services' in data and 'remoteAccessToken' in data and len(data['remoteAccessToken']) > 0 and len(data['services']) > 0:
-            remote_access_token = data['remoteAccessToken'] 
-            for service in data['services']:
-                service_id = service['serviceId']
-                post = {'remoteAccessToken' : remote_access_token} 
-                data = o2api.call_o2_api(url = 'https://api.o2tv.cz/unity/api/v1/services/selection/' + service_id + '/', data = post, headers = o2api.headers)
-                if 'err' in data:
-                    xbmcgui.Dialog().notification('O2TV','Problém při přihlášení', xbmcgui.NOTIFICATION_ERROR, 5000)
-                    sys.exit()    
-                if 'accessToken' in data and len(data['accessToken']) > 0:
-                    access_token = data['accessToken']
-                    header_unity = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/75.0', 'Content-Type' : 'application/json', 'x-o2tv-access-token' : str(access_token), 'x-o2tv-device-id' : addon.getSetting('deviceid'), 'x-o2tv-device-name' : addon.getSetting('devicename')}
-                    data = o2api.call_o2_api(url = 'https://api.o2tv.cz/unity/api/v1/user/profile/', data = None, headers = header_unity)
-                    if 'err' in data:
-                        xbmcgui.Dialog().notification(' O2TV','Problém při přihlášení', xbmcgui.NOTIFICATION_ERROR, 5000)
-                        sys.exit()  
-                    ks_code = data['code']        
-        return ks_code
+    def enable_service(self, serviceid):
+        for service in self.services:
+            if serviceid == service:
+                self.services[service]['enabled'] = 1
+            else:
+                self.services[service]['enabled'] = 0
+        self.save_session()
 
     def get_token(self):
         addon = xbmcaddon.Addon()
         o2api = O2API()
-        # ks_code = self.get_ks_code()
-        ks_code = None
+
         post = {'language' : '*', 'partnerId' : int(partnerId), 'clientTag' : clientTag, 'apiVersion' : apiVersion}
         data = o2api.call_o2_api(url = 'https://' + partnerId + '.frp1.ott.kaltura.com/api_v3/service/ottuser/action/anonymousLogin?format=1&clientTag=' + clientTag, data = post, headers = o2api.headers)
         if 'err' in data or not 'result' in data or not 'objectType' in data['result'] or data['result']['objectType'] != 'KalturaLoginSession':
@@ -72,47 +50,81 @@ class Session:
             xbmcgui.Dialog().notification('O2TV','Problém při přihlášení', xbmcgui.NOTIFICATION_ERROR, 5000)
             sys.exit() 
         services = json.loads(data['result']['adapterData']['service_list']['value'])
+
         services = services['ServicesList']
+        ks_codes = {}
         for service in services:
             for id in service:
-                ks_code = service[id]
+                ks_codes.update({id : service[id]})
         
-        if ks_code is None:
+        if len(ks_codes) < 1:
             xbmcgui.Dialog().notification('O2TV','Problém při přihlášení', xbmcgui.NOTIFICATION_ERROR, 5000)
             sys.exit() 
-
-        post = {'language' : 'ces', 'ks' : ks, 'partnerId' : int(partnerId), 'username' : 'NONE', 'password' : 'NONE', 'extraParams' : {'token' : {'objectType' : 'KalturaStringValue', 'value' : jwt_token}, 'loginType' : {'objectType' : 'KalturaStringValue', 'value' : 'accessToken'}, 'brandId' : {'objectType' : 'KalturaStringValue', 'value' : '22'}, 'externalId' : {'objectType' : 'KalturaStringValue', 'value' : ks_code}}, 'udid' : addon.getSetting('deviceid'), 'clientTag' : clientTag, 'apiVersion' : apiVersion}
-        data = o2api.call_o2_api(url = 'https://' + partnerId + '.frp1.ott.kaltura.com/api_v3/service/ottuser/action/login?format=1&clientTag=' + clientTag, data = post, headers = o2api.headers)
-        if 'err' in data or not 'result' in data or not 'objectType' in data['result'] or data['result']['objectType'] != 'KalturaLoginResponse' or not 'loginSession' in data['result']:
-            xbmcgui.Dialog().notification('O2TV','Problém při přihlášení', xbmcgui.NOTIFICATION_ERROR, 5000)
-            sys.exit() 
-        self.ks_expiry = data['result']['loginSession']['expiry']
-        self.ks_refresh_token = data['result']['loginSession']['refreshToken']
-        self.ks = data['result']['loginSession']['ks']
+        
+        for service in ks_codes:
+            post = {'language' : 'ces', 'ks' : ks, 'partnerId' : int(partnerId), 'username' : 'NONE', 'password' : 'NONE', 'extraParams' : {'token' : {'objectType' : 'KalturaStringValue', 'value' : jwt_token}, 'loginType' : {'objectType' : 'KalturaStringValue', 'value' : 'accessToken'}, 'brandId' : {'objectType' : 'KalturaStringValue', 'value' : '22'}, 'externalId' : {'objectType' : 'KalturaStringValue', 'value' : ks_codes[service]}}, 'udid' : addon.getSetting('deviceid'), 'clientTag' : clientTag, 'apiVersion' : apiVersion}
+            data = o2api.call_o2_api(url = 'https://' + partnerId + '.frp1.ott.kaltura.com/api_v3/service/ottuser/action/login?format=1&clientTag=' + clientTag, data = post, headers = o2api.headers)
+            if 'err' in data or not 'result' in data or not 'objectType' in data['result'] or data['result']['objectType'] != 'KalturaLoginResponse' or not 'loginSession' in data['result']:
+                xbmcgui.Dialog().notification('O2TV','Problém při přihlášení', xbmcgui.NOTIFICATION_ERROR, 5000)
+                sys.exit() 
+            if self.services is not None:
+                if service in self.services:
+                    self.services.update({service : {'ks_code' : ks_codes[service], 'ks_expiry' : data['result']['loginSession']['expiry'], 'ks_refresh_token' : data['result']['loginSession']['refreshToken'], 'ks' : data['result']['loginSession']['ks'], 'enabled' : self.services[service]['enabled']}})
+                else:
+                    self.services.update({service : {'ks_code' : ks_codes[service], 'ks_expiry' : data['result']['loginSession']['expiry'], 'ks_refresh_token' : data['result']['loginSession']['refreshToken'], 'ks' : data['result']['loginSession']['ks'], 'enabled' : 0}})                    
+            else:
+                self.services = {}
+                self.services.update({service : {'ks_code' : ks_codes[service], 'ks_expiry' : data['result']['loginSession']['expiry'], 'ks_refresh_token' : data['result']['loginSession']['refreshToken'], 'ks' : data['result']['loginSession']['ks'], 'enabled' : 0}})
+        for service in list(self.services):
+            if service not in ks_codes.keys():
+                del self.services[service]
 
         # post = {'language' : 'ces', 'ks' : ks, 'clientTag' : clientTag, 'apiVersion' : apiVersion}
         # data = o2api.call_o2_api(url = 'https://' + partnerId + '.frp1.ott.kaltura.com/api_v3/service/ottuser/action/get?format=1&clientTag=' + clientTag, data = post, headers = o2api.headers)
         # print(data)
 
     def load_session(self):
+        from libs.settings import Settings
         settings = Settings()
         data = settings.load_json_data({'filename' : 'session.txt', 'description' : 'session'})
-        if data is not None:
+        self.services = None
+        if data is not None :
             data = json.loads(data)
-            self.ks_expiry = int(data['ks_expiry'])
-            self.ks_refresh_token = data['ks_refresh_token']
-            self.ks = data['ks']
-            if self.ks_expiry and self.ks_expiry < int(time.time()):
+            reset = 0
+            if 'services' in data:
+                self.services = data['services']
+                for serviceid in self.services:
+                    service = self.services[serviceid]
+                    if 'ks_expiry' not in service or int(service['ks_expiry']) < int(time.time()):
+                        if reset == 0: 
+                            self.create_session()
+                            reset = 1
+            else:
                 self.create_session()
         else:
             self.create_session()
+        active = False
+        for service in self.services:
+            if self.services[service]['enabled'] == 1:
+                active = True
+                self.ks = self.services[service]['ks']
+
+        if active == False:
+            for service in self.services:
+                if active == False:
+                    active = True
+                    self.ks = self.services[service]['ks']
+                    self.services[service]['enabled'] = 1
+                    self.save_session                
 
     def save_session(self):
+        from libs.settings import Settings
         settings = Settings()
-        data = json.dumps({'ks_expiry' : self.ks_expiry, 'ks_refresh_token' : self.ks_refresh_token, 'ks' : self.ks})
+        data = json.dumps({'services' : self.services})        
         settings.save_json_data({'filename' : 'session.txt', 'description' : 'session'}, data)
 
     def remove_session(self):
+        from libs.settings import Settings
         settings = Settings()
         settings.reset_json_data({'filename' : 'session.txt', 'description' : 'session'})
         self.valid_to = -1

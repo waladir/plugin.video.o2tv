@@ -1,3 +1,6 @@
+v1.2.7 (13.05.2023)
+- přidaná možnost výběru služby v Nastavení O2TV
+
 v1.2.6 (28.04.2023)
 - stahování a generování EPG pro IPTV Simple Clienta je omezené jen na viditelné kanály (ve vybrané skupině)
 
@@ -11,9 +14,3 @@ v1.2.4 (27.02.2023)
 v1.2.3 (26.02.2023)
 - oprava generování EPG pro IPTV simple clienta
 - doplnění rolí
-
-v1.2.2 (26.02.2023)
-- podpora DRM
-- odstranění nepoužívaného kódu
-- úprava zobrazení metadat pro Kodi Nexus
-- doplnění metadat k pořadům
