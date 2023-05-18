@@ -1,3 +1,6 @@
+v1.2.8 (18.05.2023)
+- ošetření nekorektních položek v EPG
+
 v1.2.7 (13.05.2023)
 - přidaná možnost výběru služby v Nastavení O2TV
 
@@ -10,7 +13,3 @@ v1.2.5 (27.02.2023)
 v1.2.4 (27.02.2023)
 - upravené procházení programu v archivu a při plánovaní nahrávek (díky Radek_Kovacik a cache)
 - optimalizace náhrady problémových znaků v EPG pro IPTV SC
-
-v1.2.3 (26.02.2023)
-- oprava generování EPG pro IPTV simple clienta
-- doplnění rolí

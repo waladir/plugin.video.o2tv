@@ -25,7 +25,7 @@ def epg_api(post, key):
     channels = Channels()
     channels_list = channels.get_channels_list('id', visible_filter = False)            
     for item in result:
-        if item['objectType'] == 'KalturaProgramAsset' or item['objectType'] == 'KalturaRecordingAsset':
+        if (item['objectType'] == 'KalturaProgramAsset' or item['objectType'] == 'KalturaRecordingAsset') and 'linearAssetId' in item:
             id = item['id']
             channel_id = item['linearAssetId']
             title = item['name']
