@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 import sys
+import xbmc
 import xbmcgui
 import xbmcplugin
+
+import ssl
+from urllib.request import urlopen, Request
 
 from datetime import datetime
 import time
@@ -103,6 +107,17 @@ def play_stream(post):
                 list_item.setMimeType('application/dash+xml')
                 list_item.setContentLookup(False)       
                 xbmcplugin.setResolvedUrl(_handle, True, list_item)
+
+                # context=ssl.create_default_context()
+                # context.set_ciphers('DEFAULT')
+                # request = Request(url = url , data = None)
+                # response = urlopen(request)
+                # mpd = response.geturl()
+                # keepalive = mpd.split('?')[0] + '/keepalive'
+                # while(xbmc.Player().isPlaying()):
+                #     request = Request(url = mpd , data = None)
+                #     response = urlopen(request)
+                #     time.sleep(5)
             else:
                 xbmcgui.Dialog().notification('O2TV','Problém při přehrání', xbmcgui.NOTIFICATION_ERROR, 5000)
         elif 'messages' in data['result'][1] and len(data['result'][1]['messages']) > 0 and data['result'][1]['messages'][0]['code'] == 'ConcurrencyLimitation' :

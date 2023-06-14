@@ -1,3 +1,10 @@
+v1.2.9 (14.06.2023)
+- do nastavení přidaná možnost ignorovat rádia
+- oprava playlistu s catchup módem default
+- je možné si vybrat, jestli provést jen aktualizaci seznamu kanálů nebo provést kompletní reset
+- při ruční vygenerování EPG se zobrazí progres
+- příprava pro volání keepalive požadavků
+
 v1.2.8 (18.05.2023)
 - ošetření nekorektních položek v EPG
 
@@ -9,7 +16,3 @@ v1.2.6 (28.04.2023)
 
 v1.2.5 (27.02.2023)
 - úprava labelu v archivu a nahrávkách
-
-v1.2.4 (27.02.2023)
-- upravené procházení programu v archivu a při plánovaní nahrávek (díky Radek_Kovacik a cache)
-- optimalizace náhrady problémových znaků v EPG pro IPTV SC

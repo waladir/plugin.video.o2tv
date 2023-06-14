@@ -66,7 +66,7 @@ def generate_playlist(output_file = ''):
                 if logo is None:
                     logo = ''
                 if addon.getSetting('catchup_mode') == 'default':
-                    line = '#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.archivo2tv/?action=iptsc_play_stream&id=' + str(channels_list[number]['id']) + '&catchup_start_ts={utc}&catchup_end_ts={utcend}" tvg-chno="' + str(number) + '" tvg-id="' + channels_list[number]['name'] + '" tvh-epg="0" tvg-logo="' + logo + '",' + channels_list[number]['name']
+                    line = '#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://' + plugin_id + '/?action=iptsc_play_stream&id=' + str(channels_list[number]['id']) + '&catchup_start_ts={utc}&catchup_end_ts={utcend}" tvg-chno="' + str(number) + '" tvg-id="' + channels_list[number]['name'] + '" tvh-epg="0" tvg-logo="' + logo + '",' + channels_list[number]['name']
                 else:
                     line = '#EXTINF:-1 catchup="append" catchup-days="7" catchup-source="&catchup_start_ts={utc}&catchup_end_ts={utcend}" tvg-chno="' + str(number) + '" tvg-id="' + channels_list[number]['name'] + '" tvh-epg="0" tvg-logo="' + logo + '",' + channels_list[number]['name']
                 file.write(bytearray((line + '\n').encode('utf-8')))
@@ -82,7 +82,7 @@ def generate_playlist(output_file = ''):
         file.close()
         xbmcgui.Dialog().notification('O2TV', 'Chyba při uložení playlistu', xbmcgui.NOTIFICATION_ERROR, 5000)
 
-def generate_epg(output_file = ''):
+def generate_epg(output_file = '', show_progress = True):
     addon = xbmcaddon.Addon()
     channels = Channels()
     channels_list = channels.get_channels_list('channel_number')
@@ -119,9 +119,14 @@ def generate_epg(output_file = ''):
                 today_end_ts = today_start_ts + 60*60*24 - 1
                 session = Session()
                 channels_ids = []
+                if show_progress == True:
+                    dialog = xbmcgui.DialogProgressBG()
+                    dialog.create('Stahování EPG dat')
                 for number in sorted(channels_list.keys()):
                     channels_ids.append("linear_media_id:'" + str(channels_list[number]['id']) + "'")
                 for i in range(0, len(channels_ids), 10):
+                    if show_progress == True:
+                        dialog.update(int(i/len(channels_ids)*100))
                     channels_query = ' '.join(channels_ids[i:i+10])
                     cnt = 0
                     content = ''
@@ -166,6 +171,8 @@ def generate_epg(output_file = ''):
                     file.write(bytearray((content).encode('utf-8')))                          
                 file.write(bytearray(('</tv>\n').encode('utf-8')))
                 file.close()
+                if show_progress == True:
+                    dialog.close()
                 xbmcgui.Dialog().notification('O2TV', 'EPG bylo uložené', xbmcgui.NOTIFICATION_INFO, 5000)    
         except Exception:
             file.close()

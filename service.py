@@ -25,7 +25,7 @@ while not xbmc.Monitor().abortRequested():
         time.sleep(3)
         if addon.getSetting('username') and len(addon.getSetting('username')) > 0 and addon.getSetting('password') and len(addon.getSetting('password')) > 0:
             if addon.getSetting('autogen') == 'true':
-                generate_epg()
+                generate_epg(show_progress = False)
         if not addon.getSetting('epg_interval'):
             interval = 12*60*60
         else:

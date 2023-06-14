@@ -30,7 +30,7 @@ def manage_channels(label):
     list_item = xbmcgui.ListItem(label='Vlastní skupiny kanálů')
     url = get_url(action='list_channels_groups', label = label + ' / Skupiny kanálů')  
     xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
-    list_item = xbmcgui.ListItem(label='Resetovat seznam kanálů')
+    list_item = xbmcgui.ListItem(label='Aktualizovat kanály')
     url = get_url(action='reset_channels_list')  
     xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
     list_item = xbmcgui.ListItem(label='Obnovit seznam kanálů')
@@ -280,22 +280,24 @@ class Channels:
         return channels
 
     def get_channels(self):
+        addon = xbmcaddon.Addon()
         channels = {}
         session = Session()
         post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaChannelFilter","kSql":"(and asset_type=607)","idEqual":355960},"pager":{"objectType":"KalturaFilterPager","pageSize":300,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
         result = o2tv_list_api(post = post)
         for channel in result:
             if 'ChannelNumber' in channel['metas']:
-                image = None
-                if len(channel['images']) > 1:
-                    for img in channel['images']:
-                        if img['ratio'] == '16x9':
-                            image = img['url']
-                    if image is None:  
-                        image = channel['images'][0]['url'] + '/height/320/width/480'
-                else:
+                if not (addon.getSetting('ignore_radios') == 'true' and 'tags' in channel and len(channel['tags']) > 0 and 'Genre' in channel['tags'] and len(channel['tags']['Genre']) > 0 and channel['tags']['Genre']['objects'][0]['value'] == 'radio'):
                     image = None
-                channels.update({int(channel['id']) : {'channel_number' : int(channel['metas']['ChannelNumber']['value']), 'o2_number' : int(channel['metas']['ChannelNumber']['value']), 'name' : channel['name'], 'id' : channel['id'], 'logo' : image, 'visible' : True}})
+                    if len(channel['images']) > 1:
+                        for img in channel['images']:
+                            if img['ratio'] == '16x9':
+                                image = img['url']
+                        if image is None:  
+                            image = channel['images'][0]['url'] + '/height/320/width/480'
+                    else:
+                        image = None
+                    channels.update({int(channel['id']) : {'channel_number' : int(channel['metas']['ChannelNumber']['value']), 'o2_number' : int(channel['metas']['ChannelNumber']['value']), 'name' : channel['name'], 'id' : channel['id'], 'logo' : image, 'visible' : True}})
         return channels
 
     def load_channels(self):
@@ -333,16 +335,27 @@ class Channels:
 
     def reset_channels(self):
         addon = xbmcaddon.Addon()
-        addon_userdata_dir = translatePath(addon.getAddonInfo('profile')) 
-        filename = os.path.join(addon_userdata_dir, 'channels.txt')
-        if os.path.exists(filename):
-            self.backup_channels()            
-        settings = Settings()
-        settings.reset_json_data({'filename' : 'channels.txt', 'description' : 'kanálů'})
-        self.channels = {}
-        self.valid_to = -1
-        self.load_channels()
-        xbmcgui.Dialog().notification('O2TV', 'Seznam kanálů byl resetovaný', xbmcgui.NOTIFICATION_INFO, 5000)
+        response = xbmcgui.Dialog().yesno('Aktualizace kanálů', 'Provést kompletní reset nebo jen aktualizovat stávající seznam kanálů', 'Aktualizovat', 'Kompletní reset') 
+        if response == True:
+            addon_userdata_dir = translatePath(addon.getAddonInfo('profile')) 
+            filename = os.path.join(addon_userdata_dir, 'channels.txt')
+            if os.path.exists(filename):
+                self.backup_channels()            
+            settings = Settings()
+            settings.reset_json_data({'filename' : 'channels.txt', 'description' : 'kanálů'})
+            self.channels = {}
+            self.valid_to = -1
+            self.load_channels()
+            xbmcgui.Dialog().notification('O2TV', 'Seznam kanálů byl resetovaný', xbmcgui.NOTIFICATION_INFO, 5000)
+        else:
+            self.valid_to = -1
+            self.merge_channels()
+            self.save_channels()
+            xbmcgui.Dialog().notification('O2TV', 'Seznam kanálů byl aktualizovaný', xbmcgui.NOTIFICATION_INFO, 5000)
+        if addon.getSetting('output_dir') is not None and len(addon.getSetting('output_dir')) > 0:
+            from libs.iptvsc import generate_playlist
+            generate_playlist()
+
 
     def get_backups(self):
         import glob

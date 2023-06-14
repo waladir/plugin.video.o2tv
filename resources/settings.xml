@@ -8,6 +8,7 @@
 	</category>
 	<category label="Nastavení">
                 <setting label="Historie vyhledávání" type="number" id="search_history" default="10"/>
+                <setting label="Ignorovat rádia" type="bool" id="ignore_radios" default="false"/>
                 <setting label="Skrýt Nastavení O2TV v menu" type="bool" id="hide_settings" default="false"/>
 	</category>
 	<category label="IPTV Simple Client">
