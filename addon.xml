@@ -1,4 +1,4 @@
-﻿<addon id="plugin.video.o2tv" name="O2TV" provider-name="waladir" version="1.2.9">
+﻿<addon id="plugin.video.o2tv" name="O2TV" provider-name="waladir" version="1.3.0">
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
     <import addon="inputstream.adaptive" version="19.0.0"/>
@@ -35,6 +35,9 @@ Další informace a podporu najdete na fóru www.xbmc-kodi.cz (https://www.xbmc-
     <platform>all</platform>
     <source>https://github.com/waladir/plugin.video.o2tv</source>
     <news>
+v1.3.0 (22.06.2023)
+- přidáno udržování session při přehrávání (řeší pády po delším pozastavení přehrávání)
+
 v1.2.9 (14.06.2023)
 - do nastavení přidaná možnost ignorovat rádia
 - oprava playlistu s catchup módem default
@@ -50,9 +53,6 @@ v1.2.7 (13.05.2023)
 
 v1.2.6 (28.04.2023)
 - stahování a generování EPG pro IPTV Simple Clienta je omezené jen na viditelné kanály (ve vybrané skupině)
-
-v1.2.5 (27.02.2023)
-- úprava labelu v archivu a nahrávkách
     </news>
     <assets>
         <icon>icon.png</icon>

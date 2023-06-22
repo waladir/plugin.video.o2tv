@@ -5,6 +5,7 @@ import xbmcgui
 import xbmcplugin
 
 import ssl
+from xml.dom import minidom
 from urllib.request import urlopen, Request
 
 from datetime import datetime
@@ -100,7 +101,13 @@ def play_stream(post):
 
             if 'DASH' in urls:
                 url = urls['DASH']['url']
-                list_item = xbmcgui.ListItem(path = url)
+                context=ssl.create_default_context()
+                context.set_ciphers('DEFAULT')
+                request = Request(url = url , data = None)
+                response = urlopen(request)
+                mpd = response.geturl()
+
+                list_item = xbmcgui.ListItem(path = mpd)
                 # list_item.setProperty('inputstream.adaptive.play_timeshift_buffer', 'true')
                 list_item.setProperty('inputstream', 'inputstream.adaptive')
                 list_item.setProperty('inputstream.adaptive.manifest_type', 'mpd')
@@ -108,19 +115,32 @@ def play_stream(post):
                 list_item.setContentLookup(False)       
                 xbmcplugin.setResolvedUrl(_handle, True, list_item)
 
-                # context=ssl.create_default_context()
-                # context.set_ciphers('DEFAULT')
-                # request = Request(url = url , data = None)
-                # response = urlopen(request)
-                # mpd = response.geturl()
-                # keepalive = mpd.split('?')[0] + '/keepalive'
-                # while(xbmc.Player().isPlaying()):
-                #     request = Request(url = mpd , data = None)
-                #     response = urlopen(request)
-                #     time.sleep(5)
+                keepalive = get_keepalive_url(mpd, response)
+                if keepalive is not None:
+                    time.sleep(3)
+                    while(xbmc.Player().isPlaying()):
+                        request = Request(url = keepalive , data = None)
+                        response = urlopen(request)
+                        time.sleep(5)
             else:
                 xbmcgui.Dialog().notification('O2TV','Problém při přehrání', xbmcgui.NOTIFICATION_ERROR, 5000)
         elif 'messages' in data['result'][1] and len(data['result'][1]['messages']) > 0 and data['result'][1]['messages'][0]['code'] == 'ConcurrencyLimitation' :
             xbmcgui.Dialog().notification('O2TV','Překročený limit přehrávání', xbmcgui.NOTIFICATION_ERROR, 5000)
         else:
             xbmcgui.Dialog().notification('O2TV','Problém při přehrání', xbmcgui.NOTIFICATION_ERROR, 5000)
+
+def get_keepalive_url(mpd, response):
+    keepalive = None
+    dom = minidom.parseString(response.read())
+    adaptationSets = dom.getElementsByTagName('AdaptationSet')
+    for adaptationSet in adaptationSets:
+        if adaptationSet.getAttribute('contentType') == 'video':
+            maxBandwidth = adaptationSet.getAttribute('maxBandwidth')
+            segmentTemplates = adaptationSet.getElementsByTagName('SegmentTemplate')
+            for segmentTemplate in segmentTemplates:
+                timelines = segmentTemplate.getElementsByTagName('S')
+                for timeline in timelines:
+                    ts = timeline.getAttribute('t')
+                uri = 'dash/' + segmentTemplate.getAttribute('media').replace('&amp;', '&').replace('$RepresentationID$', 'video=' + maxBandwidth).replace('$Time$', ts)
+                keepalive = mpd.replace('manifest.mpd?bkm-query', uri)
+    return keepalive
