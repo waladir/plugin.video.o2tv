@@ -1,3 +1,7 @@
+v1.3.1 (24.06.2023)
+- změna identifikátoru služeb ze jména na kód
+- ošetření zobrazení nahrávek z aktuálně neexistujicího kanálů
+
 v1.3.0 (22.06.2023)
 - přidáno udržování session při přehrávání (řeší pády po delším pozastavení přehrávání)
 
@@ -13,6 +17,3 @@ v1.2.8 (18.05.2023)
 
 v1.2.7 (13.05.2023)
 - přidaná možnost výběru služby v Nastavení O2TV
-
-v1.2.6 (28.04.2023)
-- stahování a generování EPG pro IPTV Simple Clienta je omezené jen na viditelné kanály (ve vybrané skupině)

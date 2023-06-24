@@ -5,6 +5,10 @@
 Živé vysílání, archiv, nahrávky, vytváření playlistu a EPG pro IPTV Simple Clienta<br><br>
 <a href="https://www.xbmc-kodi.cz/prispevek-o2tv">Vlákno na fóru XBMC-Kodi.cz</a><br><br>
 <h3>Doplněk je určený pro O2TV 2.0. Pro původní O2TV používejte doplněk Sledování O2TV!</h3><br><br>
+v1.3.1 (24.06.2023)<br>
+- změna identifikátoru služeb ze jména na kód<br>
+- ošetření zobrazení nahrávek z aktuálně neexistujicího kanálů<br><br>
+
 v1.3.0 (22.06.2023)<br>
 - přidáno udržování session při přehrávání (řeší pády po delším pozastavení přehrávání)<br><br>
 
@@ -20,7 +24,4 @@ v1.2.8 (18.05.2023)<br>
 
 v1.2.7 (13.05.2023)<br>
 - přidaná možnost výběru služby v Nastavení O2TV<br><br>
-
-v1.2.6 (28.04.2023)<br>
-- stahování a generování EPG pro IPTV Simple Clienta je omezené jen na viditelné kanály (ve vybrané skupině)<br><br>
 </p>

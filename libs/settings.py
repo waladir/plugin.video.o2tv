@@ -8,7 +8,7 @@ import xbmcplugin
 from xbmcvfs import translatePath
 
 from libs.session import Session
-from libs.utils import get_url, plugin_id
+from libs.utils import get_url
 
 def list_settings(label):
     _handle = int(sys.argv[1])
@@ -32,10 +32,14 @@ def list_services(label):
     xbmcplugin.setPluginCategory(_handle, label)   
     session = Session()
     for serviceid in session.services:
-        if session.services[serviceid]['enabled'] == 1:
-            list_item = xbmcgui.ListItem(label = serviceid )
+        if 'ks_name' in session.services[serviceid]:
+            name = ' - ' + session.services[serviceid]['ks_name']
         else:
-            list_item = xbmcgui.ListItem(label = '[COLOR=gray]' + serviceid + '[/COLOR]')
+            name = ''
+        if session.services[serviceid]['enabled'] == 1:
+            list_item = xbmcgui.ListItem(label = serviceid + name)
+        else:
+            list_item = xbmcgui.ListItem(label = '[COLOR=gray]' + serviceid + name + '[/COLOR]')
         url = get_url(action='enable_service', serviceid = serviceid)  
         xbmcplugin.addDirectoryItem(_handle, url , list_item, False)  
         first = 0

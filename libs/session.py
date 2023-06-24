@@ -53,10 +53,13 @@ class Session:
 
         services = services['ServicesList']
         ks_codes = {}
+        ks_names = {}
         for service in services:
             for id in service:
-                ks_codes.update({id : service[id]})
-        
+                ks_codes.update({service[id] : service[id]})
+                ks_names.update({service[id] : id})
+
+
         if len(ks_codes) < 1:
             xbmcgui.Dialog().notification('O2TV','Problém při přihlášení', xbmcgui.NOTIFICATION_ERROR, 5000)
             sys.exit() 
@@ -69,12 +72,12 @@ class Session:
                 sys.exit() 
             if self.services is not None:
                 if service in self.services:
-                    self.services.update({service : {'ks_code' : ks_codes[service], 'ks_expiry' : data['result']['loginSession']['expiry'], 'ks_refresh_token' : data['result']['loginSession']['refreshToken'], 'ks' : data['result']['loginSession']['ks'], 'enabled' : self.services[service]['enabled']}})
+                    self.services.update({service : {'ks_name' : ks_names[service], 'ks_code' : ks_codes[service], 'ks_expiry' : data['result']['loginSession']['expiry'], 'ks_refresh_token' : data['result']['loginSession']['refreshToken'], 'ks' : data['result']['loginSession']['ks'], 'enabled' : self.services[service]['enabled']}})
                 else:
-                    self.services.update({service : {'ks_code' : ks_codes[service], 'ks_expiry' : data['result']['loginSession']['expiry'], 'ks_refresh_token' : data['result']['loginSession']['refreshToken'], 'ks' : data['result']['loginSession']['ks'], 'enabled' : 0}})                    
+                    self.services.update({service : {'ks_name' : ks_names[service], 'ks_code' : ks_codes[service], 'ks_expiry' : data['result']['loginSession']['expiry'], 'ks_refresh_token' : data['result']['loginSession']['refreshToken'], 'ks' : data['result']['loginSession']['ks'], 'enabled' : 0}})                    
             else:
                 self.services = {}
-                self.services.update({service : {'ks_code' : ks_codes[service], 'ks_expiry' : data['result']['loginSession']['expiry'], 'ks_refresh_token' : data['result']['loginSession']['refreshToken'], 'ks' : data['result']['loginSession']['ks'], 'enabled' : 0}})
+                self.services.update({service : {'ks_name' : ks_names[service], 'ks_code' : ks_codes[service], 'ks_expiry' : data['result']['loginSession']['expiry'], 'ks_refresh_token' : data['result']['loginSession']['refreshToken'], 'ks' : data['result']['loginSession']['ks'], 'enabled' : 0}})
         for service in list(self.services):
             if service not in ks_codes.keys():
                 del self.services[service]
@@ -92,7 +95,12 @@ class Session:
             data = json.loads(data)
             reset = 0
             if 'services' in data:
-                self.services = data['services']
+                self.services = {}
+                services = data['services']
+# konverze id pro sluzby (update 1.3.1)                
+                for serviceid in services:
+                    id = services[serviceid]['ks_code']
+                    self.services.update({id : services[serviceid]})
                 for serviceid in self.services:
                     service = self.services[serviceid]
                     if 'ks_expiry' not in service or int(service['ks_expiry']) < int(time.time()):
