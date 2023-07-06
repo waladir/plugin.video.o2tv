@@ -7,6 +7,7 @@ import xbmcaddon
 
 from datetime import date, datetime, timedelta
 import time
+import json
 
 from libs.utils import get_url, day_translation, day_translation_short, plugin_id
 from libs.channels import Channels 
@@ -16,11 +17,20 @@ if len(sys.argv) > 1:
     _handle = int(sys.argv[1])
 
 def list_archive(label):
+    addon = xbmcaddon.Addon()
     xbmcplugin.setPluginCategory(_handle, label)
     channels = Channels()
     channels_list = channels.get_channels_list('channel_number')
+    cnt = 0
     for number in sorted(channels_list.keys()):  
-        list_item = xbmcgui.ListItem(label=channels_list[number]['name'])
+        cnt += 1
+        if addon.getSetting('channel_numbers') == 'číslo kanálu':
+            channel_number = str(number) + '. '
+        elif addon.getSetting('channel_numbers') == 'pořadové číslo':
+            channel_number = str(cnt) + '. '
+        else:
+            channel_number = ''
+        list_item = xbmcgui.ListItem(label = channel_number + channels_list[number]['name'])
         list_item.setArt({'thumb': channels_list[number]['logo'], 'icon': channels_list[number]['logo']})
         url = get_url(action='list_archive_days', id = channels_list[number]['id'], label = label + ' / ' + channels_list[number]['name'])  
         xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
@@ -76,9 +86,9 @@ def list_program(id, day_min, label):
             list_item = epg_listitem(list_item = list_item, epg = epg[key], logo = '')
             menus = [('Přidat nahrávku', 'RunPlugin(plugin://' + plugin_id + '?action=add_recording&id=' + str(epg[key]['id']) + ')')]
             list_item.addContextMenuItems(menus)       
-            list_item.setProperty('IsPlayable', 'true')
             list_item.setContentLookup(False)          
-            url = get_url(action='play_archive', id = epg[key]['id'], channel_id = epg[key]['channel_id'], startts = epg[key]['startts']-1, endts = epg[key]['endts'])
+            list_item.setProperty('IsPlayable', 'true')
+            url = get_url(action='play_archive', id = epg[key]['id'], epg = json.dumps(epg[key]), channel_id = epg[key]['channel_id'], startts = epg[key]['startts']-1, endts = epg[key]['endts'])
             xbmcplugin.addDirectoryItem(_handle, url, list_item, False)
 
     if int(day_min) > 0:

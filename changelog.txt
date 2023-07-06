@@ -1,3 +1,7 @@
+v1.4.0 (06.07.2023)
+- v nastavení lze zapnout zobrazení čísel kanálů/pořadové číslo kanálu
+- možnost výběru streamu v rámci multidimenze
+
 v1.3.1 (24.06.2023)
 - změna identifikátoru služeb ze jména na kód
 - ošetření zobrazení nahrávek z aktuálně neexistujicího kanálů
@@ -14,6 +18,3 @@ v1.2.9 (14.06.2023)
 
 v1.2.8 (18.05.2023)
 - ošetření nekorektních položek v EPG
-
-v1.2.7 (13.05.2023)
-- přidaná možnost výběru služby v Nastavení O2TV
