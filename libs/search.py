@@ -9,6 +9,7 @@ from xbmcvfs import translatePath
 from urllib.parse import quote    
 
 from datetime import datetime
+import json
 
 from libs.utils import get_url, plugin_id, day_translation_short, clientTag, apiVersion
 from libs.session import Session
@@ -55,7 +56,7 @@ def program_search(query, label):
                 list_item = epg_listitem(list_item = list_item, epg = epg[key], logo = channels_list[epg[key]['channel_id']]['logo'])
                 list_item.setProperty('IsPlayable', 'true')
                 list_item.setContentLookup(False)          
-                url = get_url(action='play_archive', id = epg[key]['id'], channel_id = epg[key]['channel_id'], startts = epg[key]['startts'], endts = epg[key]['endts'])
+                url = get_url(action='play_archive', id = epg[key]['id'], epg = json.dumps(epg[key]), channel_id = epg[key]['channel_id'], startts = epg[key]['startts'], endts = epg[key]['endts'])
                 menus = [('Přidat nahrávku', 'RunPlugin(plugin://' + plugin_id + '?action=add_recording&id=' + str(epg[key]['id']) + ')')]
                 list_item.addContextMenuItems(menus)       
                 xbmcplugin.addDirectoryItem(_handle, url, list_item, False)

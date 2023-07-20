@@ -5,6 +5,7 @@ import xbmcgui
 
 from datetime import datetime
 import time
+import json
 
 from libs.session import Session
 from libs.o2tv import O2API, o2tv_list_api
@@ -175,7 +176,7 @@ def list_category(id, series, label):
                 list_item = epg_listitem(list_item = list_item, epg = epg[key], logo = '')
                 list_item.setProperty('IsPlayable', 'true')
                 list_item.setContentLookup(False)          
-                url = get_url(action='play_archive', id = epg[key]['id'], channel_id = epg[key]['channel_id'], startts = epg[key]['startts']-1, endts = epg[key]['endts'])
+                url = get_url(action='play_archive', id = epg[key]['id'], epg = json.dumps(epg[key]), channel_id = epg[key]['channel_id'], startts = epg[key]['startts']-1, endts = epg[key]['endts'])
                 xbmcplugin.addDirectoryItem(_handle, url, list_item, False)
     xbmcplugin.endOfDirectory(_handle, cacheToDisc = False)
 
@@ -200,7 +201,7 @@ def list_series(id, label):
             list_item = epg_listitem(list_item = list_item, epg = epg[key], logo = '')
             list_item.setProperty('IsPlayable', 'true')
             list_item.setContentLookup(False)          
-            url = get_url(action='play_archive', id = epg[key]['id'], channel_id = epg[key]['channel_id'], startts = epg[key]['startts']-1, endts = epg[key]['endts'])
+            url = get_url(action='play_archive', id = epg[key]['id'], epg = json.dumps(epg[key]), channel_id = epg[key]['channel_id'], startts = epg[key]['startts']-1, endts = epg[key]['endts'])
             xbmcplugin.addDirectoryItem(_handle, url, list_item, False)
     xbmcplugin.endOfDirectory(_handle, cacheToDisc = False)
 
