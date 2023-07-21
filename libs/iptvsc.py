@@ -177,10 +177,8 @@ def generate_epg(output_file = '', show_progress = True):
         except Exception:
             file.close()
             xbmcgui.Dialog().notification('O2TV', 'Chyba při generování EPG!', xbmcgui.NOTIFICATION_ERROR, 5000)
-            sys.exit()
     else:
         xbmcgui.Dialog().notification('O2TV', 'Nevrácena žádná data!', xbmcgui.NOTIFICATION_ERROR, 5000)
-        sys.exit()
 
 def iptv_sc_rec(channelName, startdatetime):
     channels = Channels()

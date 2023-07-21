@@ -4,6 +4,7 @@ import sys
 import xbmcgui
 import xbmcplugin
 import xbmcaddon
+import xbmc
 
 import json
 from urllib.parse import parse_qsl
@@ -139,7 +140,7 @@ def router(paramstring):
             manage_channels(params['label'])
         elif params['action'] == 'reset_channels_list':
             channels = Channels()
-            channels.reset_channels()      
+            channels.reset_channels()   
         elif params['action'] == 'restore_channels':
             channels = Channels()
             channels.restore_channels(params['backup'])        
@@ -208,3 +209,4 @@ def router(paramstring):
 
 if __name__ == '__main__':
     router(sys.argv[2][1:])
+''

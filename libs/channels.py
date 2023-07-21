@@ -32,7 +32,7 @@ def manage_channels(label):
     xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
     list_item = xbmcgui.ListItem(label='Aktualizovat kanály')
     url = get_url(action='reset_channels_list')  
-    xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
+    xbmcplugin.addDirectoryItem(_handle, url, list_item, False)
     list_item = xbmcgui.ListItem(label='Obnovit seznam kanálů')
     url = get_url(action='list_channels_list_backups', label = label + ' / Obnova seznamu kanálů')  
     xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
@@ -114,7 +114,7 @@ def list_channels_groups(label):
     channels_groups = Channels_groups()
     list_item = xbmcgui.ListItem(label='Nová skupina')
     url = get_url(action='add_channel_group', label = 'Nová skupina')  
-    xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
+    xbmcplugin.addDirectoryItem(_handle, url, list_item, False)
     if channels_groups.selected == None:
         list_item = xbmcgui.ListItem(label='[B]Všechny kanály[/B]')
     else:  

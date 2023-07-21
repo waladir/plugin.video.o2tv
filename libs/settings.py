@@ -24,7 +24,7 @@ def list_settings(label):
 
     list_item = xbmcgui.ListItem(label='Nastavení doplňku')
     url = get_url(action='addon_settings', label = 'Nastavení doplňku')  
-    xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
+    xbmcplugin.addDirectoryItem(_handle, url, list_item, False)
     xbmcplugin.endOfDirectory(_handle)
 
 def list_services(label):

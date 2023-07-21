@@ -1,3 +1,6 @@
+v1.4.2 (21.07.2023)
+- ošetření zalogovaných chyb
+
 v1.4.1 (20.07.2023)
 - oprava přehrávání z kategorií a výsledků vyhledávání
 
@@ -11,10 +14,3 @@ v1.3.1 (24.06.2023)
 
 v1.3.0 (22.06.2023)
 - přidáno udržování session při přehrávání (řeší pády po delším pozastavení přehrávání)
-
-v1.2.9 (14.06.2023)
-- do nastavení přidaná možnost ignorovat rádia
-- oprava playlistu s catchup módem default
-- je možné si vybrat, jestli provést jen aktualizaci seznamu kanálů nebo provést kompletní reset
-- při ruční vygenerování EPG se zobrazí progres
-- příprava pro volání keepalive požadavků
