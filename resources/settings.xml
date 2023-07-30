@@ -16,6 +16,8 @@
                 <setting label="Adresář pro playlist a EPG" type="folder" id="output_dir" default=""/>
                 <setting label="Automaticky generovat EPG" type="bool" id="autogen" default="false"/>
                 <setting label="Interval pro generování EPG (hod.)" type="slider" id="epg_interval" range="1,1,24" default="12" option="int"/>
+                <setting label="Počet dnů pro stahovaní EPG zpětně" type="slider" id="epg_from" range="1,1,7" default="1" option="int"/>
+                <setting label="Počet dnů pro stahovaní EPG dopředu" type="slider" id="epg_to" range="1,1,7" default="1" option="int"/>
                 <setting label="Catchup mod" type="select" id="catchup_mode" values="append|default" default="append"/>
                 <setting label="Generovat playlist" type="action" action="RunPlugin(plugin://plugin.video.o2tv?action=generate_playlist)"/>
                 <setting label="Generovat EPG" type="action" action="RunPlugin(plugin://plugin.video.o2tv?action=generate_epg)"/>

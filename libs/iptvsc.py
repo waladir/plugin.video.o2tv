@@ -130,7 +130,7 @@ def generate_epg(output_file = '', show_progress = True):
                     channels_query = ' '.join(channels_ids[i:i+10])
                     cnt = 0
                     content = ''
-                    post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaSearchAssetFilter","orderBy":"START_DATE_ASC","kSql":"(and (or " + channels_query + ") start_date >= '" + str(today_start_ts - 60*60*24*7) + "' end_date  <= '" + str(today_end_ts + 60*60*24*7) + "' asset_type='epg' auto_fill= true)"},"pager":{"objectType":"KalturaFilterPager","pageSize":500,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
+                    post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaSearchAssetFilter","orderBy":"START_DATE_ASC","kSql":"(and (or " + channels_query + ") start_date >= '" + str(today_start_ts - 60*60*24*int(addon.getSetting('epg_from'))) + "' end_date  <= '" + str(today_end_ts + 60*60*24*int(addon.getSetting('epg_to'))) + "' asset_type='epg' auto_fill= true)"},"pager":{"objectType":"KalturaFilterPager","pageSize":500,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
                     epg =  epg_api(post = post, key = 'startts_channel_number')
                     for ts in sorted(epg.keys()):
                         epg_item = epg[ts]
@@ -175,6 +175,8 @@ def generate_epg(output_file = '', show_progress = True):
                     dialog.close()
                 xbmcgui.Dialog().notification('O2TV', 'EPG bylo uložené', xbmcgui.NOTIFICATION_INFO, 5000)    
         except Exception:
+            if show_progress == True:
+                dialog.close()
             file.close()
             xbmcgui.Dialog().notification('O2TV', 'Chyba při generování EPG!', xbmcgui.NOTIFICATION_ERROR, 5000)
     else:
