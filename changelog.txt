@@ -1,3 +1,6 @@
+v1.4.5 (09.08.2023)
+- oprava rodičovské kontroly
+
 v1.4.4 (09.08.2023)
 - úprava načítání kanálů (díky Mihaloo?)
 - rodičovská kontrola (PIN)
@@ -10,7 +13,3 @@ v1.4.2 (21.07.2023)
 
 v1.4.1 (20.07.2023)
 - oprava přehrávání z kategorií a výsledků vyhledávání
-
-v1.4.0 (06.07.2023)
-- v nastavení lze zapnout zobrazení čísel kanálů/pořadové číslo kanálu
-- možnost výběru streamu v rámci multidimenze

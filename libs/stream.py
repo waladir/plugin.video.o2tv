@@ -128,7 +128,7 @@ def play_stream(post, channel_id):
         channels = Channels()
         channel_id = int(channel_id)
         channels_list = channels.get_channels_list('id')
-        if channel_id in channels_list and channels_list[channel_id]['adult'] == False:
+        if channel_id in channels_list and channels_list[channel_id]['adult'] == True:
             session = Session()
             # pin_post = {"language":"ces","ks":session.ks,"pin":"1110","type":"parental","clientTag":clientTag,"apiVersion":apiVersion}
             # data = o2api.call_o2_api(url = 'https://' + partnerId + '.frp1.ott.kaltura.com/api_v3/service/pin/action/validate?format=1&clientTag=' + clientTag, data = pin_post, headers = o2api.headers)
