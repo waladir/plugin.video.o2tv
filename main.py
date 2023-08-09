@@ -4,7 +4,6 @@ import sys
 import xbmcgui
 import xbmcplugin
 import xbmcaddon
-import xbmc
 
 import json
 from urllib.parse import parse_qsl
@@ -122,7 +121,7 @@ def router(paramstring):
         elif params['action'] == 'play_archive':
             play_archive(params['id'], json.loads(params['epg']), params['channel_id'], params['startts'], params['endts'])
         elif params['action'] == 'play_recording':
-            play_recording(params['id'])
+            play_recording(params['id'], params['channel_id'])
 
         elif params['action'] == 'list_settings':
             list_settings(params['label'])

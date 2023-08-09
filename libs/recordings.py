@@ -41,14 +41,16 @@ def list_recordings(label):
         for key in sorted(epg.keys(), reverse = False):
             if epg[key]['channel_id'] in channels_list:
                 list_item = xbmcgui.ListItem(label = epg[key]['title'] + ' (' + channels_list[epg[key]['channel_id']]['name'] + ' | ' + day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')] + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ')')
+                channel_id = channels_list[epg[key]['channel_id']]['id']
             else:
                 list_item = xbmcgui.ListItem(label = epg[key]['title'] + ' (' + day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')] + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ')')
+                channel_id = -1
             list_item = epg_listitem(list_item = list_item, epg = epg[key], logo = '')
             list_item.setProperty('IsPlayable', 'true')
             list_item.setContentLookup(False)          
             menus = [('Smazat nahrávku', 'RunPlugin(plugin://' + plugin_id + '?action=delete_recording&id=' + str(recording_ids[epg[key]['id']]) + ')')]
             list_item.addContextMenuItems(menus)         
-            url = get_url(action='play_recording', id = recording_ids[epg[key]['id']], start = epg[key]['startts'], end = epg[key]['endts'])
+            url = get_url(action='play_recording', id = recording_ids[epg[key]['id']], channel_id = channel_id, start = epg[key]['startts'], end = epg[key]['endts'])
             xbmcplugin.addDirectoryItem(_handle, url, list_item, False)
     xbmcplugin.endOfDirectory(_handle, cacheToDisc = False)
 
@@ -88,12 +90,12 @@ def list_future_recordings(label):
     for key in sorted(epg.keys(), reverse = False):
         list_item = xbmcgui.ListItem(label = epg[key]['title'])
         list_item = epg_listitem(list_item = list_item, epg = epg[key], logo = '')
-        list_item.setProperty('IsPlayable', 'true')
+        list_item.setProperty('IsPlayable', 'false')
         list_item.setContentLookup(False)          
         menus = [('Smazat nahrávku', 'RunPlugin(plugin://' + plugin_id + '?action=delete_future_recording&id=' + str(recording_ids[epg[key]['id']]) + ')')]
         list_item.addContextMenuItems(menus)         
         url = get_url(action='play_recording', id = epg[key]['id'], start = epg[key]['startts'], end = epg[key]['endts'])
-        xbmcplugin.addDirectoryItem(_handle, url, list_item, False)
+        xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
     xbmcplugin.endOfDirectory(_handle, cacheToDisc = False)
 
 def list_planning_recordings(label):

@@ -35,6 +35,10 @@ Další informace a podporu najdete na fóru www.xbmc-kodi.cz (https://www.xbmc-
     <platform>all</platform>
     <source>https://github.com/waladir/plugin.video.o2tv</source>
     <news>
+v1.4.4 (09.08.2023)
+- úprava načítání kanálů (díky Mihaloo?)
+- rodičovská kontrola (PIN)
+      
 v1.4.3 (30.07.2023)
 - možnost nastavit interval pro stahování EPG (standardně +/- 1 den)
       
@@ -47,10 +51,6 @@ v1.4.1 (20.07.2023)
 v1.4.0 (06.07.2023)
 - v nastavení lze zapnout zobrazení čísel kanálů/pořadové číslo kanálu
 - možnost výběru streamu v rámci multidimenze
-
-v1.3.1 (24.06.2023)
-- změna identifikátoru služeb ze jména na kód
-- ošetření zobrazení nahrávek z aktuálně neexistujicího kanálů
     </news>
     <assets>
         <icon>icon.png</icon>

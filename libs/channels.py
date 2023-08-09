@@ -283,7 +283,7 @@ class Channels:
         addon = xbmcaddon.Addon()
         channels = {}
         session = Session()
-        post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaChannelFilter","kSql":"(and asset_type=607)","idEqual":355960},"pager":{"objectType":"KalturaFilterPager","pageSize":300,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
+        post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaSearchAssetFilter","kSql":"(and asset_type='607' (or entitled_assets='entitledSubscriptions' entitled_assets='free') )"},"pager":{"objectType":"KalturaFilterPager","pageSize":300,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
         result = o2tv_list_api(post = post)
         for channel in result:
             if 'ChannelNumber' in channel['metas']:
@@ -297,7 +297,7 @@ class Channels:
                             image = channel['images'][0]['url'] + '/height/320/width/480'
                     else:
                         image = None
-                    channels.update({int(channel['id']) : {'channel_number' : int(channel['metas']['ChannelNumber']['value']), 'o2_number' : int(channel['metas']['ChannelNumber']['value']), 'name' : channel['name'], 'id' : channel['id'], 'logo' : image, 'visible' : True}})
+                    channels.update({int(channel['id']) : {'channel_number' : int(channel['metas']['ChannelNumber']['value']), 'o2_number' : int(channel['metas']['ChannelNumber']['value']), 'name' : channel['name'], 'id' : channel['id'], 'logo' : image, 'adult' : channel['metas']['Adult']['value'] , 'visible' : True}})
         return channels
 
     def load_channels(self):
@@ -309,6 +309,8 @@ class Channels:
                 self.valid_to = int(data['valid_to'])
                 channels = data['channels']
                 for channel in channels:
+                    if 'adult' not in channels[channel]:
+                        channels[channel]['adult'] = False
                     self.channels.update({int(channel) : channels[channel]})
             else:
                 self.channels = {}
@@ -422,6 +424,8 @@ class Channels:
                     self.channels[channel].update({'o2_number' : o2_channels[channel]['o2_number']})
                 if self.channels[channel]['logo'] != o2_channels[channel]['logo']:
                     self.channels[channel].update({'logo' : o2_channels[channel]['logo']})
+                if self.channels[channel]['adult'] != o2_channels[channel]['adult']:
+                    self.channels[channel].update({'adult' : o2_channels[channel]['adult']})
             else:
                 max_number = max_number + 1
                 o2_channels[channel]['channel_number'] = max_number
