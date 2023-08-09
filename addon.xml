@@ -1,4 +1,4 @@
-﻿<addon id="plugin.video.o2tv" name="O2TV" provider-name="waladir" version="1.4.5">
+﻿<addon id="plugin.video.o2tv" name="O2TV" provider-name="waladir" version="1.4.6">
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
     <import addon="inputstream.adaptive" version="19.0.0"/>
@@ -35,6 +35,9 @@ Další informace a podporu najdete na fóru www.xbmc-kodi.cz (https://www.xbmc-
     <platform>all</platform>
     <source>https://github.com/waladir/plugin.video.o2tv</source>
     <news>
+v1.4.6 (09.08.2023)
+- oprava nezobrazovaní pořadů v archivu
+      
 v1.4.5 (09.08.2023)
 - oprava rodičovské kontroly
       
@@ -47,9 +50,6 @@ v1.4.3 (30.07.2023)
       
 v1.4.2 (21.07.2023)
 - ošetření zalogovaných chyb
-      
-v1.4.1 (20.07.2023)
-- oprava přehrávání z kategorií a výsledků vyhledávání
     </news>
     <assets>
         <icon>icon.png</icon>
