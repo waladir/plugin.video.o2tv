@@ -1,3 +1,6 @@
+v1.4.7 (26.08.2023)
+- ošetření chyb v multidimenzi
+
 v1.4.6 (09.08.2023)
 - oprava nezobrazovaní pořadů v archivu
 
@@ -10,6 +13,3 @@ v1.4.4 (09.08.2023)
 
 v1.4.3 (30.07.2023)
 - možnost nastavit interval pro stahování EPG (standardně +/- 1 den)
-
-v1.4.2 (21.07.2023)
-- ošetření zalogovaných chyb

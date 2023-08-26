@@ -47,26 +47,27 @@ def play_live(id):
         md_epg = o2tv_list_api(post = post, nolog = True)
         for md_epg_item in md_epg:
             md_ids = []
+            md_titles = {}
             if 'MosaicChannelsInfo' in md_epg_item['tags']:
                 for mditem in md_epg_item['tags']['MosaicChannelsInfo']['objects']:
-                    if 'ProgramExternalID' in mditem['value']:
-                        md_ids.append(mditem['value'].split('ProgramExternalID=')[1])
+                    if 'ChannelExternalId' in mditem['value']:
+                        channel = mditem['value'].split('ChannelExternalId=')[1].split(',')[0]
+                        md_ids.append(channel)
+                        md_titles.update({channel : mditem['value'].split('Title=')[1].split(',')[0]})
                 for id in md_ids:
                     post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaSearchAssetFilter","orderBy":"START_DATE_ASC","kSql":"(or externalId='" + str(id) + "')"},"pager":{"objectType":"KalturaFilterPager","pageSize":200,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
                     epg = o2tv_list_api(post = post, nolog = True)
                     if len(epg) > 0:
                         item = epg[0]
-                        items.append(item['name'])
+                        items.append(md_titles[id])
                         ids.append(item['id'])
-        response = xbmcgui.Dialog().select(heading = 'Multidimenze - výběr streamu', list = items, preselect = 0)
-        if response < 0:
-            response = 0
-        id = ids[response]
-        post = {"1":{"service":"asset","action":"get","id":id,"assetReferenceType":"epg_internal","ks":session.ks},"2":{"service":"asset","action":"getPlaybackContext","assetId":id,"assetType":"epg","contextDataParams":{"objectType":"KalturaPlaybackContextOptions","context":"START_OVER","streamerType":"mpegdash","urlType":"DIRECT"},"ks":session.ks},"apiVersion":"7.8.1","ks":session.ks,"partnerId":partnerId}    
-        play_stream(post, id)
-    else:
-        post = {"1":{"service":"asset","action":"get","id":id,"assetReferenceType":"media","ks":session.ks},"2":{"service":"asset","action":"getPlaybackContext","assetId":id,"assetType":"media","contextDataParams":{"objectType":"KalturaPlaybackContextOptions","context":"PLAYBACK","streamerType":"mpegdash","urlType":"DIRECT"},"ks":session.ks},"apiVersion":"7.8.1","ks":session.ks,"partnerId":partnerId}
-        play_stream(post, id)
+        if len(items) > 0:
+            response = xbmcgui.Dialog().select(heading = 'Multidimenze - výběr streamu', list = items, preselect = 0)
+            if response < 0:
+                response = 0
+            id = ids[response]
+    post = {"1":{"service":"asset","action":"get","id":id,"assetReferenceType":"media","ks":session.ks},"2":{"service":"asset","action":"getPlaybackContext","assetId":id,"assetType":"media","contextDataParams":{"objectType":"KalturaPlaybackContextOptions","context":"PLAYBACK","streamerType":"mpegdash","urlType":"DIRECT"},"ks":session.ks},"apiVersion":"7.8.1","ks":session.ks,"partnerId":partnerId}
+    play_stream(post, id)
 
 def play_archive(id, epg, channel_id, startts, endts):
     session = Session()
@@ -83,18 +84,18 @@ def play_archive(id, epg, channel_id, startts, endts):
                 for mditem in md_epg_item['tags']['MosaicChannelsInfo']['objects']:
                     if 'ProgramExternalID' in mditem['value']:
                         md_ids.append(mditem['value'].split('ProgramExternalID=')[1])
-                for id in md_ids:
-                    post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaSearchAssetFilter","orderBy":"START_DATE_ASC","kSql":"(or externalId='" + str(id) + "')"},"pager":{"objectType":"KalturaFilterPager","pageSize":200,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
+                for md_id in md_ids:
+                    post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaSearchAssetFilter","orderBy":"START_DATE_ASC","kSql":"(or externalId='" + str(md_id) + "')"},"pager":{"objectType":"KalturaFilterPager","pageSize":200,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
                     epg = o2tv_list_api(post = post, nolog = True)
                     if len(epg) > 0:
                         item = epg[0]
                         items.append(item['name'])
                         ids.append(item['id'])
-        response = xbmcgui.Dialog().select(heading = 'Multidimenze - výběr streamu', list = items, preselect = 0)
-        if response < 0:
-            response = 0
-        id = ids[response]
-
+        if len(items) > 0:
+            response = xbmcgui.Dialog().select(heading = 'Multidimenze - výběr streamu', list = items, preselect = 0)
+            if response < 0:
+                response = 0
+            id = ids[response]
 
     # post = {"1":{"service":"asset","action":"get","id":id,"assetReferenceType":"epg_internal","ks":session.ks},"2":{"service":"asset","action":"getPlaybackContext","assetId":id,"assetType":"epg","contextDataParams":{"objectType":"KalturaPlaybackContextOptions","context":"START_OVER","streamerType":"mpegdash","urlType":"DIRECT"},"ks":session.ks},"apiVersion":"7.8.1","ks":session.ks,"partnerId":partnerId}    
     # play_stream(post)
@@ -130,9 +131,6 @@ def play_stream(post, channel_id):
         channels_list = channels.get_channels_list('id')
         if channel_id in channels_list and channels_list[channel_id]['adult'] == True:
             session = Session()
-            # pin_post = {"language":"ces","ks":session.ks,"pin":"1110","type":"parental","clientTag":clientTag,"apiVersion":apiVersion}
-            # data = o2api.call_o2_api(url = 'https://' + partnerId + '.frp1.ott.kaltura.com/api_v3/service/pin/action/validate?format=1&clientTag=' + clientTag, data = pin_post, headers = o2api.headers)
-            # if 'err' in data or not 'result' in data or data['result'] != True:
             pin = xbmcgui.Dialog().numeric(type = 0, heading = 'Zadejte PIN', bHiddenInput = True)
             if len(str(pin)) > 0:
                 pin_post = {"language":"ces","ks":session.ks,"pin":str(pin),"type":"parental","clientTag":clientTag,"apiVersion":apiVersion}
