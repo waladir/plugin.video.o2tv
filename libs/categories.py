@@ -161,7 +161,7 @@ def list_category(id, series, label):
     epg = epg_api(post = post, key = 'startts_channel_number')
     for key in epg:
         if epg[key]['channel_id'] in channels_list:
-            list_item = xbmcgui.ListItem(label = epg[key]['title'] + ' (' + channels_list[epg[key]['channel_id']]['name'] + ' | ' + day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')] + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ')')        
+            list_item = xbmcgui.ListItem(label = epg[key]['title'] + ' (' + channels_list[epg[key]['channel_id']]['name'] + ' | ' + day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')] + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m. %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ')')        
             if epg[key]['isSeries'] == True:
                 url = get_url(action='list_series', id = epg[key]['seriesId'], label = label + ' / ' + epg[key]['title'])
                 if 'cover' in epg[key] and len(epg[key]['cover']) > 0:
@@ -197,7 +197,7 @@ def list_series(id, label):
                         title = title + ' S' + str(epg[key]['seasonNumber']) + 'E' + str(epg[key]['seasonNumber'])
                     else:
                         title = title + ' E' + str(epg[key]['episodeNumber'])
-            list_item = xbmcgui.ListItem(label = title + ' (' + channels_list[epg[key]['channel_id']]['name'] + ' | ' + day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')] + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ')')        
+            list_item = xbmcgui.ListItem(label = title + ' (' + channels_list[epg[key]['channel_id']]['name'] + ' | ' + day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')] + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m. %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ')')        
             list_item = epg_listitem(list_item = list_item, epg = epg[key], logo = '')
             list_item.setProperty('IsPlayable', 'true')
             list_item.setContentLookup(False)          

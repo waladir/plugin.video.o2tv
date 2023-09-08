@@ -40,10 +40,10 @@ def list_recordings(label):
         epg = epg_api(post = post, key = 'startts')
         for key in sorted(epg.keys(), reverse = False):
             if epg[key]['channel_id'] in channels_list:
-                list_item = xbmcgui.ListItem(label = epg[key]['title'] + ' (' + channels_list[epg[key]['channel_id']]['name'] + ' | ' + day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')] + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ')')
+                list_item = xbmcgui.ListItem(label = epg[key]['title'] + ' (' + channels_list[epg[key]['channel_id']]['name'] + ' | ' + day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')] + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m. %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ')')
                 channel_id = channels_list[epg[key]['channel_id']]['id']
             else:
-                list_item = xbmcgui.ListItem(label = epg[key]['title'] + ' (' + day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')] + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ')')
+                list_item = xbmcgui.ListItem(label = epg[key]['title'] + ' (' + day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')] + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m. %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ')')
                 channel_id = -1
             list_item = epg_listitem(list_item = list_item, epg = epg[key], logo = '')
             list_item.setProperty('IsPlayable', 'true')
@@ -129,7 +129,7 @@ def list_rec_days(id, label):
             den_label = 'Zítra'
             den = 'Zítra'
         else:
-            den_label = day_translation_short[day.strftime('%w')] + ' ' + day.strftime('%d.%m')
+            den_label = day_translation_short[day.strftime('%w')] + ' ' + day.strftime('%d.%m.')
             den = day_translation[day.strftime('%w')] + ' ' + day.strftime('%d.%m.%Y')
         list_item = xbmcgui.ListItem(label=den)
         url = get_url(action='future_program', id = id, day = i, label = label + ' / ' + den_label)  
@@ -157,7 +157,7 @@ def future_program(id, day, label):
     if int(day) >  0:
         list_item = xbmcgui.ListItem(label='Předchozí den')
         day_dt = date.today() + timedelta(days = int(day) - 1)
-        den_label = day_translation_short[day_dt.strftime('%w')] + ' ' + day_dt.strftime('%d.%m')
+        den_label = day_translation_short[day_dt.strftime('%w')] + ' ' + day_dt.strftime('%d.%m.')
         url = get_url(action='future_program', id = id, day = int(day) - 1, label = label.rsplit(' / ')[0] + ' / ' + den_label)  
         list_item.setArt({ 'thumb' : os.path.join(icons_dir , 'previous_arrow.png'), 'icon' : os.path.join(icons_dir , 'previous_arrow.png') })
         xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
@@ -165,7 +165,7 @@ def future_program(id, day, label):
     for key in sorted(epg.keys()):
         start = epg[key]['startts']
         end = epg[key]['endts']
-        list_item = xbmcgui.ListItem(label = day_translation_short[datetime.fromtimestamp(start).strftime('%w')] + ' ' + datetime.fromtimestamp(start).strftime('%d.%m %H:%M') + ' - ' + datetime.fromtimestamp(end).strftime('%H:%M') + ' | ' + epg[key]['title'])
+        list_item = xbmcgui.ListItem(label = day_translation_short[datetime.fromtimestamp(start).strftime('%w')] + ' ' + datetime.fromtimestamp(start).strftime('%d.%m. %H:%M') + ' - ' + datetime.fromtimestamp(end).strftime('%H:%M') + ' | ' + epg[key]['title'])
         list_item = epg_listitem(list_item, epg[key], '')
         list_item.setProperty('IsPlayable', 'false')
         list_item.addContextMenuItems([('Přidat nahrávku', 'RunPlugin(plugin://' + plugin_id + '?action=add_recording&id=' + str(epg[key]['id']) + ')',)])       
@@ -175,7 +175,7 @@ def future_program(id, day, label):
     if int(day) <  7:
         list_item = xbmcgui.ListItem(label='Následující den')
         day_dt = date.today() + timedelta(days = int(day) + 1)
-        den_label = day_translation_short[day_dt.strftime('%w')] + ' ' + day_dt.strftime('%d.%m')
+        den_label = day_translation_short[day_dt.strftime('%w')] + ' ' + day_dt.strftime('%d.%m.')
         url = get_url(action='future_program', id = id, day = int(day) + 1, label = label.rsplit(' / ')[0] + ' / ' + den_label)  
         list_item.setArt({ 'thumb' : os.path.join(icons_dir , 'next_arrow.png'), 'icon' : os.path.join(icons_dir , 'next_arrow.png') })
         xbmcplugin.addDirectoryItem(_handle, url, list_item, True)

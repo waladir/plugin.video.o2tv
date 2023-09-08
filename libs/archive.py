@@ -47,7 +47,7 @@ def list_archive_days(id, label):
             den_label = 'Včera'
             den = 'Včera'
         else:
-            den_label = day_translation_short[day.strftime('%w')] + ' ' + day.strftime('%d.%m')
+            den_label = day_translation_short[day.strftime('%w')] + ' ' + day.strftime('%d.%m.')
             den = day_translation[day.strftime('%w')] + ' ' + day.strftime('%d.%m.%Y')
         list_item = xbmcgui.ListItem(label = den)
         url = get_url(action='list_program', id = id, day_min = i, label = label + ' / ' + den_label)  
@@ -75,14 +75,14 @@ def list_program(id, day_min, label):
     if int(day_min) < 7:
         list_item = xbmcgui.ListItem(label='Předchozí den')
         day = date.today() - timedelta(days = int(day_min) + 1)
-        den_label = day_translation_short[day.strftime('%w')] + ' ' + day.strftime('%d.%m')
+        den_label = day_translation_short[day.strftime('%w')] + ' ' + day.strftime('%d.%m.')
         url = get_url(action='list_program', id = id, day_min = int(day_min) + 1, label = label.rsplit(' / ')[0] + ' / ' + den_label)
         list_item.setArt({ 'thumb' : os.path.join(icons_dir , 'previous_arrow.png'), 'icon' : os.path.join(icons_dir , 'previous_arrow.png') })
         xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
 
     for key in sorted(epg.keys(), reverse = False):
         if int(epg[key]['endts']) > int(time.mktime(datetime.now().timetuple()))-60*60*24*7:
-            list_item = xbmcgui.ListItem(label = day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')] + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ' | ' + epg[key]['title'])
+            list_item = xbmcgui.ListItem(label = day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')] + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m. %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ' | ' + epg[key]['title'])
             list_item = epg_listitem(list_item = list_item, epg = epg[key], logo = '')
             menus = [('Přidat nahrávku', 'RunPlugin(plugin://' + plugin_id + '?action=add_recording&id=' + str(epg[key]['id']) + ')')]
             list_item.addContextMenuItems(menus)       
@@ -94,7 +94,7 @@ def list_program(id, day_min, label):
     if int(day_min) > 0:
         list_item = xbmcgui.ListItem(label='Následující den')
         day = date.today() - timedelta(days = int(day_min) - 1)
-        den_label = day_translation_short[day.strftime('%w')] + ' ' + day.strftime('%d.%m')
+        den_label = day_translation_short[day.strftime('%w')] + ' ' + day.strftime('%d.%m.')
         url = get_url(action='list_program', id = id, day_min = int(day_min) - 1, label = label.rsplit(' / ')[0] + ' / ' + den_label)  
         list_item.setArt({ 'thumb' : os.path.join(icons_dir , 'next_arrow.png'), 'icon' : os.path.join(icons_dir , 'next_arrow.png') })
         xbmcplugin.addDirectoryItem(_handle, url, list_item, True)

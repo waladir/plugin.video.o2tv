@@ -52,7 +52,7 @@ def program_search(query, label):
     if len(epg) > 0:
         for key in sorted(epg.keys(), reverse = True):
             if epg[key]['channel_id'] in channels_list:                
-                list_item = xbmcgui.ListItem(label = epg[key]['title'] + ' (' + channels_list[epg[key]['channel_id']]['name'] + ' | ' + day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')] + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ')')
+                list_item = xbmcgui.ListItem(label = epg[key]['title'] + ' (' + channels_list[epg[key]['channel_id']]['name'] + ' | ' + day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')] + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m. %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ')')
                 list_item = epg_listitem(list_item = list_item, epg = epg[key], logo = channels_list[epg[key]['channel_id']]['logo'])
                 list_item.setProperty('IsPlayable', 'true')
                 list_item.setContentLookup(False)          
