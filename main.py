@@ -18,7 +18,7 @@ from libs.channels import list_channels_groups, add_channel_group, edit_channel_
 from libs.recordings import list_recordings, delete_recording, delete_future_recording, list_future_recordings, list_planning_recordings, list_rec_days, future_program, add_recording
 from libs.categories import list_categories, list_category, list_subcategories, list_series, list_sport_categories, list_children_categories
 from libs.search import list_search, delete_search, program_search
-from libs.settings import list_settings, list_services, enable_service
+from libs.settings import list_settings, list_services, enable_service, list_devices, delete_device
 from libs.session import Session
 
 if len(sys.argv) > 1:
@@ -133,7 +133,11 @@ def router(paramstring):
         elif params['action'] == 'list_services':
             list_services(params['label'])                   
         elif params['action'] == 'enable_service':
-            enable_service(params['serviceid'])                
+            enable_service(params['serviceid'])   
+        elif params['action'] == 'list_devices':
+            list_devices(params['label'])                   
+        elif params['action'] == 'delete_device':
+            delete_device(params['udid'])
 
         elif params['action'] == 'manage_channels':
             manage_channels(params['label'])

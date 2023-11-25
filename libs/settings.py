@@ -7,8 +7,11 @@ import xbmcgui
 import xbmcplugin
 from xbmcvfs import translatePath
 
+from datetime import datetime
+
 from libs.session import Session
-from libs.utils import get_url
+from libs.o2tv import O2API
+from libs.utils import get_url, partnerId, apiVersion, clientTag
 
 def list_settings(label):
     _handle = int(sys.argv[1])
@@ -20,6 +23,10 @@ def list_settings(label):
 
     list_item = xbmcgui.ListItem(label='Služby')
     url = get_url(action='list_services', label = 'Služby')  
+    xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
+
+    list_item = xbmcgui.ListItem(label='Zařízení')
+    url = get_url(action='list_devices', label = 'Zařízení')  
     xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
 
     list_item = xbmcgui.ListItem(label='Nastavení doplňku')
@@ -52,6 +59,62 @@ def enable_service(serviceid):
     xbmcgui.Dialog().notification('O2TV', 'Po změně služby je třeba resetovat seznam kanálů!', xbmcgui.NOTIFICATION_WARNING, 5000)
     xbmc.executebuiltin('Container.Refresh')   
 
+def list_devices(label):
+    _handle = int(sys.argv[1])
+    xbmcplugin.setPluginCategory(_handle, label)   
+    session = Session()
+    o2api = O2API()
+
+    active = []
+    post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaStreamingDeviceFilter"},"clientTag":clientTag,"apiVersion":apiVersion}
+    data = o2api.call_o2_api(url = 'https://' + partnerId + '.frp1.ott.kaltura.com/api_v3/service/streamingdevice/action/list?format=1&clientTag=' + clientTag, data = post, headers = o2api.headers, nolog = False)
+    if 'err' not in data and 'result' in data and len(data['result']) > 0 and 'objects' in data['result'] and len(data['result']['objects']) > 0:
+        for device in data['result']['objects']:
+            active.append(device['udid'])
+
+    types = {}
+    post = {"language":"ces","ks":session.ks,"clientTag":clientTag,"apiVersion":apiVersion}
+    data = o2api.call_o2_api(url = 'https://' + partnerId + '.frp1.ott.kaltura.com/api_v3/service/devicebrand/action/list?format=1&clientTag=' + clientTag, data = post, headers = o2api.headers, nolog = False)
+    if 'err' not in data and 'result' in data and len(data['result']) > 0 and 'objects' in data['result'] and len(data['result']['objects']) > 0:
+        for item in data['result']['objects']:
+            types.update({item['id'] : item['name']})
+
+    post = {"language":"ces","ks":session.ks,"clientTag":clientTag,"apiVersion":apiVersion}
+    data = o2api.call_o2_api(url = 'https://' + partnerId + '.frp1.ott.kaltura.com/api_v3/service/householddevice/action/list?format=1&clientTag=' + clientTag, data = post, headers = o2api.headers, nolog = False)
+    if 'err' in data or not 'result' in data or len(data['result']) == 0 or 'objects' not in data['result'] or len(data['result']['objects']) == 0:
+        xbmcgui.Dialog().notification('O2TV','Problém při načtení zařízení', xbmcgui.NOTIFICATION_ERROR, 5000)
+        sys.exit() 
+    for device in data['result']['objects']:
+        if 'activatedOn' in device and len(str(device['activatedOn'])) > 0: 
+            activated = '\n[COLOR=gray]aktivováno: ' + datetime.fromtimestamp(int(device['activatedOn'])).strftime('%d.%m.%Y %H:%M') + '[/COLOR]'
+        else:
+            activated = ''
+        if device['udid'] in active:
+            streaming = True
+        else:
+            streaming = False        
+        if device['brandId'] in types:
+            device_name = device['udid'] + ' (' + types[device['brandId']] + ')'
+        else:
+            device_name = device['udid']
+
+        if streaming:
+            list_item = xbmcgui.ListItem(label = '[COLOR=red]' + device_name + activated + '[/COLOR]')
+        else:
+            list_item = xbmcgui.ListItem(label = device_name + activated)
+        url = get_url(action='delete_device', udid = device['udid'])  
+        xbmcplugin.addDirectoryItem(_handle, url , list_item, False)  
+    xbmcplugin.endOfDirectory(_handle, cacheToDisc = False)
+
+def delete_device(udid):
+    response = xbmcgui.Dialog().yesno('Odhlášení zařízení', 'Opravdu provést odhlašení zařízení s ID ' + udid + '?', nolabel = 'Ne', yeslabel = 'Ano')
+    if response:
+        session = Session()
+        o2api = O2API()
+        post = {"language":"ces","ks":session.ks,"udid":udid,"clientTag":clientTag,"apiVersion":apiVersion}
+        data = o2api.call_o2_api(url = 'https://' + partnerId + '.frp1.ott.kaltura.com/api_v3/service/householddevice/action/delete?format=1&clientTag=' + clientTag, data = post, headers = o2api.headers, nolog = False)
+        xbmc.executebuiltin('Container.Refresh')
+    
 class Settings:
     def __init__(self):
         self.is_settings_ok = self.check_settings()
