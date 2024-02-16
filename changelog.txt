@@ -1,3 +1,6 @@
+v1.5.2 (16.02.2024)
+- spouštění živé vysílání přes startover s multidemenzí
+
 v1.5.1 (11.02.2024)
 - spouštění živé vysílání přes startover (mimo multidemenze)
 
@@ -12,6 +15,3 @@ v1.4.9 (26.10.2023)
 
 v1.4.8 (08.09.2023)
 - úprava zobrazení datumů
-
-v1.4.7 (26.08.2023)
-- ošetření chyb v multidimenzi

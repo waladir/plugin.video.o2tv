@@ -39,7 +39,10 @@ def play_startover(id, channel_id):
 
 def play_live(id):
     session = Session()
+    epg_id = -1
     epg = get_live_epg()[int(id)]
+    if 'id' in epg:
+        epg_id = epg['id']
     if 'md' in epg and epg['md'] is not None:
         items = []
         ids = []
@@ -66,8 +69,11 @@ def play_live(id):
             if response < 0:
                 response = 0
             id = ids[response]
-    if 'id' in epg and epg['channel_id'] == int(id):
-        post = {"1":{"service":"asset","action":"get","id":epg['id'],"assetReferenceType":"epg_internal","ks":session.ks},"2":{"service":"asset","action":"getPlaybackContext","assetId":epg['id'],"assetType":"epg","contextDataParams":{"objectType":"KalturaPlaybackContextOptions","context":"START_OVER","streamerType":"mpegdash","urlType":"DIRECT"},"ks":session.ks},"apiVersion":"7.8.1","ks":session.ks,"partnerId":partnerId}    
+            epg = get_live_epg()[int(id)]
+            if 'id' in epg:
+                epg_id = epg['id']
+    if epg_id > 0:
+        post = {"1":{"service":"asset","action":"get","id":epg_id,"assetReferenceType":"epg_internal","ks":session.ks},"2":{"service":"asset","action":"getPlaybackContext","assetId":epg_id,"assetType":"epg","contextDataParams":{"objectType":"KalturaPlaybackContextOptions","context":"START_OVER","streamerType":"mpegdash","urlType":"DIRECT"},"ks":session.ks},"apiVersion":"7.8.1","ks":session.ks,"partnerId":partnerId}    
     else:
         post = {"1":{"service":"asset","action":"get","id":id,"assetReferenceType":"media","ks":session.ks},"2":{"service":"asset","action":"getPlaybackContext","assetId":id,"assetType":"media","contextDataParams":{"objectType":"KalturaPlaybackContextOptions","context":"PLAYBACK","streamerType":"mpegdash","urlType":"DIRECT"},"ks":session.ks},"apiVersion":"7.8.1","ks":session.ks,"partnerId":partnerId}
     play_stream(post, id)
