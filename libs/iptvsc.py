@@ -173,7 +173,8 @@ def generate_epg(output_file = '', show_progress = True):
                 file.close()
                 if show_progress == True:
                     dialog.close()
-                xbmcgui.Dialog().notification('O2TV', 'EPG bylo uložené', xbmcgui.NOTIFICATION_INFO, 5000)    
+                if show_progress == True or addon.getSetting('epg_info') == 'true':
+                    xbmcgui.Dialog().notification('O2TV', 'EPG bylo uložené', xbmcgui.NOTIFICATION_INFO, 5000)    
         except Exception:
             if show_progress == True:
                 dialog.close()

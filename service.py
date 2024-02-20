@@ -18,7 +18,7 @@ if not addon.getSetting('epg_interval'):
     interval = 12*60*60
 else:
     interval = int(addon.getSetting('epg_interval'))*60*60
-next = time.time() + 5*60
+next = time.time() + 10
 
 while not xbmc.Monitor().abortRequested():
     if(next < time.time()):
