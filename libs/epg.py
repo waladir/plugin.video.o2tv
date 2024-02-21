@@ -28,7 +28,10 @@ def epg_api(post, key):
             id = item['id']
             channel_id = item['linearAssetId']
             title = item['name']
-            description = item['description']
+            if 'description' in item:
+                description = item['description']
+            else:
+                description = ''
             startts = item['startDate']
             endts = item['endDate']
 

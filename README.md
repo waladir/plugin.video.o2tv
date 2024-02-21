@@ -4,6 +4,9 @@
 <p>
 Živé vysílání, archiv, nahrávky, vytváření playlistu a EPG pro IPTV Simple Clienta<br><br>
 <a href="https://www.xbmc-kodi.cz/prispevek-o2tv">Vlákno na fóru XBMC-Kodi.cz</a><br><br>
+v1.5.4 (21.02.2024)<br>
+- oštření chybějící dat v EPG<br><br>
+
 v1.5.3 (20.02.2024)<br>
 - přidaná možnost vypnutí zobrazení hlášek při automatickém generování EPG<br><br>
 
@@ -16,9 +19,4 @@ v1.5.1 (11.02.2024)<br>
 v1.5.0 (25.11.2023)<br>
 - úprava parametrů API<br>
 - přehled zařízení s možností odhlášení<br><br>
-
-v1.4.9 (26.10.2023)<br>
-- úprava textu chyby při problému s přihlášením<br>
-- logování odeslaných dat při volání API (vyjma přihlašovacích údajů)<br>
-- získávání tokenu jen pro aktivní službu<br><br>
 </p>

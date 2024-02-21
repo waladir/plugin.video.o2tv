@@ -1,4 +1,4 @@
-﻿<addon id="plugin.video.o2tv" name="O2TV" provider-name="waladir" version="1.5.3">
+﻿<addon id="plugin.video.o2tv" name="O2TV" provider-name="waladir" version="1.5.4">
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
     <import addon="inputstream.adaptive" version="19.0.0"/>
@@ -35,6 +35,9 @@ Další informace a podporu najdete na fóru www.xbmc-kodi.cz (https://www.xbmc-
     <platform>all</platform>
     <source>https://github.com/waladir/plugin.video.o2tv</source>
     <news>
+v1.5.4 (21.02.2024)
+- oštření chybějící dat v EPG
+
 v1.5.3 (20.02.2024)
 - přidaná možnost vypnutí zobrazení hlášek při automatickém generování EPG
 
@@ -47,11 +50,6 @@ v1.5.1 (11.02.2024)
 v1.5.0 (25.11.2023)
 - úprava parametrů API
 - přehled zařízení s možností odhlášení
-
-v1.4.9 (26.10.2023)
-- úprava textu chyby při problému s přihlášením
-- logování odeslaných dat při volání API (vyjma přihlašovacích údajů)
-- získávání tokenu jen pro aktivní službu
     </news>
     <assets>
         <icon>icon.png</icon>
