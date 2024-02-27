@@ -43,20 +43,17 @@ def generate_playlist(output_file = ''):
     if addon.getSetting('output_dir') is None or len(addon.getSetting('output_dir')) == 0:
         xbmcgui.Dialog().notification('O2TV', 'Nastav adresář pro playlist a EPG!', xbmcgui.NOTIFICATION_ERROR, 5000)
         sys.exit() 
-             
     channels = Channels()
     channels_list = channels.get_channels_list('channel_number')
-
-    if len(output_file) > 0:
-        filename = output_file
-    else:
-        filename = addon.getSetting('output_dir') + 'playlist.m3u'
-
     if save_file_test() == 0:
         xbmcgui.Dialog().notification('O2TV', 'Chyba při uložení playlistu', xbmcgui.NOTIFICATION_ERROR, 5000)
         return
+    output_dir = addon.getSetting('output_dir') 
     try:
-        file = xbmcvfs.File(filename, 'w')
+        if len(output_file) > 0:
+            file = xbmcvfs.File(output_file, 'w')
+        else:
+            file = xbmcvfs.File(output_dir + 'playlist.m3u', 'w')
         if file == None:
             xbmcgui.Dialog().notification('O2TV', 'Chyba při uložení playlistu', xbmcgui.NOTIFICATION_ERROR, 5000)
         else:

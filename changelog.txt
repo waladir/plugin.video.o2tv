@@ -1,3 +1,6 @@
+v1.5.5 (27.02.2024)
+- úprava generování playlistu pro IPTV SC
+
 v1.5.4 (21.02.2024)
 - ošetření chybějících dat v EPG
 
@@ -9,7 +12,3 @@ v1.5.2 (16.02.2024)
 
 v1.5.1 (11.02.2024)
 - spouštění živé vysílání přes startover (mimo multidemenze)
-
-v1.5.0 (25.11.2023)
-- úprava parametrů API
-- přehled zařízení s možností odhlášení
