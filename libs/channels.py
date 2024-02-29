@@ -288,16 +288,24 @@ class Channels:
         for channel in result:
             if 'ChannelNumber' in channel['metas']:
                 if not (addon.getSetting('ignore_radios') == 'true' and 'tags' in channel and len(channel['tags']) > 0 and 'Genre' in channel['tags'] and len(channel['tags']['Genre']) > 0 and channel['tags']['Genre']['objects'][0]['value'] == 'radio'):
+                    print(channel['images'])
                     image = None
+                    imagesq = None
                     if len(channel['images']) > 1:
                         for img in channel['images']:
                             if img['ratio'] == '16x9':
                                 image = img['url']
+                            if img['ratio'] == '1x1':
+                                imagesq = img['url']
                         if image is None:  
                             image = channel['images'][0]['url'] + '/height/320/width/480'
+                        if imagesq is None:  
+                            imagesq = channel['images'][0]['url'] + '/height/320/width/480'
+
                     else:
                         image = None
-                    channels.update({int(channel['id']) : {'channel_number' : int(channel['metas']['ChannelNumber']['value']), 'o2_number' : int(channel['metas']['ChannelNumber']['value']), 'name' : channel['name'], 'id' : channel['id'], 'logo' : image, 'adult' : channel['metas']['Adult']['value'] , 'visible' : True}})
+                        imagesq = None
+                    channels.update({int(channel['id']) : {'channel_number' : int(channel['metas']['ChannelNumber']['value']), 'o2_number' : int(channel['metas']['ChannelNumber']['value']), 'name' : channel['name'], 'id' : channel['id'], 'logo' : image, 'logosq' : imagesq, 'adult' : channel['metas']['Adult']['value'] , 'visible' : True}})
         return channels
 
     def load_channels(self):
@@ -424,6 +432,8 @@ class Channels:
                     self.channels[channel].update({'o2_number' : o2_channels[channel]['o2_number']})
                 if self.channels[channel]['logo'] != o2_channels[channel]['logo']:
                     self.channels[channel].update({'logo' : o2_channels[channel]['logo']})
+                if 'logosq' not in self.channels[channel] or self.channels[channel]['logosq'] != o2_channels[channel]['logosq']:
+                    self.channels[channel].update({'logosq' : o2_channels[channel]['logosq']})
                 if self.channels[channel]['adult'] != o2_channels[channel]['adult']:
                     self.channels[channel].update({'adult' : o2_channels[channel]['adult']})
             else:

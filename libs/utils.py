@@ -66,3 +66,10 @@ def parsetime(txt):
 
 def replace_by_html_entity(string):
     return string.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;').replace("'","&apos;").replace('"',"&quot;")
+
+def get_color(settings_color):
+    if len(settings_color) >2 and settings_color.find(']') > 1:
+        color = settings_color[1:settings_color.find(']')].replace('COLOR ','')
+        return color
+    else:
+        return ''

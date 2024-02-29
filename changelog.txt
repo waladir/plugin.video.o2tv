@@ -1,3 +1,8 @@
+v1.5.6 (29.02.2024)
+- v nastavení lze změnit jméno souboru playlistu na playlist.txt (řeší problém s generováním playlistu na Androidu)
+- přidaná možnost nastavení barvy pro jméno pořadu u živého vysílání
+- ošetření chyby při volání keepalive požadavků
+
 v1.5.5 (27.02.2024)
 - úprava generování playlistu pro IPTV SC
 
@@ -9,6 +14,3 @@ v1.5.3 (20.02.2024)
 
 v1.5.2 (16.02.2024)
 - spouštění živé vysílání přes startover s multidemenzí
-
-v1.5.1 (11.02.2024)
-- spouštění živé vysílání přes startover (mimo multidemenze)

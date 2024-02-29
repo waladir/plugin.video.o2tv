@@ -207,7 +207,6 @@ def play_stream(post, channel_id):
     else:
         xbmcgui.Dialog().notification('O2TV','Nesprávný PIN', xbmcgui.NOTIFICATION_ERROR, 5000)
 
-
 def get_keepalive_url(mpd, response):
     keepalive = None
     dom = minidom.parseString(response.read())
@@ -219,7 +218,8 @@ def get_keepalive_url(mpd, response):
             for segmentTemplate in segmentTemplates:
                 timelines = segmentTemplate.getElementsByTagName('S')
                 for timeline in timelines:
-                    ts = timeline.getAttribute('t')
+                    if len(timeline.getAttribute('t')) > 0:
+                        ts = timeline.getAttribute('t')
                 uri = 'dash/' + segmentTemplate.getAttribute('media').replace('&amp;', '&').replace('$RepresentationID$', 'video=' + maxBandwidth).replace('$Time$', ts)
                 keepalive = mpd.replace('manifest.mpd?bkm-query', uri)
     return keepalive

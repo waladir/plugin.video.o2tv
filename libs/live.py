@@ -8,7 +8,7 @@ from datetime import datetime
 
 from libs.channels import Channels 
 from libs.epg import get_live_epg, epg_listitem
-from libs.utils import get_url
+from libs.utils import get_url, get_color
 
 if len(sys.argv) > 1:
     _handle = int(sys.argv[1])
@@ -30,7 +30,7 @@ def list_live(label):
             channel_number = ''
         if channels_list[num]['id'] in epg:
             epg_item = epg[channels_list[num]['id']]
-            list_item = xbmcgui.ListItem(label = channel_number + channels_list[num]['name'] + ' | ' + epg_item['title'] + ' | ' + datetime.fromtimestamp(epg_item['startts']).strftime('%H:%M') + ' - ' + datetime.fromtimestamp(epg_item['endts']).strftime('%H:%M'))
+            list_item = xbmcgui.ListItem(label = channel_number + channels_list[num]['name'] + '[COLOR ' + get_color(addon.getSetting('label_color_live')) + '] | ' + epg_item['title'] + ' | ' + datetime.fromtimestamp(epg_item['startts']).strftime('%H:%M') + ' - ' + datetime.fromtimestamp(epg_item['endts']).strftime('%H:%M') + '[/COLOR]')
             list_item = epg_listitem(list_item = list_item, epg = epg_item, logo = channels_list[num]['logo'])
         else:
             epg_item = {}

@@ -53,7 +53,10 @@ def generate_playlist(output_file = ''):
         if len(output_file) > 0:
             file = xbmcvfs.File(output_file, 'w')
         else:
-            file = xbmcvfs.File(output_dir + 'playlist.m3u', 'w')
+            if addon.getSetting('playlist_filename') == 'playlist.m3u':
+                file = xbmcvfs.File(output_dir + 'playlist.m3u', 'w')
+            else:
+                file = xbmcvfs.File(output_dir + 'playlist.txt', 'w')
         if file == None:
             xbmcgui.Dialog().notification('O2TV', 'Chyba při uložení playlistu', xbmcgui.NOTIFICATION_ERROR, 5000)
         else:
