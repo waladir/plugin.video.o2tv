@@ -288,19 +288,18 @@ class Channels:
         for channel in result:
             if 'ChannelNumber' in channel['metas']:
                 if not (addon.getSetting('ignore_radios') == 'true' and 'tags' in channel and len(channel['tags']) > 0 and 'Genre' in channel['tags'] and len(channel['tags']['Genre']) > 0 and channel['tags']['Genre']['objects'][0]['value'] == 'radio'):
-                    print(channel['images'])
                     image = None
                     imagesq = None
                     if len(channel['images']) > 1:
                         for img in channel['images']:
                             if img['ratio'] == '16x9':
                                 image = img['url']
-                            if img['ratio'] == '1x1':
-                                imagesq = img['url']
+                            if img['ratio'] == '2x3':
+                                imagesq = img['url'] + '/height/256/width/256'
                         if image is None:  
                             image = channel['images'][0]['url'] + '/height/320/width/480'
                         if imagesq is None:  
-                            imagesq = channel['images'][0]['url'] + '/height/320/width/480'
+                            imagesq = channel['images'][0]['url'] + '/height/256/width/256'
 
                     else:
                         image = None

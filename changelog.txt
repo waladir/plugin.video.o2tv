@@ -1,3 +1,8 @@
+v1.5.7 (02.03.2024)
+- nastavení timoutu 10s u požadavků
+- zobrazení náhrávek epizod seriálů
+- přidaná možnost změny řazení nahrávek
+
 v1.5.6 (29.02.2024)
 - v nastavení lze změnit jméno souboru playlistu na playlist.txt (řeší problém s generováním playlistu na Androidu)
 - přidaná možnost nastavení barvy pro jméno pořadu u živého vysílání
@@ -11,6 +16,3 @@ v1.5.4 (21.02.2024)
 
 v1.5.3 (20.02.2024)
 - přidaná možnost vypnutí zobrazení hlášek při automatickém generování EPG
-
-v1.5.2 (16.02.2024)
-- spouštění živé vysílání přes startover s multidemenzí

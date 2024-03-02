@@ -11,6 +11,8 @@ from urllib.error import HTTPError
 
 from libs.utils import clientTag, partnerId
 
+import socket
+
 class O2API:
     def __init__(self):
         self.headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:98.0) Gecko/20100101 Firefox/98.0', 'Accept-Encoding' : 'gzip', 'Accept' : '*/*', 'Content-type' : 'application/json;charset=UTF-8'} 
@@ -26,7 +28,7 @@ class O2API:
         if addon.getSetting('log_request_url') == 'true' and data != None and sensitive == False:
             xbmc.log('O2TV > ' + str(data))
         try:
-            response = urlopen(request)
+            response = urlopen(request, timeout = 10)
             if response.getheader("Content-Encoding") == 'gzip':
                 gzipFile = gzip.GzipFile(fileobj = response)
                 html = gzipFile.read()
