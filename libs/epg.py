@@ -20,7 +20,7 @@ def get_channel_epg(id, from_ts, to_ts):
     
 def epg_api(post, key):
     epg = {}
-    result = o2tv_list_api(post = post, nolog = True)
+    result = o2tv_list_api(post = post, type = 'EPG', nolog = True)
     channels = Channels()
     channels_list = channels.get_channels_list('id', visible_filter = False)            
     for item in result:
@@ -113,7 +113,7 @@ def epg_api(post, key):
                     if 'MosaicProgramExternalId' in mditem['value']:
                         md = mditem['value'].replace('MosaicProgramExternalId=', '')
                         md_post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaSearchAssetFilter","orderBy":"START_DATE_ASC","kSql":"(and IsMosaicEvent='1' MosaicInfo='mosaic' (or externalId='" + str(md) + "'))"},"pager":{"objectType":"KalturaFilterPager","pageSize":200,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
-                        md_epg = o2tv_list_api(post = md_post, nolog = True)
+                        md_epg = o2tv_list_api(post = md_post, type = 'multidimenze', nolog = True)
                         if len(md_epg) > 0 and 'name' in md_epg[0]:
                             title = md_epg[0]['name']
 

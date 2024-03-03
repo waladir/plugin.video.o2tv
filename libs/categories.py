@@ -98,7 +98,7 @@ def list_sport_categories(id, label):
         sys.exit() 
     category_tree = data
     post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaChannelFilter","kSql":"","idEqual":id},"pager":{"objectType":"KalturaFilterPager","pageSize":20,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}    
-    result = o2tv_list_api(post = post)
+    result = o2tv_list_api(post = post, type = 'kategorie')
     for item in result:
         list_item = xbmcgui.ListItem(label = item['name'].capitalize())
         for item2 in category_tree['result']['children']:

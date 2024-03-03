@@ -1,3 +1,7 @@
+v1.5.8 (03.03.2024)
+- úprava přehrávání běžícího pořadu z archivu
+- doplnění detailu u chyby "Problém při stažení dat z O2TV"
+
 v1.5.7 (02.03.2024)
 - nastavení timoutu 10s u požadavků
 - zobrazení náhrávek epizod seriálů
@@ -13,6 +17,3 @@ v1.5.5 (27.02.2024)
 
 v1.5.4 (21.02.2024)
 - ošetření chybějících dat v EPG
-
-v1.5.3 (20.02.2024)
-- přidaná možnost vypnutí zobrazení hlášek při automatickém generování EPG

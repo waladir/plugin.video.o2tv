@@ -284,7 +284,7 @@ class Channels:
         channels = {}
         session = Session()
         post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaSearchAssetFilter","kSql":"(and asset_type='607' (or entitled_assets='entitledSubscriptions' entitled_assets='free') )"},"pager":{"objectType":"KalturaFilterPager","pageSize":300,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
-        result = o2tv_list_api(post = post)
+        result = o2tv_list_api(post = post, type = 'kanály')
         for channel in result:
             if 'ChannelNumber' in channel['metas']:
                 if not (addon.getSetting('ignore_radios') == 'true' and 'tags' in channel and len(channel['tags']) > 0 and 'Genre' in channel['tags'] and len(channel['tags']['Genre']) > 0 and channel['tags']['Genre']['objects'][0]['value'] == 'radio'):

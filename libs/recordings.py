@@ -32,12 +32,12 @@ def list_recordings(label):
     recording_ids = {}
     session = Session()
     post = {"language":"ces","ks":session.ks,"responseProfile":{"objectType":"KalturaOnDemandResponseProfile","relatedProfiles":[{"objectType":"KalturaDetachedResponseProfile","name":"group_result","filter":{"objectType":"KalturaAggregationCountFilter"}}]},"filter":{"objectType":"KalturaSearchAssetFilter","orderBy":"START_DATE_DESC","kSql":"(and asset_type='recording' start_date <'0' end_date < '-900')","groupBy":[{"objectType":"KalturaAssetMetaOrTagGroupBy","value":"SeriesID"}],"groupingOptionEqual":"Include"},"pager":{"objectType":"KalturaFilterPager","pageSize":500,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
-    result = o2tv_list_api(post = post, silent = True)
+    result = o2tv_list_api(post = post, type = 'nahrávky', silent = True)
     for item in result:
         if 'SeriesID' in item['metas']:
             seriesid = item['metas']['SeriesID']['value']
             series_post = {"language":"ces","ks":session.ks,"responseProfile":{"objectType":"KalturaOnDemandResponseProfile","relatedProfiles":[{"objectType":"KalturaDetachedResponseProfile","name":"group_result","filter":{"objectType":"KalturaAggregationCountFilter"}}]},"filter":{"objectType":"KalturaSearchAssetFilter","dynamicOrderBy":{"objectType":"KalturaDynamicOrderBy","name":"EpisodeNumber","orderBy":"META_ASC"},"kSql":"(and SeriesId='" + seriesid + "' (and asset_type='recording'))"},"pager":{"objectType":"KalturaFilterPager","pageSize":200,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
-            series_result = o2tv_list_api(post = series_post, silent = True)
+            series_result = o2tv_list_api(post = series_post, type = 'epizody nahrávek', silent = True)
             for series_item in series_result:
                 recording_ids.update({series_item['id'] : series_item['recordingId']})
         else:
@@ -105,7 +105,7 @@ def list_future_recordings(label):
     recording_ids = {}
     session = Session()
     post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaScheduledRecordingProgramFilter","orderBy":"START_DATE_ASC","recordingTypeEqual":"single"},"pager":{"objectType":"KalturaFilterPager","pageSize":500,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
-    result = o2tv_list_api(post = post)
+    result = o2tv_list_api(post = post, type = 'naplánované nahrávky')
     for item in result:
         recording_ids.update({item['id'] : item['recordingId']})
     epg = epg_api(post = post, key = 'startts')

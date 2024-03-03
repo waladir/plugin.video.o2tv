@@ -11,8 +11,6 @@ from urllib.error import HTTPError
 
 from libs.utils import clientTag, partnerId
 
-import socket
-
 class O2API:
     def __init__(self):
         self.headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:98.0) Gecko/20100101 Firefox/98.0', 'Accept-Encoding' : 'gzip', 'Accept' : '*/*', 'Content-type' : 'application/json;charset=UTF-8'} 
@@ -45,7 +43,7 @@ class O2API:
             xbmc.log('O2TV > ' 'Chyba při volání '+ str(url) + ': ' + e.reason)
             return { 'err' : e.reason }  
         
-def o2tv_list_api(post, nolog = False, silent = False):
+def o2tv_list_api(post, type = '', nolog = False, silent = False):
     result = []
     o2api = O2API()
     fetch = True
@@ -53,7 +51,12 @@ def o2tv_list_api(post, nolog = False, silent = False):
         data = o2api.call_o2_api(url = 'https://' + partnerId + '.frp1.ott.kaltura.com/api_v3/service/asset/action/list?format=1&clientTag=' + clientTag, data = post, headers = o2api.headers, nolog = nolog)
         if 'err' in data or not 'result' in data or not 'totalCount' in data['result']:
             if silent == False:
-                xbmcgui.Dialog().notification('O2TV','Problém při stažení dat z O2TV', xbmcgui.NOTIFICATION_ERROR, 5000)
+                if len(type) == 0:
+                    xbmcgui.Dialog().notification('O2TV','Problém při stažení dat z O2TV', xbmcgui.NOTIFICATION_ERROR, 5000)
+                else:
+                    xbmcgui.Dialog().notification('O2TV','Problém při stažení dat z O2TV (' + type + ')', xbmcgui.NOTIFICATION_ERROR, 5000)
+                    if 'result' in data and 'error' in data['result'] and 'message' in data['result']['error']:
+                        xbmcgui.Dialog().notification('O2TV',str(data['result']['error']['message']), xbmcgui.NOTIFICATION_ERROR, 5000)
             fetch = False
         else:
             total_count = data['result']['totalCount']
