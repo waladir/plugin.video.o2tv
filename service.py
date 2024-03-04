@@ -21,6 +21,8 @@ else:
 next = time.time() + 10
 
 while not xbmc.Monitor().abortRequested():
+    if xbmc.Monitor().waitForAbort(1):
+        break
     if(next < time.time()):
         time.sleep(3)
         if addon.getSetting('username') and len(addon.getSetting('username')) > 0 and addon.getSetting('password') and len(addon.getSetting('password')) > 0:

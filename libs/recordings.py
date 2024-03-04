@@ -62,7 +62,7 @@ def list_recordings(label):
             reverse = True
         for key in sorted(epg.keys(), reverse = reverse):
             if epg[key]['channel_id'] in channels_list:
-                list_item = xbmcgui.ListItem(label = epg[key]['title'] + ' (' + channels_list[epg[key]['channel_id']]['name'] + ' | ' + day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')] + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m. %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ')')
+                list_item = xbmcgui.ListItem(label = epg[key]['title'] + ' | ' + channels_list[epg[key]['channel_id']]['name'] + ' | ' + day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')] + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m. %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M'))
                 channel_id = channels_list[epg[key]['channel_id']]['id']
             else:
                 list_item = xbmcgui.ListItem(label = epg[key]['title'] + ' (' + day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')] + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m. %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ')')
@@ -104,13 +104,18 @@ def list_future_recordings(label):
     xbmcplugin.setPluginCategory(_handle, label)
     recording_ids = {}
     session = Session()
+    channels = Channels()
+    channels_list = channels.get_channels_list('id', visible_filter = False)  
     post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaScheduledRecordingProgramFilter","orderBy":"START_DATE_ASC","recordingTypeEqual":"single"},"pager":{"objectType":"KalturaFilterPager","pageSize":500,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
     result = o2tv_list_api(post = post, type = 'naplánované nahrávky')
     for item in result:
         recording_ids.update({item['id'] : item['recordingId']})
     epg = epg_api(post = post, key = 'startts')
     for key in sorted(epg.keys(), reverse = False):
-        list_item = xbmcgui.ListItem(label = epg[key]['title'])
+        if epg[key]['channel_id'] in channels_list:
+            list_item = xbmcgui.ListItem(label = epg[key]['title'] + ' | ' + channels_list[epg[key]['channel_id']]['name'] + ' | ' + day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')] + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m. %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M'))
+        else:
+            list_item = xbmcgui.ListItem(label = epg[key]['title'] + ' (' + day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')] + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m. %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ')')
         list_item = epg_listitem(list_item = list_item, epg = epg[key], logo = '')
         list_item.setProperty('IsPlayable', 'false')
         list_item.setContentLookup(False)          

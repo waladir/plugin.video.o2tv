@@ -1,3 +1,9 @@
+v1.5.9 (04.03.2024)
+- přidání čísel epizod k názvům pořadů
+- přidání logovaní neAPI requestů
+- oprava problému s loginem po prvním spuštění
+- oprava ukončení service modulu
+
 v1.5.8 (03.03.2024)
 - úprava přehrávání běžícího pořadu z archivu
 - doplnění detailu u chyby "Problém při stažení dat z O2TV"
@@ -14,6 +20,3 @@ v1.5.6 (29.02.2024)
 
 v1.5.5 (27.02.2024)
 - úprava generování playlistu pro IPTV SC
-
-v1.5.4 (21.02.2024)
-- ošetření chybějících dat v EPG

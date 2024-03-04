@@ -87,6 +87,8 @@ def epg_api(post, key):
 
             if 'EpisodeNumber' in item['metas']:
                 episodeNumber = int(item['metas']['EpisodeNumber']['value'])
+                if episodeNumber > 0:
+                    title = title + ' (' + str(episodeNumber) + ')'
             if 'SeasonNumber' in item['metas']:
                 seasonNumber = int(item['metas']['SeasonNumber']['value'])
             if 'EpisodeInSeason' in item['metas']:

@@ -3,6 +3,7 @@ import sys
 import xbmc
 import xbmcgui
 import xbmcplugin
+import xbmcaddon
 
 import ssl
 from xml.dom import minidom
@@ -135,6 +136,7 @@ def play_recording(id, channel_id):
     play_stream(post, channel_id)
 
 def play_stream(post, channel_id):
+    addon = xbmcaddon.Addon()
     o2api = O2API()
     err = False
     if channel_id is not None:
@@ -180,11 +182,16 @@ def play_stream(post, channel_id):
                     xbmcplugin.setResolvedUrl(_handle, True, list_item)
 
                 if 'DASH' in urls:
+                    # url = urls['DASH']['url'].encode().decode('unicode_escape')
                     url = urls['DASH']['url']
                     context=ssl.create_default_context()
                     context.set_ciphers('DEFAULT')
                     request = Request(url = url , data = None)
+                    if addon.getSetting('log_request_url') == 'true':
+                        xbmc.log('O2TV > ' + str(url))
                     response = urlopen(request)
+                    if addon.getSetting('log_response') == 'true':
+                        xbmc.log('O2TV > ' + str(response.status))
                     mpd = response.geturl()
 
                     list_item = xbmcgui.ListItem(path = mpd)
@@ -199,7 +206,11 @@ def play_stream(post, channel_id):
                         time.sleep(3)
                         while(xbmc.Player().isPlaying()):
                             request = Request(url = keepalive , data = None)
+                            if addon.getSetting('log_request_url') == 'true':
+                                xbmc.log('O2TV > ' + str(keepalive))
                             response = urlopen(request)
+                            if addon.getSetting('log_response') == 'true':
+                                xbmc.log('O2TV > ' + str(response.status))
                             time.sleep(5)
                 else:
                     xbmcgui.Dialog().notification('O2TV','Problém při přehrání', xbmcgui.NOTIFICATION_ERROR, 5000)
