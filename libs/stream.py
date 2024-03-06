@@ -31,7 +31,7 @@ def play_catchup(id, start_ts, end_ts):
         else:
             play_archive(id = epg[start_ts]['id'], epg = epg[start_ts], channel_id = id, startts = epg[start_ts]['startts'], endts = epg[start_ts]['endts'])
     else:
-        play_live(id, epg[id])
+        play_live(id)
 
 def play_startover(id, channel_id):
     session = Session()
@@ -149,7 +149,7 @@ def play_stream(post, channel_id):
             if len(str(pin)) > 0:
                 pin_post = {"language":"ces","ks":session.ks,"pin":str(pin),"type":"parental","clientTag":clientTag,"apiVersion":apiVersion}
                 data = o2api.call_o2_api(url = 'https://' + partnerId + '.frp1.ott.kaltura.com/api_v3/service/pin/action/validate?format=1&clientTag=' + clientTag, data = pin_post, headers = o2api.headers)
-                if 'err' in data or not 'result' in data or  data['result'] != True:
+                if 'err' in data or not 'result' in data or data['result'] != True:
                     xbmcgui.Dialog().notification('O2TV','Nesprávný PIN', xbmcgui.NOTIFICATION_ERROR, 5000)
                     err = True
             else:
@@ -157,6 +157,11 @@ def play_stream(post, channel_id):
                 err = True
     if err == False:
         data = o2api.call_o2_api(url = 'https://' + partnerId + '.frp1.ott.kaltura.com/api_v3/service/multirequest', data = post, headers = o2api.headers)
+        if 'err' in data or not 'result' in data or len(data['result']) == 0 or not 'sources' in data['result'][1]:
+            # if channel_id is not None and 'error' in data['result'][1] and 'message' and data['result'][1]['error'] and data['result'][1]['error']['message'] == 'ProgramStartOverNotEnabled' and post['2']['contextDataParams']['context'] == 'START_OVER':
+            session = Session()
+            post = {"1":{"service":"asset","action":"get","id":channel_id,"assetReferenceType":"media","ks":session.ks},"2":{"service":"asset","action":"getPlaybackContext","assetId":channel_id,"assetType":"media","contextDataParams":{"objectType":"KalturaPlaybackContextOptions","context":"PLAYBACK","streamerType":"mpegdash","urlType":"DIRECT"},"ks":session.ks},"apiVersion":"7.8.1","ks":session.ks,"partnerId":partnerId}
+            data = o2api.call_o2_api(url = 'https://' + partnerId + '.frp1.ott.kaltura.com/api_v3/service/multirequest', data = post, headers = o2api.headers)
         if 'err' in data or not 'result' in data or len(data['result']) == 0 or not 'sources' in data['result'][1]:
             xbmcgui.Dialog().notification('O2TV','Problém při přehrání', xbmcgui.NOTIFICATION_ERROR, 5000)
         else:
@@ -182,7 +187,6 @@ def play_stream(post, channel_id):
                     xbmcplugin.setResolvedUrl(_handle, True, list_item)
 
                 if 'DASH' in urls:
-                    # url = urls['DASH']['url'].encode().decode('unicode_escape')
                     url = urls['DASH']['url']
                     context=ssl.create_default_context()
                     context.set_ciphers('DEFAULT')
