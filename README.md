@@ -4,6 +4,9 @@
 <p>
 Živé vysílání, archiv, nahrávky, vytváření playlistu a EPG pro IPTV Simple Clienta<br><br>
 <a href="https://www.xbmc-kodi.cz/prispevek-o2tv">Vlákno na fóru XBMC-Kodi.cz</a><br><br>
+v1.6.1 (10.03.2024)<br>
+- oprava ukončení výběru streamu u MD<br><br>
+
 v1.6.0 (06.03.2024)<br>
 - ošetření přehrávání kanálů bez dostupného startover<br><br>
 
@@ -21,9 +24,4 @@ v1.5.7 (02.03.2024)<br>
 - nastavení timoutu 10s u požadavků<br>
 - zobrazení náhrávek epizod seriálů<br>
 - přidaná možnost změny řazení nahrávek<br><br>
-
-v1.5.6 (29.02.2024)<br>
-- v nastavení lze změnit jméno souboru playlistu na playlist.txt (řeší problém s generováním playlistu na Androidu)<br>
-- přidaná možnost nastavení barvy pro jméno pořadu u živého vysílání<br>
-- ošetření chyby při volání keepalive požadavků<br><br>
 </p>

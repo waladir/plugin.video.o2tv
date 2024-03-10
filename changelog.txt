@@ -1,3 +1,6 @@
+v1.6.1 (10.03.2024)
+- oprava ukončení výběru streamu u MD
+
 v1.6.0 (06.03.2024)
 - ošetření přehrávání kanálů bez dostupného startover
 
@@ -15,8 +18,3 @@ v1.5.7 (02.03.2024)
 - nastavení timoutu 10s u požadavků
 - zobrazení náhrávek epizod seriálů
 - přidaná možnost změny řazení nahrávek
-
-v1.5.6 (29.02.2024)
-- v nastavení lze změnit jméno souboru playlistu na playlist.txt (řeší problém s generováním playlistu na Androidu)
-- přidaná možnost nastavení barvy pro jméno pořadu u živého vysílání
-- ošetření chyby při volání keepalive požadavků

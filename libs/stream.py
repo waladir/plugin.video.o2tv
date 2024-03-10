@@ -68,7 +68,7 @@ def play_live(id):
         if len(items) > 0:
             response = xbmcgui.Dialog().select(heading = 'Multidimenze - výběr streamu', list = items, preselect = 0)
             if response < 0:
-                response = 0
+                return
             id = ids[response]
             epg = get_live_epg()[int(id)]
             if 'id' in epg:
@@ -158,10 +158,10 @@ def play_stream(post, channel_id):
     if err == False:
         data = o2api.call_o2_api(url = 'https://' + partnerId + '.frp1.ott.kaltura.com/api_v3/service/multirequest', data = post, headers = o2api.headers)
         if 'err' in data or not 'result' in data or len(data['result']) == 0 or not 'sources' in data['result'][1]:
-            # if channel_id is not None and 'error' in data['result'][1] and 'message' and data['result'][1]['error'] and data['result'][1]['error']['message'] == 'ProgramStartOverNotEnabled' and post['2']['contextDataParams']['context'] == 'START_OVER':
-            session = Session()
-            post = {"1":{"service":"asset","action":"get","id":channel_id,"assetReferenceType":"media","ks":session.ks},"2":{"service":"asset","action":"getPlaybackContext","assetId":channel_id,"assetType":"media","contextDataParams":{"objectType":"KalturaPlaybackContextOptions","context":"PLAYBACK","streamerType":"mpegdash","urlType":"DIRECT"},"ks":session.ks},"apiVersion":"7.8.1","ks":session.ks,"partnerId":partnerId}
-            data = o2api.call_o2_api(url = 'https://' + partnerId + '.frp1.ott.kaltura.com/api_v3/service/multirequest', data = post, headers = o2api.headers)
+            if channel_id is not None and 'error' in data['result'][1] and 'message' and data['result'][1]['error'] and data['result'][1]['error']['message'] == 'ProgramStartOverNotEnabled' and post['2']['contextDataParams']['context'] == 'START_OVER':
+                session = Session()
+                post = {"1":{"service":"asset","action":"get","id":channel_id,"assetReferenceType":"media","ks":session.ks},"2":{"service":"asset","action":"getPlaybackContext","assetId":channel_id,"assetType":"media","contextDataParams":{"objectType":"KalturaPlaybackContextOptions","context":"PLAYBACK","streamerType":"mpegdash","urlType":"DIRECT"},"ks":session.ks},"apiVersion":"7.8.1","ks":session.ks,"partnerId":partnerId}
+                data = o2api.call_o2_api(url = 'https://' + partnerId + '.frp1.ott.kaltura.com/api_v3/service/multirequest', data = post, headers = o2api.headers)
         if 'err' in data or not 'result' in data or len(data['result']) == 0 or not 'sources' in data['result'][1]:
             xbmcgui.Dialog().notification('O2TV','Problém při přehrání', xbmcgui.NOTIFICATION_ERROR, 5000)
         else:
