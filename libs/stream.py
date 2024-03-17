@@ -15,7 +15,7 @@ import time
 from libs.session import Session
 from libs.channels import Channels
 from libs.o2tv import O2API, o2tv_list_api
-from libs.epg import get_channel_epg, get_live_epg
+from libs.epg import get_channel_epg, get_live_epg, epg_api
 from libs.utils import clientTag, apiVersion, partnerId
 
 if len(sys.argv) > 1:
@@ -86,6 +86,7 @@ def play_archive(id, epg, channel_id, startts, endts):
     if epg['md'] is not None:
         items = []
         ids = []
+        epgs = []
         post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaSearchAssetFilter","orderBy":"START_DATE_ASC","kSql":"(and IsMosaicEvent='1' MosaicInfo='mosaic' (or externalId='" + str(epg['md']) + "'))"},"pager":{"objectType":"KalturaFilterPager","pageSize":200,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
         md_epg = o2tv_list_api(post = post, type = 'multidimenze', nolog = True)
         for md_epg_item in md_epg:
@@ -96,20 +97,22 @@ def play_archive(id, epg, channel_id, startts, endts):
                         md_ids.append(mditem['value'].split('ProgramExternalID=')[1])
                 for md_id in md_ids:
                     post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaSearchAssetFilter","orderBy":"START_DATE_ASC","kSql":"(or externalId='" + str(md_id) + "')"},"pager":{"objectType":"KalturaFilterPager","pageSize":200,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
-                    epg = o2tv_list_api(post = post, type = 'multidimenze', nolog = True)
+                    epg_md_item = o2tv_list_api(post = post, type = 'multidimenze', nolog = True)
                     if len(epg) > 0:
-                        item = epg[0]
+                        item = epg_md_item[0]
+                        epg = epg_api(post,'id')
+                        epgs.append(epg[item['id']])
                         items.append(item['name'])
                         ids.append(item['id'])
         if len(items) > 0:
             response = xbmcgui.Dialog().select(heading = 'Multidimenze - výběr streamu', list = items, preselect = 0)
             if response < 0:
                 return
+            epg = epgs[response]
             id = ids[response]
 
     # post = {"1":{"service":"asset","action":"get","id":id,"assetReferenceType":"epg_internal","ks":session.ks},"2":{"service":"asset","action":"getPlaybackContext","assetId":id,"assetType":"epg","contextDataParams":{"objectType":"KalturaPlaybackContextOptions","context":"START_OVER","streamerType":"mpegdash","urlType":"DIRECT"},"ks":session.ks},"apiVersion":"7.8.1","ks":session.ks,"partnerId":partnerId}    
     # play_stream(post)
-
     if epg['endts'] > int(time.mktime(datetime.now().timetuple()))-10:
         play_startover(id = epg['id'], channel_id = channel_id)
     else:

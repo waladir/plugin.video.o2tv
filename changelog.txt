@@ -1,3 +1,6 @@
+v1.6.3 (17.03.2024)
+- oprava přehrávání u MD
+
 v1.6.2 (10.03.2024)
 - oprava ukončení výběru streamu u MD
 
@@ -13,8 +16,3 @@ v1.5.9 (04.03.2024)
 v1.5.8 (03.03.2024)
 - úprava přehrávání běžícího pořadu z archivu
 - doplnění detailu u chyby "Problém při stažení dat z O2TV"
-
-v1.5.7 (02.03.2024)
-- nastavení timoutu 10s u požadavků
-- zobrazení náhrávek epizod seriálů
-- přidaná možnost změny řazení nahrávek
