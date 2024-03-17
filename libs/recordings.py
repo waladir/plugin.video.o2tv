@@ -46,7 +46,7 @@ def list_recordings(label):
             reverse = False
         else:
             reverse = True
-        for key in sorted(epg.keys(), reverse = reverse):
+        for key in sorted(epg, key=lambda x:epg[x]['startts'], reverse = reverse):
             if epg[key]['channel_id'] in channels_list:
                 list_item = xbmcgui.ListItem(label = epg[key]['title'] + ' | ' + channels_list[epg[key]['channel_id']]['name'] + ' | ' + day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')] + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m. %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M'))
                 channel_id = channels_list[epg[key]['channel_id']]['id']
@@ -88,6 +88,8 @@ def delete_future_recording(id):
 
 def list_future_recordings(label):
     xbmcplugin.setPluginCategory(_handle, label)
+    addon = xbmcaddon.Addon()
+
     recording_ids = {}
     session = Session()
     channels = Channels()
@@ -97,7 +99,11 @@ def list_future_recordings(label):
     for item in result:
         recording_ids.update({item['id'] : item['recordingId']})
     epg = epg_api(post = post, key = 'id', no_md_title = True)
-    for key in sorted(epg.keys(), reverse = False):
+    if addon.getSetting('recording_order') == 'od nejstarších':
+        reverse = False
+    else:
+        reverse = True
+    for key in sorted(epg, key=lambda x:epg[x]['startts'], reverse = reverse):
         if epg[key]['channel_id'] in channels_list:
             list_item = xbmcgui.ListItem(label = epg[key]['title'] + ' | ' + channels_list[epg[key]['channel_id']]['name'] + ' | ' + day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')] + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m. %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M'))
         else:

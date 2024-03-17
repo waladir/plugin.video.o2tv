@@ -1,3 +1,6 @@
+v1.6.5 (17.03.2024)
+- úprava řazení nahrávek
+
 v1.6.4 (17.03.2024)
 - přidání plánovaní nahrávek z MD
 - přepracovaní zobrazení nahrávek
@@ -10,9 +13,3 @@ v1.6.2 (10.03.2024)
 
 v1.6.0 (06.03.2024)
 - ošetření přehrávání kanálů bez dostupného startover
-
-v1.5.9 (04.03.2024)
-- přidání čísel epizod k názvům pořadů
-- přidání logovaní neAPI requestů
-- oprava problému s loginem po prvním spuštění
-- oprava ukončení service modulu
