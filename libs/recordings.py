@@ -11,7 +11,7 @@ import time
 
 from libs.session import Session
 from libs.channels import Channels
-from libs.epg import epg_api, epg_listitem, get_channel_epg
+from libs.epg import epg_api, epg_listitem, get_channel_epg, get_item_epg
 from libs.o2tv import O2API, o2tv_list_api
 from libs.utils import get_url, plugin_id, day_translation, day_translation_short, clientTag, apiVersion, partnerId
 
@@ -31,31 +31,17 @@ def list_recordings(label):
 
     recording_ids = {}
     session = Session()
-    post = {"language":"ces","ks":session.ks,"responseProfile":{"objectType":"KalturaOnDemandResponseProfile","relatedProfiles":[{"objectType":"KalturaDetachedResponseProfile","name":"group_result","filter":{"objectType":"KalturaAggregationCountFilter"}}]},"filter":{"objectType":"KalturaSearchAssetFilter","orderBy":"START_DATE_DESC","kSql":"(and asset_type='recording' start_date <'0' end_date < '-900')","groupBy":[{"objectType":"KalturaAssetMetaOrTagGroupBy","value":"SeriesID"}],"groupingOptionEqual":"Include"},"pager":{"objectType":"KalturaFilterPager","pageSize":500,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
+    post = {"language":"ces","ks":session.ks,"responseProfile":{"objectType":"KalturaOnDemandResponseProfile","relatedProfiles":[{"objectType":"KalturaDetachedResponseProfile","name":"group_result","filter":{"objectType":"KalturaAggregationCountFilter"}}]},"filter":{"objectType":"KalturaSearchAssetFilter","orderBy":"START_DATE_DESC","kSql":"(and asset_type='recording' start_date <'0' end_date < '-900')","groupingOptionEqual":"Include"},"pager":{"objectType":"KalturaFilterPager","pageSize":500,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
     result = o2tv_list_api(post = post, type = 'nahrávky', silent = True)
     for item in result:
-        if 'SeriesID' in item['metas']:
-            seriesid = item['metas']['SeriesID']['value']
-            series_post = {"language":"ces","ks":session.ks,"responseProfile":{"objectType":"KalturaOnDemandResponseProfile","relatedProfiles":[{"objectType":"KalturaDetachedResponseProfile","name":"group_result","filter":{"objectType":"KalturaAggregationCountFilter"}}]},"filter":{"objectType":"KalturaSearchAssetFilter","dynamicOrderBy":{"objectType":"KalturaDynamicOrderBy","name":"EpisodeNumber","orderBy":"META_ASC"},"kSql":"(and SeriesId='" + seriesid + "' (and asset_type='recording'))"},"pager":{"objectType":"KalturaFilterPager","pageSize":200,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
-            series_result = o2tv_list_api(post = series_post, type = 'epizody nahrávek', silent = True)
-            for series_item in series_result:
-                recording_ids.update({series_item['id'] : series_item['recordingId']})
-        else:
-            recording_ids.update({item['id'] : item['recordingId']})
+        recording_ids.update({item['id'] : item['recordingId']})
     channels = Channels()
     channels_list = channels.get_channels_list('id', visible_filter = False)  
     if len(recording_ids) > 0:
         epg = {}
-        epg_data = epg_api(post = post, key = 'startts')
+        epg_data = epg_api(post = post, key = 'id', no_md_title = True)
         for key in epg_data.keys():
-            if len(epg_data[key]['seriesId']) > 0:
-                seriesid = epg_data[key]['seriesId']
-                post = {"language":"ces","ks":session.ks,"responseProfile":{"objectType":"KalturaOnDemandResponseProfile","relatedProfiles":[{"objectType":"KalturaDetachedResponseProfile","name":"group_result","filter":{"objectType":"KalturaAggregationCountFilter"}}]},"filter":{"objectType":"KalturaSearchAssetFilter","dynamicOrderBy":{"objectType":"KalturaDynamicOrderBy","name":"EpisodeNumber","orderBy":"META_ASC"},"kSql":"(and SeriesId='" + seriesid + "' (and asset_type='recording'))"},"pager":{"objectType":"KalturaFilterPager","pageSize":200,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
-                series_epg = epg_api(post = post, key = 'startts')
-                for series_key in series_epg.keys():
-                    epg.update({series_key : series_epg[series_key]})
-            else:
-                epg.update({key : epg_data[key]})
+            epg.update({key : epg_data[key]})
         if addon.getSetting('recording_order') == 'od nejstarších':
             reverse = False
         else:
@@ -110,7 +96,7 @@ def list_future_recordings(label):
     result = o2tv_list_api(post = post, type = 'naplánované nahrávky')
     for item in result:
         recording_ids.update({item['id'] : item['recordingId']})
-    epg = epg_api(post = post, key = 'startts')
+    epg = epg_api(post = post, key = 'id', no_md_title = True)
     for key in sorted(epg.keys(), reverse = False):
         if epg[key]['channel_id'] in channels_list:
             list_item = xbmcgui.ListItem(label = epg[key]['title'] + ' | ' + channels_list[epg[key]['channel_id']]['name'] + ' | ' + day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')] + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m. %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M'))
@@ -212,6 +198,30 @@ def add_recording(id):
     id = int(id)
     session = Session()
     o2api = O2API()
+    epg = get_item_epg(id)
+    if epg['md'] is not None:
+        items = []
+        ids = []
+        post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaSearchAssetFilter","orderBy":"START_DATE_ASC","kSql":"(and IsMosaicEvent='1' MosaicInfo='mosaic' (or externalId='" + str(epg['md']) + "'))"},"pager":{"objectType":"KalturaFilterPager","pageSize":200,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
+        md_epg = o2tv_list_api(post = post, type = 'multidimenze', nolog = True)
+        for md_epg_item in md_epg:
+            md_ids = []
+            if 'MosaicChannelsInfo' in md_epg_item['tags']:
+                for mditem in md_epg_item['tags']['MosaicChannelsInfo']['objects']:
+                    if 'ProgramExternalID' in mditem['value']:
+                        md_ids.append(mditem['value'].split('ProgramExternalID=')[1])
+                for md_id in md_ids:
+                    post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaSearchAssetFilter","orderBy":"START_DATE_ASC","kSql":"(or externalId='" + str(md_id) + "')"},"pager":{"objectType":"KalturaFilterPager","pageSize":200,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
+                    epg_md_item = o2tv_list_api(post = post, type = 'multidimenze', nolog = True)
+                    if len(epg) > 0:
+                        item = epg_md_item[0]
+                        items.append(item['name'])
+                        ids.append(item['id'])
+        if len(items) > 0:
+            response = xbmcgui.Dialog().select(heading = 'Multidimenze - výběr streamu', list = items, preselect = 0)
+            if response < 0:
+                return
+            id = ids[response]
     post = {"language":"ces","ks":session.ks,"recording":{"objectType":"KalturaRecording","assetId":id},"clientTag":clientTag,"apiVersion":apiVersion}
     data = o2api.call_o2_api(url = 'https://' + partnerId + '.frp1.ott.kaltura.com/api_v3/service/recording/action/add?format=1&clientTag=' + clientTag, data = post, headers = o2api.headers)
     if 'err' in data or not 'result' in data or not 'status' in data['result'] or (data['result']['status'] != 'SCHEDULED' and data['result']['status'] != 'RECORDED'):

@@ -4,6 +4,10 @@
 <p>
 Živé vysílání, archiv, nahrávky, vytváření playlistu a EPG pro IPTV Simple Clienta<br><br>
 <a href="https://www.xbmc-kodi.cz/prispevek-o2tv">Vlákno na fóru XBMC-Kodi.cz</a><br><br>
+v1.6.4 (17.03.2024)<br>
+- přidání plánovaní nahrávek z MD<br>
+- přepracovaní zobrazení nahrávek<br><br>
+
 v1.6.3 (17.03.2024)<br>
 - oprava přehrávání u MD<br><br>
 
@@ -18,8 +22,4 @@ v1.5.9 (04.03.2024)<br>
 - přidání logovaní neAPI requestů<br>
 - oprava problému s loginem po prvním spuštění<br>
 - oprava ukončení service modulu<br><br>
-
-v1.5.8 (03.03.2024)<br>
-- úprava přehrávání běžícího pořadu z archivu<br>
-- doplnění detailu u chyby "Problém při stažení dat z O2TV"<br><br>
 </p>

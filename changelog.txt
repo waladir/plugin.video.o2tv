@@ -1,3 +1,7 @@
+v1.6.4 (17.03.2024)
+- přidání plánovaní nahrávek z MD
+- přepracovaní zobrazení nahrávek
+
 v1.6.3 (17.03.2024)
 - oprava přehrávání u MD
 
@@ -12,7 +16,3 @@ v1.5.9 (04.03.2024)
 - přidání logovaní neAPI requestů
 - oprava problému s loginem po prvním spuštění
 - oprava ukončení service modulu
-
-v1.5.8 (03.03.2024)
-- úprava přehrávání běžícího pořadu z archivu
-- doplnění detailu u chyby "Problém při stažení dat z O2TV"

@@ -17,8 +17,13 @@ def get_channel_epg(id, from_ts, to_ts):
     session = Session()
     post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaSearchAssetFilter","orderBy":"START_DATE_ASC","kSql":"(and linear_media_id:'" + str(id) + "' start_date >= '" + str(from_ts) + "' start_date  <= '" + str(to_ts) + "' asset_type='epg' auto_fill= true)"},"pager":{"objectType":"KalturaFilterPager","pageSize":500,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
     return epg_api(post = post, key = 'startts')
-    
-def epg_api(post, key):
+
+def get_item_epg(id):
+    session = Session()
+    post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaSearchAssetFilter","orderBy":"START_DATE_ASC","kSql":"(and epg_id:'" + str(id) + "' asset_type='epg' auto_fill= true)"},"pager":{"objectType":"KalturaFilterPager","pageSize":500,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
+    return epg_api(post = post, key = 'id')[id]
+
+def epg_api(post, key, no_md_title = False):
     epg = {}
     result = o2tv_list_api(post = post, type = 'EPG', nolog = True)
     channels = Channels()
@@ -106,7 +111,6 @@ def epg_api(post, key):
             else:
                 isSeries = False
                 seriesId = ''
-
             md = None
             md_ids = []
             if 'MosaicInfo' in item['tags']:
@@ -115,14 +119,16 @@ def epg_api(post, key):
                     if 'MosaicProgramExternalId' in mditem['value']:
                         md = mditem['value'].replace('MosaicProgramExternalId=', '')
                         md_post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaSearchAssetFilter","orderBy":"START_DATE_ASC","kSql":"(and IsMosaicEvent='1' MosaicInfo='mosaic' (or externalId='" + str(md) + "'))"},"pager":{"objectType":"KalturaFilterPager","pageSize":200,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
-                        md_epg = o2tv_list_api(post = md_post, type = 'multidimenze', nolog = True)
-                        if len(md_epg) > 0 and 'name' in md_epg[0]:
-                            title = md_epg[0]['name']
+                        if no_md_title == False:
+                            md_epg = o2tv_list_api(post = md_post, type = 'multidimenze', nolog = True)
+                            if len(md_epg) > 0 and 'name' in md_epg[0]:
+                                title = md_epg[0]['name']
 
             if 'MosaicChannelsInfo' in item['tags']:
                 for mditem in item['tags']['MosaicChannelsInfo']['objects']:
                     if 'ProgramExternalID' in mditem['value']:
                         md_ids.append(mditem['value'].split('ProgramExternalID=')[1])
+            print(title)
             epg_item = {'id' : id, 'title' : title, 'channel_id' : channel_id, 'description' : description, 'startts' : startts, 'endts' : endts, 'cover' : cover, 'poster' : poster, 'original' : original, 'imdb' : imdb, 'year' : year, 'contentType' : contentType, 'genres' : genres, 'cast' : cast, 'directors' : directors, 'writers' : writers, 'country' : country, 'episodeNumber' : episodeNumber, 'seasonNumber' : seasonNumber, 'episodesInSeason' : episodesInSeason, 'episodeName' : episodeName, 'seasonName' : seasonName, 'seriesName' : seriesName, 'isSeries' : isSeries, 'seriesId' : seriesId, 'md' : md, 'md_ids' : md_ids}
             if key == 'startts':
                 epg.update({startts : epg_item})
