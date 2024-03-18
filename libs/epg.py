@@ -128,7 +128,6 @@ def epg_api(post, key, no_md_title = False):
                 for mditem in item['tags']['MosaicChannelsInfo']['objects']:
                     if 'ProgramExternalID' in mditem['value']:
                         md_ids.append(mditem['value'].split('ProgramExternalID=')[1])
-            print(title)
             epg_item = {'id' : id, 'title' : title, 'channel_id' : channel_id, 'description' : description, 'startts' : startts, 'endts' : endts, 'cover' : cover, 'poster' : poster, 'original' : original, 'imdb' : imdb, 'year' : year, 'contentType' : contentType, 'genres' : genres, 'cast' : cast, 'directors' : directors, 'writers' : writers, 'country' : country, 'episodeNumber' : episodeNumber, 'seasonNumber' : seasonNumber, 'episodesInSeason' : episodesInSeason, 'episodeName' : episodeName, 'seasonName' : seasonName, 'seriesName' : seriesName, 'isSeries' : isSeries, 'seriesId' : seriesId, 'md' : md, 'md_ids' : md_ids}
             if key == 'startts':
                 epg.update({startts : epg_item})

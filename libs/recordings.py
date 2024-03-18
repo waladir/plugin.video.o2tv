@@ -56,18 +56,21 @@ def list_recordings(label):
             list_item = epg_listitem(list_item = list_item, epg = epg[key], logo = '')
             list_item.setProperty('IsPlayable', 'true')
             list_item.setContentLookup(False)          
-            menus = [('Smazat nahrávku', 'RunPlugin(plugin://' + plugin_id + '?action=delete_recording&id=' + str(recording_ids[epg[key]['id']]) + ')')]
+            menus = [('Smazat nahrávku', 'RunPlugin(plugin://' + plugin_id + '?action=delete_recording&id=' + str(recording_ids[epg[key]['id']]) + '&cancel=0)')]
             list_item.addContextMenuItems(menus)         
             url = get_url(action='play_recording', id = recording_ids[epg[key]['id']], channel_id = channel_id, start = epg[key]['startts'], end = epg[key]['endts'])
             xbmcplugin.addDirectoryItem(_handle, url, list_item, False)
     xbmcplugin.endOfDirectory(_handle, cacheToDisc = False)
 
-def delete_recording(id):
+def delete_recording(id, cancel):
     id = int(id)
     session = Session()
     post = {"language":"ces","ks":session.ks,"id":id,"clientTag":clientTag,"apiVersion":apiVersion}
     o2api = O2API()
-    data = o2api.call_o2_api(url = 'https://' + partnerId + '.frp1.ott.kaltura.com/api_v3/service/recording/action/delete?format=1&clientTag=' + clientTag, data = post, headers = o2api.headers)
+    if int(cancel) == 1:
+        data = o2api.call_o2_api(url = 'https://' + partnerId + '.frp1.ott.kaltura.com/api_v3/service/recording/action/cancel?format=1&clientTag=' + clientTag, data = post, headers = o2api.headers)
+    else:
+        data = o2api.call_o2_api(url = 'https://' + partnerId + '.frp1.ott.kaltura.com/api_v3/service/recording/action/delete?format=1&clientTag=' + clientTag, data = post, headers = o2api.headers)
     if 'err' in data or not 'result' in data or not 'status' in data['result'] or data['result']['status'] != 'DELETED':
         xbmcgui.Dialog().notification('O2TV', 'Problém se smazáním nahrávky', xbmcgui.NOTIFICATION_ERROR, 5000)
     else:
@@ -99,22 +102,28 @@ def list_future_recordings(label):
     for item in result:
         recording_ids.update({item['id'] : item['recordingId']})
     epg = epg_api(post = post, key = 'id', no_md_title = True)
+    post = {"language":"ces","ks":session.ks,"responseProfile":{"objectType":"KalturaOnDemandResponseProfile","relatedProfiles":[{"objectType":"KalturaDetachedResponseProfile","name":"group_result","filter":{"objectType":"KalturaAggregationCountFilter"}}]},"filter":{"objectType":"KalturaSearchAssetFilter","orderBy":"START_DATE_DESC","kSql":"(and asset_type='recording')","groupingOptionEqual":"Include"},"pager":{"objectType":"KalturaFilterPager","pageSize":500,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
+    result = o2tv_list_api(post = post, type = 'naplánované nahrávky')
+    for item in result:
+        recording_ids.update({item['id'] : item['recordingId']})
+    epg.update(epg_api(post = post, key = 'id', no_md_title = True))
     if addon.getSetting('recording_order') == 'od nejstarších':
         reverse = False
     else:
         reverse = True
     for key in sorted(epg, key=lambda x:epg[x]['startts'], reverse = reverse):
-        if epg[key]['channel_id'] in channels_list:
-            list_item = xbmcgui.ListItem(label = epg[key]['title'] + ' | ' + channels_list[epg[key]['channel_id']]['name'] + ' | ' + day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')] + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m. %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M'))
-        else:
-            list_item = xbmcgui.ListItem(label = epg[key]['title'] + ' (' + day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')] + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m. %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ')')
-        list_item = epg_listitem(list_item = list_item, epg = epg[key], logo = '')
-        list_item.setProperty('IsPlayable', 'false')
-        list_item.setContentLookup(False)          
-        menus = [('Smazat nahrávku', 'RunPlugin(plugin://' + plugin_id + '?action=delete_future_recording&id=' + str(recording_ids[epg[key]['id']]) + ')')]
-        list_item.addContextMenuItems(menus)         
-        url = get_url(action='play_recording', id = epg[key]['id'], start = epg[key]['startts'], end = epg[key]['endts'])
-        xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
+        if epg[key]['endts'] > int(time.mktime(datetime.now().timetuple())):
+            if epg[key]['channel_id'] in channels_list:
+                list_item = xbmcgui.ListItem(label = epg[key]['title'] + ' | ' + channels_list[epg[key]['channel_id']]['name'] + ' | ' + day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')] + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m. %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M'))
+            else:
+                list_item = xbmcgui.ListItem(label = epg[key]['title'] + ' (' + day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')] + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m. %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ')')
+            list_item = epg_listitem(list_item = list_item, epg = epg[key], logo = '')
+            list_item.setProperty('IsPlayable', 'false')
+            list_item.setContentLookup(False)          
+            menus = [('Smazat nahrávku', 'RunPlugin(plugin://' + plugin_id + '?action=delete_future_recording&id=' + str(recording_ids[epg[key]['id']]) + ')')]
+            list_item.addContextMenuItems(menus)         
+            url = get_url(action='list_future_recordings', label = label)
+            xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
     xbmcplugin.endOfDirectory(_handle, cacheToDisc = False)
 
 def list_planning_recordings(label):
@@ -230,7 +239,7 @@ def add_recording(id):
             id = ids[response]
     post = {"language":"ces","ks":session.ks,"recording":{"objectType":"KalturaRecording","assetId":id},"clientTag":clientTag,"apiVersion":apiVersion}
     data = o2api.call_o2_api(url = 'https://' + partnerId + '.frp1.ott.kaltura.com/api_v3/service/recording/action/add?format=1&clientTag=' + clientTag, data = post, headers = o2api.headers)
-    if 'err' in data or not 'result' in data or not 'status' in data['result'] or (data['result']['status'] != 'SCHEDULED' and data['result']['status'] != 'RECORDED'):
+    if 'err' in data or not 'result' in data or not 'status' in data['result'] or (data['result']['status'] != 'SCHEDULED' and data['result']['status'] != 'RECORDED' and data['result']['status'] != 'RECORDING'):
         xbmcgui.Dialog().notification('O2TV', 'Problém s přidáním nahrávky', xbmcgui.NOTIFICATION_ERROR, 5000)
     else:
         xbmcgui.Dialog().notification('O2TV', 'Nahrávka přidána', xbmcgui.NOTIFICATION_INFO, 5000)

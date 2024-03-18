@@ -1,3 +1,6 @@
+v1.6.6 (18.03.2024)
+- přidáno plánování nahrávek u živého vysílání
+
 v1.6.5 (17.03.2024)
 - úprava řazení nahrávek
 
@@ -10,6 +13,3 @@ v1.6.3 (17.03.2024)
 
 v1.6.2 (10.03.2024)
 - oprava ukončení výběru streamu u MD
-
-v1.6.0 (06.03.2024)
-- ošetření přehrávání kanálů bez dostupného startover
