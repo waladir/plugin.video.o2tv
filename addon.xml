@@ -1,4 +1,4 @@
-﻿<addon id="plugin.video.o2tv" name="O2TV" provider-name="waladir" version="1.6.6">
+﻿<addon id="plugin.video.o2tv" name="O2TV" provider-name="waladir" version="1.6.7">
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
     <import addon="inputstream.adaptive" version="19.0.0"/>
@@ -35,6 +35,9 @@ Další informace a podporu najdete na fóru www.xbmc-kodi.cz (https://www.xbmc-
     <platform>all</platform>
     <source>https://github.com/waladir/plugin.video.o2tv</source>
     <news>
+v1.6.7 (19.03.2024)
+- oprava mazání nahrávek
+
 v1.6.6 (18.03.2024)
 - přidáno plánování nahrávek u živého vysílání
 
@@ -47,9 +50,6 @@ v1.6.4 (17.03.2024)
 
 v1.6.3 (17.03.2024)
 - oprava přehrávání u MD
-
-v1.6.2 (10.03.2024)
-- oprava ukončení výběru streamu u MD
     </news>
     <assets>
         <icon>icon.png</icon>

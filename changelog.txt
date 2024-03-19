@@ -1,3 +1,6 @@
+v1.6.7 (19.03.2024)
+- oprava mazání nahrávek
+
 v1.6.6 (18.03.2024)
 - přidáno plánování nahrávek u živého vysílání
 
@@ -10,6 +13,3 @@ v1.6.4 (17.03.2024)
 
 v1.6.3 (17.03.2024)
 - oprava přehrávání u MD
-
-v1.6.2 (10.03.2024)
-- oprava ukončení výběru streamu u MD
