@@ -27,14 +27,41 @@ def play_catchup(id, start_ts, end_ts):
     epg = get_channel_epg(id = id, from_ts = start_ts, to_ts = end_ts + 60*60*12)
     if start_ts in epg:
         if epg[start_ts]['endts'] > int(time.mktime(datetime.now().timetuple()))-10:
-            play_startover(id = epg[start_ts]['id'], channel_id = id)
+            play_startover(id = epg[start_ts]['id'], epg = epg[start_ts], channel_id = id, md_dialog = True)
         else:
             play_archive(id = epg[start_ts]['id'], epg = epg[start_ts], channel_id = id, startts = epg[start_ts]['startts'], endts = epg[start_ts]['endts'])
     else:
         play_live(id)
 
-def play_startover(id, channel_id):
+def play_startover(id, epg, channel_id, md_dialog):
     session = Session()
+    if md_dialog == True and epg['md'] is not None:
+        items = []
+        ids = []
+        epgs = []
+        post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaSearchAssetFilter","orderBy":"START_DATE_ASC","kSql":"(and IsMosaicEvent='1' MosaicInfo='mosaic' (or externalId='" + str(epg['md']) + "'))"},"pager":{"objectType":"KalturaFilterPager","pageSize":200,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
+        md_epg = o2tv_list_api(post = post, type = 'multidimenze', nolog = True)
+        for md_epg_item in md_epg:
+            md_ids = []
+            if 'MosaicChannelsInfo' in md_epg_item['tags']:
+                for mditem in md_epg_item['tags']['MosaicChannelsInfo']['objects']:
+                    if 'ProgramExternalID' in mditem['value']:
+                        md_ids.append(mditem['value'].split('ProgramExternalID=')[1])
+                for md_id in md_ids:
+                    post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaSearchAssetFilter","orderBy":"START_DATE_ASC","kSql":"(or externalId='" + str(md_id) + "')"},"pager":{"objectType":"KalturaFilterPager","pageSize":200,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
+                    epg_md_item = o2tv_list_api(post = post, type = 'multidimenze', nolog = True)
+                    if len(epg) > 0:
+                        item = epg_md_item[0]
+                        epg = epg_api(post,'id')
+                        epgs.append(epg[item['id']])
+                        items.append(item['name'])
+                        ids.append(item['id'])
+        if len(items) > 0:
+            response = xbmcgui.Dialog().select(heading = 'Multidimenze - výběr streamu', list = items, preselect = 0)
+            if response < 0:
+                return
+            epg = epgs[response]
+            id = ids[response]
     post = {"1":{"service":"asset","action":"get","id":id,"assetReferenceType":"epg_internal","ks":session.ks},"2":{"service":"asset","action":"getPlaybackContext","assetId":id,"assetType":"epg","contextDataParams":{"objectType":"KalturaPlaybackContextOptions","context":"START_OVER","streamerType":"mpegdash","urlType":"DIRECT"},"ks":session.ks},"apiVersion":"7.8.1","ks":session.ks,"partnerId":partnerId}    
     play_stream(post, channel_id)
 
@@ -114,7 +141,7 @@ def play_archive(id, epg, channel_id, startts, endts):
     # post = {"1":{"service":"asset","action":"get","id":id,"assetReferenceType":"epg_internal","ks":session.ks},"2":{"service":"asset","action":"getPlaybackContext","assetId":id,"assetType":"epg","contextDataParams":{"objectType":"KalturaPlaybackContextOptions","context":"START_OVER","streamerType":"mpegdash","urlType":"DIRECT"},"ks":session.ks},"apiVersion":"7.8.1","ks":session.ks,"partnerId":partnerId}    
     # play_stream(post)
     if epg['endts'] > int(time.mktime(datetime.now().timetuple()))-10:
-        play_startover(id = epg['id'], channel_id = channel_id)
+        play_startover(id = epg['id'], epg = epg, channel_id = channel_id, md_dialog = False)
     else:
         post = {"language":"ces","ks":session.ks,"responseProfile":{"objectType":"KalturaOnDemandResponseProfile","relatedProfiles":[{"objectType":"KalturaDetachedResponseProfile","name":"group_result","filter":{"objectType":"KalturaAggregationCountFilter"}}]},"filter":{"objectType":"KalturaSearchAssetFilter","orderBy":"START_DATE_DESC","kSql":"(and asset_type='recording' start_date <'0' end_date < '-900')","groupBy":[{"objectType":"KalturaAssetMetaOrTagGroupBy","value":"SeriesID"}],"groupingOptionEqual":"Include"},"pager":{"objectType":"KalturaFilterPager","pageSize":500,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
         result = o2tv_list_api(post = post, type = 'archiv - nahrávky', silent = True)

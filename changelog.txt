@@ -1,3 +1,6 @@
+v1.6.8 (24.03.2024)
+- MD při přehrávání živého vysílání z IPTV SC
+
 v1.6.7 (19.03.2024)
 - oprava mazání nahrávek
 
@@ -10,6 +13,3 @@ v1.6.5 (17.03.2024)
 v1.6.4 (17.03.2024)
 - přidání plánovaní nahrávek z MD
 - přepracovaní zobrazení nahrávek
-
-v1.6.3 (17.03.2024)
-- oprava přehrávání u MD
