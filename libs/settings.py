@@ -148,9 +148,10 @@ class Settings:
                 with open(filename, "r") as f:
                     for row in f:
                         data = row[:-1]
-            except IOError as error:
-                if error.errno != 2:
-                    xbmcgui.Dialog().notification('O2TV', 'Chyba při načtení ' + file['description'], xbmcgui.NOTIFICATION_ERROR, 5000)
+            except FileNotFoundError:
+                pass
+            except IOError:
+                xbmcgui.Dialog().notification('O2TV', 'Chyba při načtení ' + file['description'], xbmcgui.NOTIFICATION_ERROR, 5000)
         return data    
 
     def reset_json_data(self, file):
@@ -158,8 +159,9 @@ class Settings:
             addon = xbmcaddon.Addon()
             addon_userdata_dir = translatePath(addon.getAddonInfo('profile'))
             filename = os.path.join(addon_userdata_dir, file['filename'])
-            if os.path.exists(filename):
-                try:
-                    os.remove(filename) 
-                except IOError:
-                    xbmcgui.Dialog().notification('O2TV', 'Chyba při resetu ' + file['description'], xbmcgui.NOTIFICATION_ERROR, 5000)
+            try:
+                os.remove(filename)
+            except FileNotFoundError:
+                pass
+            except IOError:
+                xbmcgui.Dialog().notification('O2TV', 'Chyba při resetu ' + file['description'], xbmcgui.NOTIFICATION_ERROR, 5000)
