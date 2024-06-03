@@ -158,8 +158,9 @@ class Settings:
             addon = xbmcaddon.Addon()
             addon_userdata_dir = translatePath(addon.getAddonInfo('profile'))
             filename = os.path.join(addon_userdata_dir, file['filename'])
-            if os.path.exists(filename):
-                try:
-                    os.remove(filename) 
-                except IOError:
-                    xbmcgui.Dialog().notification('O2TV', 'Chyba při resetu ' + file['description'], xbmcgui.NOTIFICATION_ERROR, 5000)
+            try:
+                os.remove(filename)
+            except FileNotFoundError:
+                pass
+            except IOError:
+                xbmcgui.Dialog().notification('O2TV', 'Chyba při resetu ' + file['description'], xbmcgui.NOTIFICATION_ERROR, 5000)
