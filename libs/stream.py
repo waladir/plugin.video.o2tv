@@ -68,7 +68,11 @@ def play_startover(id, epg, channel_id, md_dialog):
 def play_live(id):
     session = Session()
     epg_id = -1
-    epg = get_live_epg()[int(id)]
+    epg = get_live_epg()
+    if int(id) in epg:
+        epg = epg[int(id)]
+    else:
+        epg = {}
     if 'id' in epg:
         epg_id = epg['id']
     if 'md' in epg and epg['md'] is not None:
