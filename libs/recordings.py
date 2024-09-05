@@ -13,7 +13,7 @@ from libs.session import Session
 from libs.channels import Channels
 from libs.epg import epg_api, epg_listitem, get_channel_epg, get_item_epg
 from libs.o2tv import O2API, o2tv_list_api
-from libs.utils import get_url, plugin_id, day_translation, day_translation_short, clientTag, apiVersion, partnerId
+from libs.utils import get_url, plugin_id, day_translation, day_translation_short, clientTag, apiVersion, get_partnerId
 
 if len(sys.argv) > 1:
     _handle = int(sys.argv[1])
@@ -67,7 +67,7 @@ def delete_recording(id):
     session = Session()
     post = {"language":"ces","ks":session.ks,"id":id,"clientTag":clientTag,"apiVersion":apiVersion}
     o2api = O2API()
-    data = o2api.call_o2_api(url = 'https://' + partnerId + '.frp1.ott.kaltura.com/api_v3/service/recording/action/delete?format=1&clientTag=' + clientTag, data = post, headers = o2api.headers)
+    data = o2api.call_o2_api(url = 'https://' + get_partnerId() + '.frp1.ott.kaltura.com/api_v3/service/recording/action/delete?format=1&clientTag=' + clientTag, data = post, headers = o2api.headers)
     if 'err' in data or not 'result' in data or not 'status' in data['result'] or data['result']['status'] != 'DELETED':
         xbmcgui.Dialog().notification('O2TV', 'Problém se smazáním nahrávky', xbmcgui.NOTIFICATION_ERROR, 5000)
     else:
@@ -79,7 +79,7 @@ def delete_future_recording(id):
     session = Session()
     post = {"language":"ces","ks":session.ks,"id":id,"clientTag":clientTag,"apiVersion":apiVersion}
     o2api = O2API()
-    data = o2api.call_o2_api(url = 'https://' + partnerId + '.frp1.ott.kaltura.com/api_v3/service/recording/action/cancel?format=1&clientTag=' + clientTag, data = post, headers = o2api.headers)
+    data = o2api.call_o2_api(url = 'https://' + get_partnerId() + '.frp1.ott.kaltura.com/api_v3/service/recording/action/cancel?format=1&clientTag=' + clientTag, data = post, headers = o2api.headers)
     if 'err' in data or not 'result' in data or not 'status' in data['result'] or data['result']['status'] != 'CANCELED':
         xbmcgui.Dialog().notification('O2TV', 'Problém se smazáním nahrávky', xbmcgui.NOTIFICATION_ERROR, 5000)
     else:
@@ -235,7 +235,7 @@ def add_recording(id):
                 return
             id = ids[response]
     post = {"language":"ces","ks":session.ks,"recording":{"objectType":"KalturaRecording","assetId":id},"clientTag":clientTag,"apiVersion":apiVersion}
-    data = o2api.call_o2_api(url = 'https://' + partnerId + '.frp1.ott.kaltura.com/api_v3/service/recording/action/add?format=1&clientTag=' + clientTag, data = post, headers = o2api.headers)
+    data = o2api.call_o2_api(url = 'https://' + get_partnerId() + '.frp1.ott.kaltura.com/api_v3/service/recording/action/add?format=1&clientTag=' + clientTag, data = post, headers = o2api.headers)
     if 'err' in data or not 'result' in data or not 'status' in data['result'] or (data['result']['status'] != 'SCHEDULED' and data['result']['status'] != 'RECORDED' and data['result']['status'] != 'RECORDING'):
         xbmcgui.Dialog().notification('O2TV', 'Problém s přidáním nahrávky', xbmcgui.NOTIFICATION_ERROR, 5000)
     else:

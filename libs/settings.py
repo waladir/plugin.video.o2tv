@@ -11,7 +11,7 @@ from datetime import datetime
 
 from libs.session import Session
 from libs.o2tv import O2API
-from libs.utils import get_url, partnerId, apiVersion, clientTag
+from libs.utils import get_url, get_partnerId, apiVersion, clientTag
 
 def list_settings(label):
     _handle = int(sys.argv[1])
@@ -67,20 +67,20 @@ def list_devices(label):
 
     active = []
     post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaStreamingDeviceFilter"},"clientTag":clientTag,"apiVersion":apiVersion}
-    data = o2api.call_o2_api(url = 'https://' + partnerId + '.frp1.ott.kaltura.com/api_v3/service/streamingdevice/action/list?format=1&clientTag=' + clientTag, data = post, headers = o2api.headers, nolog = False)
+    data = o2api.call_o2_api(url = 'https://' + get_partnerId() + '.frp1.ott.kaltura.com/api_v3/service/streamingdevice/action/list?format=1&clientTag=' + clientTag, data = post, headers = o2api.headers, nolog = False)
     if 'err' not in data and 'result' in data and len(data['result']) > 0 and 'objects' in data['result'] and len(data['result']['objects']) > 0:
         for device in data['result']['objects']:
             active.append(device['udid'])
 
     types = {}
     post = {"language":"ces","ks":session.ks,"clientTag":clientTag,"apiVersion":apiVersion}
-    data = o2api.call_o2_api(url = 'https://' + partnerId + '.frp1.ott.kaltura.com/api_v3/service/devicebrand/action/list?format=1&clientTag=' + clientTag, data = post, headers = o2api.headers, nolog = False)
+    data = o2api.call_o2_api(url = 'https://' + get_partnerId() + '.frp1.ott.kaltura.com/api_v3/service/devicebrand/action/list?format=1&clientTag=' + clientTag, data = post, headers = o2api.headers, nolog = False)
     if 'err' not in data and 'result' in data and len(data['result']) > 0 and 'objects' in data['result'] and len(data['result']['objects']) > 0:
         for item in data['result']['objects']:
             types.update({item['id'] : item['name']})
 
     post = {"language":"ces","ks":session.ks,"clientTag":clientTag,"apiVersion":apiVersion}
-    data = o2api.call_o2_api(url = 'https://' + partnerId + '.frp1.ott.kaltura.com/api_v3/service/householddevice/action/list?format=1&clientTag=' + clientTag, data = post, headers = o2api.headers, nolog = False)
+    data = o2api.call_o2_api(url = 'https://' + get_partnerId() + '.frp1.ott.kaltura.com/api_v3/service/householddevice/action/list?format=1&clientTag=' + clientTag, data = post, headers = o2api.headers, nolog = False)
     if 'err' in data or not 'result' in data or len(data['result']) == 0 or 'objects' not in data['result'] or len(data['result']['objects']) == 0:
         xbmcgui.Dialog().notification('O2TV','Problém při načtení zařízení', xbmcgui.NOTIFICATION_ERROR, 5000)
         sys.exit() 
@@ -112,7 +112,7 @@ def delete_device(udid):
         session = Session()
         o2api = O2API()
         post = {"language":"ces","ks":session.ks,"udid":udid,"clientTag":clientTag,"apiVersion":apiVersion}
-        data = o2api.call_o2_api(url = 'https://' + partnerId + '.frp1.ott.kaltura.com/api_v3/service/householddevice/action/delete?format=1&clientTag=' + clientTag, data = post, headers = o2api.headers, nolog = False)
+        data = o2api.call_o2_api(url = 'https://' + get_partnerId() + '.frp1.ott.kaltura.com/api_v3/service/householddevice/action/delete?format=1&clientTag=' + clientTag, data = post, headers = o2api.headers, nolog = False)
         xbmc.executebuiltin('Container.Refresh')
     
 class Settings:

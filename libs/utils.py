@@ -12,9 +12,17 @@ day_translation = {'1' : 'Pondělí', '2' : 'Úterý', '3' : 'Středa', '4' : '�
 day_translation_short = {'1' : 'Po', '2' : 'Út', '3' : 'St', '4' : 'Čt', '5' : 'Pá', '6' : 'So', '0' : 'Ne'}  
 clientTag = '9.40.0-PC'
 apiVersion = '5.4.0'
-partnerId = '3201'
 
 _url = sys.argv[0]
+
+def get_partnerId():
+    addon = xbmcaddon.Addon()
+    partnerId = '1111'
+    if addon.getSetting('service') == 'o2tv.cz':
+        partnerId = '3201'
+    elif addon.getSetting('service') == 'o2tv.sk':
+        partnerId = '3206'
+    return partnerId
 
 def check_settings():
     addon = xbmcaddon.Addon()

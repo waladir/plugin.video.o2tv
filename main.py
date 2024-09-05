@@ -38,10 +38,11 @@ def main_menu():
     list_item.setArt({ 'thumb' : os.path.join(icons_dir , 'archive.png'), 'icon' : os.path.join(icons_dir , 'archive.png') })
     xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
 
-    list_item = xbmcgui.ListItem(label='Kategorie')
-    url = get_url(action='list_categories', label = 'Kategorie')  
-    list_item.setArt({ 'thumb' : os.path.join(icons_dir , 'categories.png'), 'icon' : os.path.join(icons_dir , 'categories.png') })
-    xbmcplugin.addDirectoryItem(_handle, url, list_item, True)    
+    if addon.getSetting('serivce') == 'o2tv.cz':
+        list_item = xbmcgui.ListItem(label='Kategorie')
+        url = get_url(action='list_categories', label = 'Kategorie')  
+        list_item.setArt({ 'thumb' : os.path.join(icons_dir , 'categories.png'), 'icon' : os.path.join(icons_dir , 'categories.png') })
+        xbmcplugin.addDirectoryItem(_handle, url, list_item, True)    
 
     list_item = xbmcgui.ListItem(label='Nahrávky')
     url = get_url(action='list_recordings', label = 'Nahrávky')  

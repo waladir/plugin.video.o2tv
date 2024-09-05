@@ -9,7 +9,7 @@ import gzip
 from urllib.request import urlopen, Request
 from urllib.error import HTTPError
 
-from libs.utils import clientTag, partnerId
+from libs.utils import clientTag, get_partnerId
 
 class O2API:
     def __init__(self):
@@ -48,7 +48,7 @@ def o2tv_list_api(post, type = '', nolog = False, silent = False):
     o2api = O2API()
     fetch = True
     while fetch == True:
-        data = o2api.call_o2_api(url = 'https://' + partnerId + '.frp1.ott.kaltura.com/api_v3/service/asset/action/list?format=1&clientTag=' + clientTag, data = post, headers = o2api.headers, nolog = nolog)
+        data = o2api.call_o2_api(url = 'https://' + get_partnerId() + '.frp1.ott.kaltura.com/api_v3/service/asset/action/list?format=1&clientTag=' + clientTag, data = post, headers = o2api.headers, nolog = nolog)
         if 'err' in data or not 'result' in data or not 'totalCount' in data['result']:
             if silent == False:
                 if len(type) == 0:
