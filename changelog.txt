@@ -1,3 +1,6 @@
+v2.0.1 (05.09.2024)
+- oprava překlepu v kódu
+
 v2.0.0 (05.09.2024)
 - přidání podpory O2TV SK
 
@@ -10,7 +13,3 @@ v1.6.8 (24.03.2024)
 
 v1.6.7 (19.03.2024)
 - oprava mazání nahrávek
-
-v1.6.6 (18.03.2024)
-- přidáno plánování nahrávek u živého vysílání
-
