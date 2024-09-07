@@ -72,44 +72,40 @@ def play_live(id):
     if int(id) in epg:
         epg = epg[int(id)]
     else:
-        epg = {}    
-    if int(id) in epg:
-        epg = epg[int(id)]
-        if 'id' in epg:
-            epg_id = epg['id']
-        if 'md' in epg and epg['md'] is not None:
-            items = []
-            ids = []
-            post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaSearchAssetFilter","orderBy":"START_DATE_ASC","kSql":"(and IsMosaicEvent='1' MosaicInfo='mosaic' (or externalId='" + str(epg['md']) + "'))"},"pager":{"objectType":"KalturaFilterPager","pageSize":200,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
-            md_epg = o2tv_list_api(post = post, type = 'multidimenze', nolog = True)
-            for md_epg_item in md_epg:
-                md_ids = []
-                md_titles = {}
-                if 'MosaicChannelsInfo' in md_epg_item['tags']:
-                    for mditem in md_epg_item['tags']['MosaicChannelsInfo']['objects']:
-                        if 'ChannelExternalId' in mditem['value']:
-                            channel = mditem['value'].split('ChannelExternalId=')[1].split(',')[0]
-                            md_ids.append(channel)
-                            md_titles.update({channel : mditem['value'].split('Title=')[1].split(',')[0]})
-                    for id in md_ids:
-                        post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaSearchAssetFilter","orderBy":"START_DATE_ASC","kSql":"(or externalId='" + str(id) + "')"},"pager":{"objectType":"KalturaFilterPager","pageSize":200,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
-                        epg = o2tv_list_api(post = post, type = 'multidimenze', nolog = True)
-                        if len(epg) > 0:
-                            item = epg[0]
-                            items.append(md_titles[id])
-                            ids.append(item['id'])
-            if len(items) > 0:
-                response = xbmcgui.Dialog().select(heading = 'Multidimenze - výběr streamu', list = items, preselect = 0)
-                if response < 0:
-                    return
-                id = ids[response]
-                epg = get_live_epg()[int(id)]
-                if 'id' in epg:
-                    epg_id = epg['id']
-        if epg_id > 0:
-            post = {"1":{"service":"asset","action":"get","id":epg_id,"assetReferenceType":"epg_internal","ks":session.ks},"2":{"service":"asset","action":"getPlaybackContext","assetId":epg_id,"assetType":"epg","contextDataParams":{"objectType":"KalturaPlaybackContextOptions","context":"START_OVER","streamerType":"mpegdash","urlType":"DIRECT"},"ks":session.ks},"apiVersion":"7.8.1","ks":session.ks,"partnerId":get_partnerId()}    
-        else:
-            post = {"1":{"service":"asset","action":"get","id":id,"assetReferenceType":"media","ks":session.ks},"2":{"service":"asset","action":"getPlaybackContext","assetId":id,"assetType":"media","contextDataParams":{"objectType":"KalturaPlaybackContextOptions","context":"PLAYBACK","streamerType":"mpegdash","urlType":"DIRECT"},"ks":session.ks},"apiVersion":"7.8.1","ks":session.ks,"partnerId":get_partnerId()}
+        epg = {}
+    if 'id' in epg:
+        epg_id = epg['id']
+    if 'md' in epg and epg['md'] is not None:
+        items = []
+        ids = []
+        post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaSearchAssetFilter","orderBy":"START_DATE_ASC","kSql":"(and IsMosaicEvent='1' MosaicInfo='mosaic' (or externalId='" + str(epg['md']) + "'))"},"pager":{"objectType":"KalturaFilterPager","pageSize":200,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
+        md_epg = o2tv_list_api(post = post, type = 'multidimenze', nolog = True)
+        for md_epg_item in md_epg:
+            md_ids = []
+            md_titles = {}
+            if 'MosaicChannelsInfo' in md_epg_item['tags']:
+                for mditem in md_epg_item['tags']['MosaicChannelsInfo']['objects']:
+                    if 'ChannelExternalId' in mditem['value']:
+                        channel = mditem['value'].split('ChannelExternalId=')[1].split(',')[0]
+                        md_ids.append(channel)
+                        md_titles.update({channel : mditem['value'].split('Title=')[1].split(',')[0]})
+                for id in md_ids:
+                    post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaSearchAssetFilter","orderBy":"START_DATE_ASC","kSql":"(or externalId='" + str(id) + "')"},"pager":{"objectType":"KalturaFilterPager","pageSize":200,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
+                    epg = o2tv_list_api(post = post, type = 'multidimenze', nolog = True)
+                    if len(epg) > 0:
+                        item = epg[0]
+                        items.append(md_titles[id])
+                        ids.append(item['id'])
+        if len(items) > 0:
+            response = xbmcgui.Dialog().select(heading = 'Multidimenze - výběr streamu', list = items, preselect = 0)
+            if response < 0:
+                return
+            id = ids[response]
+            epg = get_live_epg()[int(id)]
+            if 'id' in epg:
+                epg_id = epg['id']
+    if epg_id > 0:
+        post = {"1":{"service":"asset","action":"get","id":epg_id,"assetReferenceType":"epg_internal","ks":session.ks},"2":{"service":"asset","action":"getPlaybackContext","assetId":epg_id,"assetType":"epg","contextDataParams":{"objectType":"KalturaPlaybackContextOptions","context":"START_OVER","streamerType":"mpegdash","urlType":"DIRECT"},"ks":session.ks},"apiVersion":"7.8.1","ks":session.ks,"partnerId":get_partnerId()}    
     else:
         post = {"1":{"service":"asset","action":"get","id":id,"assetReferenceType":"media","ks":session.ks},"2":{"service":"asset","action":"getPlaybackContext","assetId":id,"assetType":"media","contextDataParams":{"objectType":"KalturaPlaybackContextOptions","context":"PLAYBACK","streamerType":"mpegdash","urlType":"DIRECT"},"ks":session.ks},"apiVersion":"7.8.1","ks":session.ks,"partnerId":get_partnerId()}
     play_stream(post, id)
