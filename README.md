@@ -4,6 +4,10 @@
 <p>
 Živé vysílání, archiv, nahrávky, vytváření playlistu a EPG pro IPTV Simple Clienta<br><br>
 <a href="https://www.xbmc-kodi.cz/prispevek-o2tv">Vlákno na fóru XBMC-Kodi.cz</a><br><br>
+v2.1.0 (01.11.2024)<br>
+- úpravy pro kompatibilitu s Kodi 18<br>
+- přidání stahování streamů<br><br>
+
 v2.0.2 (07.09.2024)<br>
 - oprava přehrávání live streamu<br><br>
 
@@ -16,8 +20,4 @@ v2.0.0 (05.09.2024)<br>
 v1.6.9 (11.07.2024)<br>
 - PR od ptesarik (lepší ošetření chyb při práci se soubory)<br>
 - oprava spouštění přehrávání s chybějícím EPG<br><br>
-
-v1.6.8 (24.03.2024)<br>
-- MD při přehrávání živého vysílání z IPTV SC<br><br>
-
 </p>

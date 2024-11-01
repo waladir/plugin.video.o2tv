@@ -1,11 +1,18 @@
 # -*- coding: utf-8 -*-
 import sys
+import os
 import xbmc
 import xbmcaddon
 import xbmcgui
 import string, random
 
-from urllib.parse import urlencode
+try:
+    from urllib import urlencode
+except ImportError:
+    from urllib.parse import urlencode
+
+PY2 = sys.version_info[0] == 2
+PY3 = sys.version_info[0] == 3
 
 plugin_id = 'plugin.video.o2tv'
 day_translation = {'1' : 'Pondělí', '2' : 'Úterý', '3' : 'Středa', '4' : 'Čtvrtek', '5' : 'Pátek', '6' : 'Sobota', '0' : 'Neděle'}  
@@ -32,6 +39,22 @@ def check_settings():
     if not addon.getSetting('username') or not addon.getSetting('password') or not addon.getSetting('deviceid'):
         xbmcgui.Dialog().notification('Sledování O2TV', 'V nastavení je nutné mít vyplněné všechny přihlašovací údaje', xbmcgui.NOTIFICATION_ERROR, 10000)
         sys.exit()
+
+    if addon.getSetting('download_streams') == 'true' and (addon.getSetting('ffmpeg_bin') is None or len(addon.getSetting('ffmpeg_bin')) == 0 or not os.path.isfile(addon.getSetting('ffmpeg_bin')) or not os.access(addon.getSetting('ffmpeg_bin'), os.X_OK)):
+        test_bin1 = '/usr/bin/ffmpeg'
+        # test_bin2 = '/storage/.kodi/addons/tools.ffmpeg-tools/bin/ffmpeg'
+        if os.path.isfile(test_bin1) and os.access(test_bin1, os.X_OK):
+            addon.setSetting('ffmpeg_bin', test_bin1)
+        # elif os.path.isfile(test_bin2) and os.access(test_bin2, os.X_OK):
+        #     addon.setSetting('ffmpeg_bin', test_bin2)
+        else:
+            xbmcgui.Dialog().notification('O2TV', 'Nastav cestu k ffmpeg!', xbmcgui.NOTIFICATION_ERROR, 5000)
+            sys.exit() 
+
+    if addon.getSetting('download_streams') == 'true' and (addon.getSetting('downloads_dir') is None or len(addon.getSetting('downloads_dir')) == 0):
+        xbmcgui.Dialog().notification('O2TV', 'Nastav adresář pro stahování!', xbmcgui.NOTIFICATION_ERROR, 5000)
+        sys.exit() 
+
 
 def get_url(**kwargs):
     return '{0}?{1}'.format(_url, urlencode(kwargs))
@@ -81,3 +104,15 @@ def get_color(settings_color):
         return color
     else:
         return ''
+    
+def decode(string_to_decode):
+    if PY2:
+        return string_to_decode.decode('utf-8')
+    else:
+        return string_to_decode
+
+def encode(string_to_encode):
+    if PY2:
+        return string_to_encode.encode('utf-8')
+    else:
+        return string_to_encode      

@@ -13,7 +13,13 @@ import requests
 import random, string
 from base64 import b64encode, urlsafe_b64encode
 from hashlib import sha256
-from urllib.parse import parse_qs, urlparse
+
+try:
+    from urllib.parse import parse_qs, urlparse
+except ImportError:
+    from urlparse import parse_qs, urlparse
+
+
 
 class Session:
     def __init__(self):

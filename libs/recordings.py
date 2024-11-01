@@ -6,6 +6,11 @@ import xbmcgui
 import xbmcplugin
 import xbmcaddon
 
+try:
+    from urllib import quote
+except ImportError:
+    from urllib.parse import quote
+
 from datetime import date, datetime, timedelta
 import time
 
@@ -13,7 +18,7 @@ from libs.session import Session
 from libs.channels import Channels
 from libs.epg import epg_api, epg_listitem, get_channel_epg, get_item_epg
 from libs.o2tv import O2API, o2tv_list_api
-from libs.utils import get_url, plugin_id, day_translation, day_translation_short, clientTag, apiVersion, get_partnerId
+from libs.utils import get_url, plugin_id, day_translation, day_translation_short, clientTag, apiVersion, get_partnerId, encode, decode
 
 if len(sys.argv) > 1:
     _handle = int(sys.argv[1])
@@ -48,7 +53,7 @@ def list_recordings(label):
             reverse = True
         for key in sorted(epg, key=lambda x:epg[x]['startts'], reverse = reverse):
             if epg[key]['channel_id'] in channels_list:
-                list_item = xbmcgui.ListItem(label = epg[key]['title'] + ' | ' + channels_list[epg[key]['channel_id']]['name'] + ' | ' + day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')] + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m. %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M'))
+                list_item = xbmcgui.ListItem(label = epg[key]['title'] + ' | ' + channels_list[epg[key]['channel_id']]['name'] + ' | ' + decode(day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')]) + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m. %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M'))
                 channel_id = channels_list[epg[key]['channel_id']]['id']
             else:
                 list_item = xbmcgui.ListItem(label = epg[key]['title'] + ' (' + day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')] + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m. %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ')')
@@ -57,6 +62,8 @@ def list_recordings(label):
             list_item.setProperty('IsPlayable', 'true')
             list_item.setContentLookup(False)          
             menus = [('Smazat nahrávku', 'RunPlugin(plugin://' + plugin_id + '?action=delete_recording&id=' + str(recording_ids[epg[key]['id']]) + ')')]
+            if addon.getSetting('download_streams') == 'true': 
+                menus.append(('Stáhnout', 'RunPlugin(plugin://' + plugin_id + '?action=add_to_download_queue&id=' + str(epg[key]['id']) + '&channel=' + quote(encode(channels_list[epg[key]['channel_id']]['name'])) + '&title=' + quote(encode(epg[key]['title'])) + '&isrec=' + recording_ids[epg[key]['id']] + ')'))
             list_item.addContextMenuItems(menus)         
             url = get_url(action='play_recording', id = recording_ids[epg[key]['id']], channel_id = channel_id, start = epg[key]['startts'], end = epg[key]['endts'])
             xbmcplugin.addDirectoryItem(_handle, url, list_item, False)
@@ -111,13 +118,16 @@ def list_future_recordings(label):
     for key in sorted(epg, key=lambda x:epg[x]['startts'], reverse = reverse):
         if epg[key]['endts'] > int(time.mktime(datetime.now().timetuple())):
             if epg[key]['channel_id'] in channels_list:
-                list_item = xbmcgui.ListItem(label = epg[key]['title'] + ' | ' + channels_list[epg[key]['channel_id']]['name'] + ' | ' + day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')] + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m. %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M'))
+                list_item = xbmcgui.ListItem(label = encode(epg[key]['title']) + ' | ' + encode(channels_list[epg[key]['channel_id']]['name']) + ' | ' + day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')] + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m. %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M'))
             else:
-                list_item = xbmcgui.ListItem(label = epg[key]['title'] + ' (' + day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')] + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m. %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ')')
+                list_item = xbmcgui.ListItem(label = encode(epg[key]['title']) + ' (' + day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')] + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m. %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ')')
             list_item = epg_listitem(list_item = list_item, epg = epg[key], logo = '')
             list_item.setProperty('IsPlayable', 'false')
             list_item.setContentLookup(False)          
             menus = [('Smazat nahrávku', 'RunPlugin(plugin://' + plugin_id + '?action=delete_future_recording&id=' + str(recording_ids[epg[key]['id']]) + ')')]
+            if addon.getSetting('download_streams') == 'true':
+                print('RunPlugin(plugin://' + plugin_id + '?action=add_to_download_queue&id=' + str(epg[key]['id']) + '&channel=' + quote(encode(channels_list[epg[key]['channel_id']]['name'])) + '&title=' + quote(encode(epg[key]['title'])) + '&isrec=0)')
+                menus.append(('Stáhnout', 'RunPlugin(plugin://' + plugin_id + '?action=add_to_download_queue&id=' + str(epg[key]['id']) + '&channel=' + quote(encode(channels_list[epg[key]['channel_id']]['name'])) + '&title=' + quote(encode(epg[key]['title'])) + '&isrec=0)'))
             list_item.addContextMenuItems(menus)         
             url = get_url(action='list_future_recordings', label = label)
             xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
@@ -139,7 +149,7 @@ def list_planning_recordings(label):
             channel_number = ''
         list_item = xbmcgui.ListItem(label = channel_number + channels_list[number]['name'])
         list_item.setArt({'thumb': channels_list[number]['logo'], 'icon': channels_list[number]['logo']})
-        url = get_url(action='list_rec_days', id = channels_list[number]['id'], label = label + ' / ' + channels_list[number]['name'])
+        url = get_url(action='list_rec_days', id = channels_list[number]['id'], label = label + ' / ' + encode(channels_list[number]['name']))
         xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
     xbmcplugin.endOfDirectory(_handle)
     
@@ -164,9 +174,10 @@ def list_rec_days(id, label):
 def future_program(id, day, label):
     addon = xbmcaddon.Addon()
     icons_dir = os.path.join(addon.getAddonInfo('path'), 'resources','images')
-
     label = label.replace('Nahrávky / Plánování /', '')
     xbmcplugin.setPluginCategory(_handle, label)
+    channels = Channels()
+    channels_list = channels.get_channels_list('id')
     id = int(id)
     today_date = datetime.today() 
     today_start_ts = int(time.mktime(datetime(today_date.year, today_date.month, today_date.day).timetuple()))
@@ -190,10 +201,14 @@ def future_program(id, day, label):
     for key in sorted(epg.keys()):
         start = epg[key]['startts']
         end = epg[key]['endts']
-        list_item = xbmcgui.ListItem(label = day_translation_short[datetime.fromtimestamp(start).strftime('%w')] + ' ' + datetime.fromtimestamp(start).strftime('%d.%m. %H:%M') + ' - ' + datetime.fromtimestamp(end).strftime('%H:%M') + ' | ' + epg[key]['title'])
+        list_item = xbmcgui.ListItem(label = day_translation_short[datetime.fromtimestamp(start).strftime('%w')] + ' ' + datetime.fromtimestamp(start).strftime('%d.%m. %H:%M') + ' - ' + datetime.fromtimestamp(end).strftime('%H:%M') + ' | ' + encode(epg[key]['title']))
         list_item = epg_listitem(list_item, epg[key], '')
         list_item.setProperty('IsPlayable', 'false')
-        list_item.addContextMenuItems([('Přidat nahrávku', 'RunPlugin(plugin://' + plugin_id + '?action=add_recording&id=' + str(epg[key]['id']) + ')',)])       
+        list_item.addContextMenuItems([])     
+        menus = [('Přidat nahrávku', 'RunPlugin(plugin://' + plugin_id + '?action=add_recording&id=' + str(epg[key]['id']) + ')')]
+        if addon.getSetting('download_streams') == 'true': 
+            menus.append(('Stáhnout', 'RunPlugin(plugin://' + plugin_id + '?action=add_to_download_queue&id=' + str(epg[key]['id']) + '&channel=' + quote(encode(channels_list[epg[key]['channel_id']]['name'])) + '&title=' + quote(encode(epg[key]['title'])) + '&isrec=0)'))
+        list_item.addContextMenuItems(menus)         
         url = get_url(action='add_recording', id = epg[key]['id'])
         xbmcplugin.addDirectoryItem(_handle, url, list_item, False)
 

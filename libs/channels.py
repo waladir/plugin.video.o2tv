@@ -5,9 +5,15 @@ import xbmc
 import xbmcgui
 import xbmcaddon
 import xbmcplugin
-from xbmcvfs import translatePath
+try:
+    from xbmcvfs import translatePath
+except ImportError:
+    from xbmc import translatePath
 
-from urllib.parse import quote
+try:
+    from urllib import quote
+except ImportError:
+    from urllib.parse import quote
 
 import json
 import codecs
@@ -289,7 +295,6 @@ class Channels:
             asset_type = '714'
         post = {"language":"ces","ks":session.ks,"filter":{"objectType":"KalturaSearchAssetFilter","kSql":"(and asset_type='" + asset_type + "' (or entitled_assets='entitledSubscriptions' entitled_assets='free') )"},"pager":{"objectType":"KalturaFilterPager","pageSize":300,"pageIndex":1},"clientTag":clientTag,"apiVersion":apiVersion}
         result = o2tv_list_api(post = post, type = 'kanály')
-        print(result)
         for channel in result:
             if 'ChannelNumber' in channel['metas']:
                 if not (addon.getSetting('ignore_radios') == 'true' and 'tags' in channel and len(channel['tags']) > 0 and 'Genre' in channel['tags'] and len(channel['tags']['Genre']) > 0 and channel['tags']['Genre']['objects'][0]['value'] == 'radio'):

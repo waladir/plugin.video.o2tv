@@ -9,7 +9,7 @@ from datetime import date, datetime, timedelta
 import time
 import json
 
-from libs.utils import get_url, day_translation, day_translation_short, plugin_id
+from libs.utils import get_url, day_translation, day_translation_short, plugin_id, encode, decode
 from libs.channels import Channels 
 from libs.epg import get_channel_epg, epg_listitem
 
@@ -32,7 +32,7 @@ def list_archive(label):
             channel_number = ''
         list_item = xbmcgui.ListItem(label = channel_number + channels_list[number]['name'])
         list_item.setArt({'thumb': channels_list[number]['logo'], 'icon': channels_list[number]['logo']})
-        url = get_url(action='list_archive_days', id = channels_list[number]['id'], label = label + ' / ' + channels_list[number]['name'])  
+        url = get_url(action='list_archive_days', id = channels_list[number]['id'], label = encode(label + ' / ' + channels_list[number]['name']))  
         xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
     xbmcplugin.endOfDirectory(_handle, cacheToDisc = False)
 
@@ -57,7 +57,8 @@ def list_archive_days(id, label):
 def list_program(id, day_min, label):
     addon = xbmcaddon.Addon()
     icons_dir = os.path.join(addon.getAddonInfo('path'), 'resources','images')
-
+    channels = Channels()
+    channels_list = channels.get_channels_list('id')
     label = label.replace('Archiv /','')
     xbmcplugin.setPluginCategory(_handle, label)
     today_date = datetime.today() 
@@ -82,9 +83,11 @@ def list_program(id, day_min, label):
 
     for key in sorted(epg.keys(), reverse = False):
         if int(epg[key]['endts']) > int(time.mktime(datetime.now().timetuple()))-60*60*24*7:
-            list_item = xbmcgui.ListItem(label = day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')] + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m. %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ' | ' + epg[key]['title'])
+            list_item = xbmcgui.ListItem(label = decode(day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')]) + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m. %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ' | ' + epg[key]['title'])
             list_item = epg_listitem(list_item = list_item, epg = epg[key], logo = '')
             menus = [('Přidat nahrávku', 'RunPlugin(plugin://' + plugin_id + '?action=add_recording&id=' + str(epg[key]['id']) + ')')]
+            if addon.getSetting('download_streams') == 'true': 
+                menus.append(('Stáhnout', 'RunPlugin(plugin://' + plugin_id + '?action=add_to_download_queue&id=' + str(epg[key]['id']) + '&channel=' + encode(channels_list[epg[key]['channel_id']]['name']) + '&title=' + encode(epg[key]['title']) + '&isrec=0)'))
             list_item.addContextMenuItems(menus)       
             list_item.setContentLookup(False)          
             list_item.setProperty('IsPlayable', 'true')

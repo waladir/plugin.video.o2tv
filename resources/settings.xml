@@ -27,6 +27,11 @@
                 <setting label="Generovat playlist" type="action" action="RunPlugin(plugin://plugin.video.o2tv?action=generate_playlist)"/>
                 <setting label="Generovat EPG" type="action" action="RunPlugin(plugin://plugin.video.o2tv?action=generate_epg)"/>
 	</category>    
+	<category label="Stahování">
+                <setting label="Povolit stahování streamů" type="bool" id="download_streams" default="false"/>
+                <setting label="Cesta k ffmpeg" type="executable" id="ffmpeg_bin"/>
+                <setting label="Adresář pro stahování" type="folder" id="downloads_dir" default=""/>
+	</category>    
     <category label="Logování">
                 <setting label="Logování požadavků - URL" type="bool" id="log_request_url" default="false"/>
                 <setting label="Logování odpovědí" type="bool" id="log_response" default="false"/>

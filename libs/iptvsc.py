@@ -13,6 +13,8 @@ from libs.channels import Session
 from libs.utils import plugin_id, clientTag, apiVersion, replace_by_html_entity
 from libs.epg import get_channel_epg, epg_api
 from libs.recordings import add_recording
+from libs.downloader import add_to_download_queue
+
 tz_offset = int((time.mktime(datetime.now().timetuple())-time.mktime(datetime.utcnow().timetuple()))/3600)
 
 def save_file_test():
@@ -190,5 +192,15 @@ def iptv_sc_rec(channelName, startdatetime):
     epg = get_channel_epg(id = channels_list[channelName]['id'], from_ts = from_ts, to_ts = from_ts + 60*60*12)
     if len(epg) > 0 and from_ts in epg:
         add_recording(epg[from_ts]['id'])
+    else:
+        xbmcgui.Dialog().notification('O2TV', 'Pořad v O2TV nenalezen! Používáte EPG z doplňku O2TV?', xbmcgui.NOTIFICATION_ERROR, 10000)
+
+def iptv_sc_dwn(channelName, startdatetime):
+    channels = Channels()
+    channels_list = channels.get_channels_list('name', visible_filter = False)
+    from_ts = int(time.mktime(time.strptime(startdatetime, '%d.%m.%Y %H:%M')))
+    epg = get_channel_epg(id = channels_list[channelName]['id'], from_ts = from_ts, to_ts = from_ts + 60*60*12)
+    if len(epg) > 0 and from_ts in epg:
+        add_to_download_queue(epg[from_ts]['id'], epg[from_ts]['title'], channelName, isrec = 0)
     else:
         xbmcgui.Dialog().notification('O2TV', 'Pořad v O2TV nenalezen! Používáte EPG z doplňku O2TV?', xbmcgui.NOTIFICATION_ERROR, 10000)

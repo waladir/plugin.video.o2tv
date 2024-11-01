@@ -6,12 +6,15 @@ import xbmcplugin
 import xbmcaddon
 
 import json
-from urllib.parse import parse_qsl
+try:
+    from urlparse import parse_qsl
+except ImportError:
+    from urllib.parse import parse_qsl
 
 from libs.utils import get_url, check_settings
 from libs.live import list_live
 from libs.archive import list_archive, list_archive_days, list_program
-from libs.iptvsc import generate_playlist, generate_epg, iptv_sc_rec
+from libs.iptvsc import generate_playlist, generate_epg, iptv_sc_rec, iptv_sc_dwn
 from libs.stream import play_live, play_archive, play_recording, play_catchup
 from libs.channels import Channels, manage_channels, list_channels_list_backups, list_channels_edit, edit_channel, delete_channel, change_channels_numbers
 from libs.channels import list_channels_groups, add_channel_group, edit_channel_group, edit_channel_group_list_channels, edit_channel_group_add_channel, edit_channel_group_add_all_channels, edit_channel_group_delete_channel, select_channel_group, delete_channel_group
@@ -19,6 +22,7 @@ from libs.recordings import list_recordings, delete_recording, delete_future_rec
 from libs.categories import list_categories, list_category, list_subcategories, list_series, list_sport_categories, list_children_categories
 from libs.search import list_search, delete_search, program_search
 from libs.settings import list_settings, list_services, enable_service, list_devices, delete_device
+from libs.downloader import list_downloads, add_to_download_queue, remove_from_download_queue
 from libs.session import Session
 
 if len(sys.argv) > 1:
@@ -53,6 +57,12 @@ def main_menu():
     url = get_url(action='list_search', label = 'Vyhledávání')  
     list_item.setArt({ 'thumb' : os.path.join(icons_dir , 'search.png'), 'icon' : os.path.join(icons_dir , 'search.png') })
     xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
+
+    if addon.getSetting('download_streams') == 'true':
+        list_item = xbmcgui.ListItem(label='Stahování')
+        url = get_url(action='list_downloads', label = 'Stahování')  
+        list_item.setArt({ 'thumb' : os.path.join(icons_dir , 'downloads.png'), 'icon' : os.path.join(icons_dir , 'downloads.png') })
+        xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
 
     if addon.getSetting('hide_settings') != 'true':
         list_item = xbmcgui.ListItem(label='Nastavení O2TV')
@@ -206,6 +216,14 @@ def router(paramstring):
         elif params['action'] == 'iptv_sc_rec':
             iptv_sc_rec(params['channel'], params['startdatetime'])
 
+        elif params['action'] == 'list_downloads':
+            list_downloads(params['label'])   
+        elif params['action'] == 'add_to_download_queue':
+            add_to_download_queue(params['id'], params['title'], params['channel'], params['isrec'])
+        elif params['action'] == 'remove_from_download_queue':
+            remove_from_download_queue(params['id'])
+        elif params['action'] == 'iptv_sc_dwn':
+            iptv_sc_dwn(params['channel'], params['startdatetime'])
         else:
             raise ValueError('Neznámý parametr: {0}!'.format(paramstring))
     else:

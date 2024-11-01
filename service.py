@@ -10,8 +10,15 @@ from libs.iptvsc import generate_epg
 
 tz_offset = int((time.mktime(datetime.now().timetuple())-time.mktime(datetime.utcnow().timetuple()))/3600)
 addon = xbmcaddon.Addon()
-if addon.getSetting('disabled_scheduler') == 'true':
-    sys.exit()
+
+if addon.getSetting('download_streams') == 'true':
+    import threading
+    from libs.downloader import read_queue
+    class DownloaderThreadClass(threading.Thread):
+        def run(self):
+            read_queue()
+    dt = DownloaderThreadClass()
+    dt.start()
 
 time.sleep(60)
 if not addon.getSetting('epg_interval'):
@@ -21,7 +28,7 @@ else:
 next = time.time() + 10
 
 while not xbmc.Monitor().abortRequested():
-    if xbmc.Monitor().waitForAbort(1):
+    if xbmc.Monitor().waitForAbort(3):
         break
     if(next < time.time()):
         time.sleep(3)
@@ -34,5 +41,4 @@ while not xbmc.Monitor().abortRequested():
             interval = int(addon.getSetting('epg_interval'))*60*60      
         next = time.time() + float(interval)
     time.sleep(1)
-
 addon = None

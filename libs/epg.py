@@ -99,11 +99,11 @@ def epg_api(post, key, no_md_title = False):
             if 'EpisodeInSeason' in item['metas']:
                 episodesInSeason = int(item['metas']['EpisodeInSeason']['value'])
             if 'EpisodeName' in item['metas']:
-                episodeName = str(item['metas']['EpisodeName']['value'])
+                episodeName = item['metas']['EpisodeName']['value']
             if 'SeasonName' in item['metas']:
-                seasonName = str(item['metas']['SeasonName']['value'])
+                seasonName = item['metas']['SeasonName']['value']
             if 'SeriesName' in item['metas']:
-                seriesName = str(item['metas']['SeriesName']['value'])
+                seriesName = item['metas']['SeriesName']['value']
 
             if 'IsSeries' in item['metas'] and int(item['metas']['IsSeries']['value']) == 1:
                 isSeries = True

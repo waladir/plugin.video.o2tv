@@ -11,7 +11,7 @@ from libs.session import Session
 from libs.o2tv import O2API, o2tv_list_api
 from libs.channels import Channels
 from libs.epg import epg_api, epg_listitem
-from libs.utils import get_url, day_translation_short, clientTag, apiVersion, get_partnerId
+from libs.utils import get_url, day_translation_short, clientTag, apiVersion, get_partnerId, encode
 
 _handle = int(sys.argv[1])
 
@@ -161,7 +161,7 @@ def list_category(id, series, label):
     epg = epg_api(post = post, key = 'startts_channel_number')
     for key in epg:
         if epg[key]['channel_id'] in channels_list:
-            list_item = xbmcgui.ListItem(label = epg[key]['title'] + ' (' + channels_list[epg[key]['channel_id']]['name'] + ' | ' + day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')] + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m. %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ')')        
+            list_item = xbmcgui.ListItem(label = encode(epg[key]['title']) + ' (' + encode(channels_list[epg[key]['channel_id']]['name']) + ' | ' + day_translation_short[datetime.fromtimestamp(epg[key]['startts']).strftime('%w')] + ' ' + datetime.fromtimestamp(epg[key]['startts']).strftime('%d.%m. %H:%M') + ' - ' + datetime.fromtimestamp(epg[key]['endts']).strftime('%H:%M') + ')')        
             if epg[key]['isSeries'] == True:
                 url = get_url(action='list_series', id = epg[key]['seriesId'], label = label + ' / ' + epg[key]['title'])
                 if 'cover' in epg[key] and len(epg[key]['cover']) > 0:

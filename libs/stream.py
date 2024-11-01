@@ -7,7 +7,10 @@ import xbmcaddon
 
 import ssl
 from xml.dom import minidom
-from urllib.request import urlopen, Request
+try:
+    from urllib2 import urlopen, Request
+except ImportError:
+    from urllib.request import urlopen, Request
 
 from datetime import datetime
 import time
@@ -16,7 +19,7 @@ from libs.session import Session
 from libs.channels import Channels
 from libs.o2tv import O2API, o2tv_list_api
 from libs.epg import get_channel_epg, get_live_epg, epg_api
-from libs.utils import clientTag, apiVersion, get_partnerId
+from libs.utils import clientTag, apiVersion, get_partnerId, PY2
 
 if len(sys.argv) > 1:
     _handle = int(sys.argv[1])
@@ -231,6 +234,8 @@ def play_stream(post, channel_id):
 
                     list_item = xbmcgui.ListItem(path = mpd)
                     list_item.setProperty('inputstream', 'inputstream.adaptive')
+                    if PY2:
+                        list_item.setProperty('inputstreamaddon', 'inputstream.adaptive')
                     list_item.setProperty('inputstream.adaptive.manifest_type', 'mpd')
                     if widevine == True:
                         list_item.setProperty('inputstream.adaptive.license_type', 'com.widevine.alpha')

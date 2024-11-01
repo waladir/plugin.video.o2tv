@@ -6,14 +6,20 @@ import xbmcgui
 import json
 import gzip 
 
-from urllib.request import urlopen, Request
-from urllib.error import HTTPError
+try:
+    from urllib2 import urlopen, Request, HTTPError
+except ImportError:
+    from urllib.request import urlopen, Request
+    from urllib.error import HTTPError
 
-from libs.utils import clientTag, get_partnerId
+from libs.utils import clientTag, get_partnerId, PY2
 
 class O2API:
     def __init__(self):
-        self.headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:98.0) Gecko/20100101 Firefox/98.0', 'Accept-Encoding' : 'gzip', 'Accept' : '*/*', 'Content-type' : 'application/json;charset=UTF-8'} 
+        if PY2:
+            self.headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:98.0) Gecko/20100101 Firefox/98.0', 'Accept-Encoding' : 'br, deflate', 'Accept' : '*/*', 'Content-type' : 'application/json;charset=UTF-8'} 
+        else:
+            self.headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:98.0) Gecko/20100101 Firefox/98.0', 'Accept-Encoding' : 'gzip', 'Accept' : '*/*', 'Content-type' : 'application/json;charset=UTF-8'} 
 
     def call_o2_api(self, url, data, headers, nolog = False, sensitive = False):
         addon = xbmcaddon.Addon()
@@ -27,7 +33,7 @@ class O2API:
             xbmc.log('O2TV > ' + str(data))
         try:
             response = urlopen(request, timeout = 10)
-            if response.getheader("Content-Encoding") == 'gzip':
+            if not PY2 and response.getheader("Content-Encoding") == 'gzip':
                 gzipFile = gzip.GzipFile(fileobj = response)
                 html = gzipFile.read()
             else:

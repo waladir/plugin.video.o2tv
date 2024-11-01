@@ -5,13 +5,16 @@ import xbmc
 import xbmcaddon
 import xbmcgui
 import xbmcplugin
-from xbmcvfs import translatePath
+try:
+    from xbmcvfs import translatePath
+except ImportError:
+    from xbmc import translatePath
 
 from datetime import datetime
 
 from libs.session import Session
 from libs.o2tv import O2API
-from libs.utils import get_url, get_partnerId, apiVersion, clientTag
+from libs.utils import get_url, get_partnerId, apiVersion, clientTag, encode
 
 def list_settings(label):
     _handle = int(sys.argv[1])
@@ -99,9 +102,9 @@ def list_devices(label):
             device_name = device['udid']
 
         if streaming:
-            list_item = xbmcgui.ListItem(label = '[COLOR=red]' + device_name + activated + '[/COLOR]')
+            list_item = xbmcgui.ListItem(label = '[COLOR=red]' + encode(device_name) + activated + '[/COLOR]')
         else:
-            list_item = xbmcgui.ListItem(label = device_name + activated)
+            list_item = xbmcgui.ListItem(label = encode(device_name) + activated)
         url = get_url(action='delete_device', udid = device['udid'])  
         xbmcplugin.addDirectoryItem(_handle, url , list_item, False)  
     xbmcplugin.endOfDirectory(_handle, cacheToDisc = False)
@@ -148,7 +151,7 @@ class Settings:
                 with open(filename, "r") as f:
                     for row in f:
                         data = row[:-1]
-            except FileNotFoundError:
+            except IOError:
                 pass
             except IOError:
                 xbmcgui.Dialog().notification('O2TV', 'Chyba při načtení ' + file['description'], xbmcgui.NOTIFICATION_ERROR, 5000)
@@ -161,7 +164,7 @@ class Settings:
             filename = os.path.join(addon_userdata_dir, file['filename'])
             try:
                 os.remove(filename)
-            except FileNotFoundError:
+            except IOError:
                 pass
             except IOError:
                 xbmcgui.Dialog().notification('O2TV', 'Chyba při resetu ' + file['description'], xbmcgui.NOTIFICATION_ERROR, 5000)

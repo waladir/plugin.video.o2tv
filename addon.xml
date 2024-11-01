@@ -1,4 +1,4 @@
-﻿<addon id="plugin.video.o2tv" name="O2TV" provider-name="waladir" version="2.0.2">
+﻿<addon id="plugin.video.o2tv" name="O2TV" provider-name="waladir" version="2.1.0">
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
     <import addon="inputstream.adaptive" version="19.0.0"/>
@@ -17,6 +17,12 @@
             Window.IsActive(10702)
           </visible>
       </item> 
+      <item library="iptvsc_dwn.py">
+          <label>Stáhnout z O2TV</label>
+          <visible>
+            Window.IsActive(10702)
+          </visible>
+      </item>       
     </menu>         
   </extension>  
   <extension point="xbmc.addon.metadata">
@@ -37,6 +43,10 @@ Další informace a podporu najdete na fóru www.xbmc-kodi.cz (https://www.xbmc-
     <platform>all</platform>
     <source>https://github.com/waladir/plugin.video.o2tv</source>
     <news>
+v2.1.0 (01.11.2024)
+- úpravy pro kompatibilitu s Kodi 18
+- přidání stahování streamů
+
 v2.0.2 (07.09.2024)
 - oprava přehrávání live streamu
 
@@ -49,10 +59,6 @@ v2.0.0 (05.09.2024)
 v1.6.9 (11.07.2024)
 - PR od ptesarik (lepší ošetření chyb při práci se soubory)
 - oprava spouštění přehrávání s chybějícím EPG
-
-v1.6.8 (24.03.2024)
-- MD při přehrávání živého vysílání z IPTV SC
-
     </news>
     <assets>
         <icon>icon.png</icon>
