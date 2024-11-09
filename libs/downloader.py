@@ -287,7 +287,7 @@ def read_queue():
             else:
                 data = json.loads(data)
             downloading = False
-            for item in data:
+            for item in list(data):
                 if encode(data[item]['status']) == 'stahování':
                     downloading = True
                 if 'downloadts' in data[item] and data[item]['downloadts'] < int(time.mktime(datetime.now().timetuple()))-7*60*60*24:
