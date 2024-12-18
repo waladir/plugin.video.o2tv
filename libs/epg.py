@@ -107,7 +107,10 @@ def epg_api(post, key, no_md_title = False):
 
             if 'IsSeries' in item['metas'] and int(item['metas']['IsSeries']['value']) == 1:
                 isSeries = True
-                seriesId = item['metas']['SeriesID']['value']
+                if 'SeriesID' in item['metas']:
+                    seriesId = item['metas']['SeriesID']['value']
+                else:
+                    seriesId = ''
             else:
                 isSeries = False
                 seriesId = ''

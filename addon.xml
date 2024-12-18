@@ -1,4 +1,4 @@
-﻿<addon id="plugin.video.o2tv" name="O2TV" provider-name="waladir" version="2.1.1">
+﻿<addon id="plugin.video.o2tv" name="O2TV" provider-name="waladir" version="2.1.2">
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
     <import addon="inputstream.adaptive" version="19.0.0"/>
@@ -43,6 +43,9 @@ Další informace a podporu najdete na fóru www.xbmc-kodi.cz (https://www.xbmc-
     <platform>all</platform>
     <source>https://github.com/waladir/plugin.video.o2tv</source>
     <news>
+v2.1.2 (18.12.2024)
+- ošetření chyb v EPG datech
+
 v2.1.1 (09.11.2024)
 - oprava mazání záznamů o stahování
 
@@ -55,9 +58,6 @@ v2.0.2 (07.09.2024)
 
 v2.0.1 (05.09.2024)
 - oprava překlepu v kódu
-
-v2.0.0 (05.09.2024)
-- přidání podpory O2TV SK
     </news>
     <assets>
         <icon>icon.png</icon>
