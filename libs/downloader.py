@@ -79,7 +79,7 @@ def remove_from_download_queue(id):
     else:
         data = json.loads(data)
     
-    if id in data.keys():
+    if id in list(data):
         if data[id]['status'] == 'stahování':
             clear_process()
         del data[id]
@@ -290,7 +290,7 @@ def read_queue():
             for item in list(data):
                 if encode(data[item]['status']) == 'stahování':
                     downloading = True
-                if 'downloadts' in data[item] and data[item]['downloadts'] < int(time.mktime(datetime.now().timetuple()))-7*60*60*24:
+                if 1 == 1: #'downloadts' in data[item] and data[item]['downloadts'] < int(time.mktime(datetime.now().timetuple()))-7*60*60*24:
                     del data[item]
             settings.save_json_data({'filename' : 'downloads.txt', 'description' : 'fronty stahování'}, json.dumps(data))
             if downloading == False and download_process is None:

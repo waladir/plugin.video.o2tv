@@ -5,6 +5,7 @@
                 <setting label="Heslo" type="text" id="password" option="hidden" enable="!eq(-1,false)" default=""/>
                 <setting label="Device Id (libovolný alfanumerický řetězec)" type="text" id="deviceid" default=""/>
                 <setting label="Služba" type="select" id="service" values="o2tv.cz|o2tv.sk" default="o2tv.cz"/>
+                <setting label="PIN" type="text" id="pin" option="hidden" default="1621"/>
                 <setting label="Nová O2 session" type="action" action="RunPlugin(plugin://plugin.video.o2tv?action=reset_session)"/>
 	</category>
 	<category label="Nastavení">

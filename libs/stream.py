@@ -182,16 +182,22 @@ def play_stream(post, channel_id):
         channels_list = channels.get_channels_list('id')
         if channel_id in channels_list and channels_list[channel_id]['adult'] == True:
             session = Session()
-            pin = xbmcgui.Dialog().numeric(type = 0, heading = 'Zadejte PIN', bHiddenInput = True)
-            if len(str(pin)) > 0:
-                pin_post = {"language":"ces","ks":session.ks,"pin":str(pin),"type":"parental","clientTag":clientTag,"apiVersion":apiVersion}
-                data = o2api.call_o2_api(url = 'https://' + get_partnerId() + '.frp1.ott.kaltura.com/api_v3/service/pin/action/validate?format=1&clientTag=' + clientTag, data = pin_post, headers = o2api.headers)
-                if 'err' in data or not 'result' in data or data['result'] != True:
-                    xbmcgui.Dialog().notification('O2TV','Nesprávný PIN', xbmcgui.NOTIFICATION_ERROR, 5000)
-                    err = True
-            else:
-                xbmcgui.Dialog().notification('O2TV','Nezadaný PIN', xbmcgui.NOTIFICATION_ERROR, 5000)
+            pin_post = {"language":"ces","ks":session.ks,"pin":str(addon.getSetting('pin')),"type":"parental","clientTag":clientTag,"apiVersion":apiVersion}
+            data = o2api.call_o2_api(url = 'https://' + get_partnerId() + '.frp1.ott.kaltura.com/api_v3/service/pin/action/validate?format=1&clientTag=' + clientTag, data = pin_post, headers = o2api.headers)
+            if 'err' in data or not 'result' in data or data['result'] != True:
                 err = True
+            if err == True:
+                err = False
+                pin = xbmcgui.Dialog().numeric(type = 0, heading = 'Zadejte PIN', bHiddenInput = True)
+                if len(str(pin)) > 0:
+                    pin_post = {"language":"ces","ks":session.ks,"pin":str(pin),"type":"parental","clientTag":clientTag,"apiVersion":apiVersion}
+                    data = o2api.call_o2_api(url = 'https://' + get_partnerId() + '.frp1.ott.kaltura.com/api_v3/service/pin/action/validate?format=1&clientTag=' + clientTag, data = pin_post, headers = o2api.headers)
+                    if 'err' in data or not 'result' in data or data['result'] != True:
+                        xbmcgui.Dialog().notification('O2TV','Nesprávný PIN', xbmcgui.NOTIFICATION_ERROR, 5000)
+                        err = True
+                else:
+                    xbmcgui.Dialog().notification('O2TV','Nezadaný PIN', xbmcgui.NOTIFICATION_ERROR, 5000)
+                    err = True
     if err == False:
         data = o2api.call_o2_api(url = 'https://' + get_partnerId() + '.frp1.ott.kaltura.com/api_v3/service/multirequest', data = post, headers = o2api.headers)
         if 'err' in data or not 'result' in data or len(data['result']) == 0 or not 'sources' in data['result'][1]:
