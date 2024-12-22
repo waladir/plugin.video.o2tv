@@ -4,6 +4,9 @@
 <p>
 Živé vysílání, archiv, nahrávky, vytváření playlistu a EPG pro IPTV Simple Clienta<br><br>
 <a href="https://www.xbmc-kodi.cz/prispevek-o2tv">Vlákno na fóru XBMC-Kodi.cz</a><br><br>
+v2.1.3 (22.12.2024)<br>
+- v nastavení lze zadat PIN pro chráněné kanály. Pokud je stejný jako u O2TV, nebude nutné PIN zadávat. Jestliže se bude lišit, objeví se dialog na zadání PINu.<br><br>
+
 v2.1.2 (18.12.2024)<br>
 - ošetření chyb v EPG datech<br><br>
 
