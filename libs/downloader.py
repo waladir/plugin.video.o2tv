@@ -290,7 +290,7 @@ def read_queue():
             for item in list(data):
                 if encode(data[item]['status']) == 'stahování':
                     downloading = True
-                if 1 == 1: #'downloadts' in data[item] and data[item]['downloadts'] < int(time.mktime(datetime.now().timetuple()))-7*60*60*24:
+                if 'downloadts' in data[item] and data[item]['downloadts'] < int(time.mktime(datetime.now().timetuple()))-7*60*60*24:
                     del data[item]
             settings.save_json_data({'filename' : 'downloads.txt', 'description' : 'fronty stahování'}, json.dumps(data))
             if downloading == False and download_process is None:
