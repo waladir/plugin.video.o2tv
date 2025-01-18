@@ -1,4 +1,4 @@
-﻿<addon id="plugin.video.o2tv" name="O2TV" provider-name="waladir" version="2.1.4">
+﻿<addon id="plugin.video.o2tv" name="O2TV" provider-name="waladir" version="2.1.5">
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
     <import addon="inputstream.adaptive" version="19.0.0"/>
@@ -43,6 +43,9 @@ Další informace a podporu najdete na fóru www.xbmc-kodi.cz (https://www.xbmc-
     <platform>all</platform>
     <source>https://github.com/waladir/plugin.video.o2tv</source>
     <news>
+v2.1.5 (18.01.2025)
+- oprava zobrazení nehrávek u virtuálních kanálů se zapnutýms tahováním
+
 v2.1.4 (01.01.2025)
 - oprava údržby u stahování. Díky Davidovi Veršeckému za upozornění.
 
@@ -54,10 +57,6 @@ v2.1.2 (18.12.2024)
 
 v2.1.1 (09.11.2024)
 - oprava mazání záznamů o stahování
-
-v2.1.0 (01.11.2024)
-- úpravy pro kompatibilitu s Kodi 18
-- přidání stahování streamů
     </news>
     <assets>
         <icon>icon.png</icon>

@@ -62,8 +62,12 @@ def list_recordings(label):
             list_item.setProperty('IsPlayable', 'true')
             list_item.setContentLookup(False)          
             menus = [('Smazat nahrávku', 'RunPlugin(plugin://' + plugin_id + '?action=delete_recording&id=' + str(recording_ids[epg[key]['id']]) + ')')]
-            if addon.getSetting('download_streams') == 'true': 
-                menus.append(('Stáhnout', 'RunPlugin(plugin://' + plugin_id + '?action=add_to_download_queue&id=' + str(epg[key]['id']) + '&channel=' + quote(encode(channels_list[epg[key]['channel_id']]['name'])) + '&title=' + quote(encode(epg[key]['title'])) + '&isrec=' + recording_ids[epg[key]['id']] + ')'))
+            if addon.getSetting('download_streams') == 'true':
+                if epg[key]['channel_id'] in channels_list:
+                    channel = channels_list[epg[key]['channel_id']]['name']
+                else:
+                    channel = ''
+                menus.append(('Stáhnout', 'RunPlugin(plugin://' + plugin_id + '?action=add_to_download_queue&id=' + str(epg[key]['id']) + '&channel=' + quote(encode(channel)) + '&title=' + quote(encode(epg[key]['title'])) + '&isrec=' + recording_ids[epg[key]['id']] + ')'))
             list_item.addContextMenuItems(menus)         
             url = get_url(action='play_recording', id = recording_ids[epg[key]['id']], channel_id = channel_id, start = epg[key]['startts'], end = epg[key]['endts'])
             xbmcplugin.addDirectoryItem(_handle, url, list_item, False)
@@ -126,7 +130,6 @@ def list_future_recordings(label):
             list_item.setContentLookup(False)          
             menus = [('Smazat nahrávku', 'RunPlugin(plugin://' + plugin_id + '?action=delete_future_recording&id=' + str(recording_ids[epg[key]['id']]) + ')')]
             if addon.getSetting('download_streams') == 'true':
-                print('RunPlugin(plugin://' + plugin_id + '?action=add_to_download_queue&id=' + str(epg[key]['id']) + '&channel=' + quote(encode(channels_list[epg[key]['channel_id']]['name'])) + '&title=' + quote(encode(epg[key]['title'])) + '&isrec=0)')
                 menus.append(('Stáhnout', 'RunPlugin(plugin://' + plugin_id + '?action=add_to_download_queue&id=' + str(epg[key]['id']) + '&channel=' + quote(encode(channels_list[epg[key]['channel_id']]['name'])) + '&title=' + quote(encode(epg[key]['title'])) + '&isrec=0)'))
             list_item.addContextMenuItems(menus)         
             url = get_url(action='list_future_recordings', label = label)
