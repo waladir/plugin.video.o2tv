@@ -5,7 +5,7 @@
 Živé vysílání, archiv, nahrávky, vytváření playlistu a EPG pro IPTV Simple Clienta<br><br>
 <a href="https://www.xbmc-kodi.cz/prispevek-o2tv">Vlákno na fóru XBMC-Kodi.cz</a><br><br>
 v2.1.5 (18.01.2025)<br>
-- oprava zobrazení nehrávek u virtuálních kanálů se zapnutýms tahováním<br><br>
+- oprava zobrazení nehrávek u virtuálních kanálů se zapnutým stahováním<br><br>
 
 v2.1.4 (01.01.2025)<br>
 - oprava údržby u stahování. Díky Davidovi Veršeckému za upozornění.<br><br>

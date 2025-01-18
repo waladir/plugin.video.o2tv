@@ -44,7 +44,7 @@ Další informace a podporu najdete na fóru www.xbmc-kodi.cz (https://www.xbmc-
     <source>https://github.com/waladir/plugin.video.o2tv</source>
     <news>
 v2.1.5 (18.01.2025)
-- oprava zobrazení nehrávek u virtuálních kanálů se zapnutýms tahováním
+- oprava zobrazení nehrávek u virtuálních kanálů se zapnutým stahováním
 
 v2.1.4 (01.01.2025)
 - oprava údržby u stahování. Díky Davidovi Veršeckému za upozornění.
