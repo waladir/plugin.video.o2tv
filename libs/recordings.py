@@ -130,7 +130,11 @@ def list_future_recordings(label):
             list_item.setContentLookup(False)          
             menus = [('Smazat nahrávku', 'RunPlugin(plugin://' + plugin_id + '?action=delete_future_recording&id=' + str(recording_ids[epg[key]['id']]) + ')')]
             if addon.getSetting('download_streams') == 'true':
-                menus.append(('Stáhnout', 'RunPlugin(plugin://' + plugin_id + '?action=add_to_download_queue&id=' + str(epg[key]['id']) + '&channel=' + quote(encode(channels_list[epg[key]['channel_id']]['name'])) + '&title=' + quote(encode(epg[key]['title'])) + '&isrec=0)'))
+                if epg[key]['channel_id'] in channels_list:
+                    channel = channels_list[epg[key]['channel_id']]['name']
+                else:
+                    channel = ''
+                menus.append(('Stáhnout', 'RunPlugin(plugin://' + plugin_id + '?action=add_to_download_queue&id=' + str(epg[key]['id']) + '&channel=' + quote(encode(channel)) + '&title=' + quote(encode(epg[key]['title'])) + '&isrec=0)'))
             list_item.addContextMenuItems(menus)         
             url = get_url(action='list_future_recordings', label = label)
             xbmcplugin.addDirectoryItem(_handle, url, list_item, True)
@@ -210,7 +214,11 @@ def future_program(id, day, label):
         list_item.addContextMenuItems([])     
         menus = [('Přidat nahrávku', 'RunPlugin(plugin://' + plugin_id + '?action=add_recording&id=' + str(epg[key]['id']) + ')')]
         if addon.getSetting('download_streams') == 'true': 
-            menus.append(('Stáhnout', 'RunPlugin(plugin://' + plugin_id + '?action=add_to_download_queue&id=' + str(epg[key]['id']) + '&channel=' + quote(encode(channels_list[epg[key]['channel_id']]['name'])) + '&title=' + quote(encode(epg[key]['title'])) + '&isrec=0)'))
+            if epg[key]['channel_id'] in channels_list:
+                channel = channels_list[epg[key]['channel_id']]['name']
+            else:
+                channel = ''
+            menus.append(('Stáhnout', 'RunPlugin(plugin://' + plugin_id + '?action=add_to_download_queue&id=' + str(epg[key]['id']) + '&channel=' + quote(encode(channel)) + '&title=' + quote(encode(epg[key]['title'])) + '&isrec=0)'))
         list_item.addContextMenuItems(menus)         
         url = get_url(action='add_recording', id = epg[key]['id'])
         xbmcplugin.addDirectoryItem(_handle, url, list_item, False)
